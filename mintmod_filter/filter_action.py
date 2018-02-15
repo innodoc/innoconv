@@ -45,7 +45,7 @@ def handle_cmd_msection(elem, doc):
     return []
 
 
-def mintmod_filter_action(elem, doc):
+def filter_action(elem, doc):
     """Walk document AST."""
     if isinstance(elem, pf.Math):
         for repl in MATH_REPL:

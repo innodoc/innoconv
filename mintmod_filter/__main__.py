@@ -3,12 +3,12 @@
 """Pandoc filter main entry."""
 
 from panflute import run_filter
-from mintmod_filter.mintmod_filter_action import mintmod_filter_action
+from mintmod_filter.filter_action import filter_action
 
 
 def main(doc=None):
     """Execute filter."""
-    return run_filter(mintmod_filter_action, doc=doc)
+    return run_filter(filter_action, doc=doc)
 
 
 if __name__ == '__main__':
