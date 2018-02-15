@@ -1,6 +1,5 @@
 """Utility Module."""
 
-import re
 import os
 import panflute as pf
 
@@ -9,14 +8,6 @@ class ParseError(ValueError):
     """Is raised when mintmod commands could not be parsed."""
 
     pass
-
-
-PATTERN_SPECIAL = re.compile(r'\\special{html:(.*)}')
-PATTERN_MSECTION = re.compile(r'\\MSection{([^}]*)}')
-PATTERN_ENV = re.compile(
-    r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
-PATTERN_ENV_ARGS = re.compile(
-    r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
 
 
 def debug(msg, *args, **kwargs):
