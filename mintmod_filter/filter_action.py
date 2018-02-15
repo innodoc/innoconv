@@ -6,7 +6,7 @@ from slugify import slugify
 
 from mintmod_filter.utils import debug, ParseError
 from mintmod_filter.handle_env import handle_environment
-from mintmod_filter.handle_substitutions import handle_math_substitutions
+from mintmod_filter.handle_math_substitutions import handle_math_substitutions
 
 PATTERN_SPECIAL = re.compile(r'\\special{html:(.*)}')
 PATTERN_MSECTION = re.compile(r'\\MSection{([^}]*)}')
