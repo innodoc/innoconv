@@ -10,10 +10,6 @@ from mintmod_filter.handle_math_substitutions import handle_math_substitutions
 
 PATTERN_LATEX_CMD = re.compile(r'\\(.*?){', re.DOTALL)
 PATTERN_CMD_ARGS = re.compile(r'{(.*?)}')
-PATTERN_SPECIAL = re.compile(r'\\special{html:(.*)}')
-PATTERN_MSECTION = re.compile(r'\\MSection{([^}]*)}')
-PATTERN_ENV_ARGS = re.compile(
-    r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
 
 
 def filter_action(elem, doc):
@@ -30,9 +26,6 @@ def filter_action(elem, doc):
                 return handle_environment(elem, doc)
             else:
                 return handle_command(latex_cmd, latex_args, elem, doc)
-                debug("unhandled command", latex_cmd)
-                debug("with args", latex_args)
-
         else:
             debug('Unhandled RawBlock: %s' % elem.text)
     return None
