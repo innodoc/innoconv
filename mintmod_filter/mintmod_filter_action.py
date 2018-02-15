@@ -1,10 +1,11 @@
 """The actual filter function."""
 
-import sys
-import os
 import re
 import panflute as pf
 from slugify import slugify
+
+from mintmod_filter.utils import debug, ParseError
+from mintmod_filter.handle_env import handle_environment
 
 MATH_REPL = (
     (r'\N', r'\mathbb{N}'),
@@ -18,37 +19,10 @@ MATH_REPL = (
     (r'\MCondSetSep', r'{\,}:{\,}'),
 )
 
-class ParseError(ValueError):
-    """Is raised when mintmod commands could not be parsed."""
-    pass
-
 PATTERN_SPECIAL = re.compile(r'\\special{html:(.*)}')
 PATTERN_MSECTION = re.compile(r'\\MSection{([^}]*)}')
 PATTERN_ENV = re.compile(r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
 PATTERN_ENV_ARGS = re.compile(r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
-
-def debug(msg, *args, **kwargs):
-    """Print preprocessor debug message."""
-    pf.debug('[MINTMOD] %s' % msg, *args, **kwargs)
-
-def error(msg, *args, **kwargs):
-    """Print error and exit."""
-    pf.debug('[MINTMOD] ERROR: %s' % msg, *args, **kwargs)
-    sys.exit(-1)
-
-def debug_elem(elem):
-    """Print debug info about element."""
-    debug('Element debug (%s)' % type(elem))
-    debug(elem)
-
-def pandoc_parse(parse_string):
-    """Parse `parse_string` using Pandoc and this filter."""
-    filter_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), '__main__.py')
-    return pf.convert_text(
-        parse_string, input_format='latex',
-        extra_args=['--filter=%s' % filter_path]
-    )
 
 def handle_cmd_special(elem):
     r"""Handle LaTeX command \special. It's commonly used to embed HTML code.
@@ -69,45 +43,6 @@ def handle_cmd_msection(elem, doc):
     doc.msection_id = slugify(match.groups()[0])
     return []
 
-def handle_environment(elem, doc):
-    """Parse and handle mintmod environments"""
-    match = PATTERN_ENV.search(elem.text)
-    if match is None:
-        raise ParseError('Could not parse environment: %s...' % elem.text[:50])
-
-    env_name = match.group('env_name')
-    inner_code = match.groups()[1]
-
-    # Parse optional arguments
-    env_args = []
-    rest = inner_code
-    while True:
-        match = PATTERN_ENV_ARGS.search(rest)
-        if match is None:
-            break
-        env_args.append(match.group('arg'))
-        rest = match.group('rest')
-
-    # Handle different environments
-    if env_name == 'MSectionStart':
-        # Use title from previously found \MSection command
-        header = pf.Header(
-            pf.RawInline(doc.msection_content),
-            identifier=doc.msection_id, level=2
-        )
-        div = pf.Div(classes=['section-start'])
-        div.content.extend([header] + pandoc_parse(rest))
-        return div
-
-    elif env_name == 'MXContent':
-        title = env_args[0]
-        header = pf.Header(
-            pf.RawInline(title), identifier=slugify(title), level=3)
-        div = pf.Div(classes=['content'])
-        div.content.extend([header] + pandoc_parse(rest))
-        return div
-
-    return elem
 
 def mintmod_filter_action(elem, doc):
     """Main entry point for doc.walk."""
