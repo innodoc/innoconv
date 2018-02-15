@@ -16,6 +16,10 @@ PATTERN_ENV = re.compile(
 PATTERN_ENV_ARGS = re.compile(
     r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
 
+MXCONTENT_CLASSES = ['content']
+MEXERCISES_CLASSES = ['content', 'exercises']
+MEXERCISE_CLASSES = ['exercise']
+
 
 def handle_environment(elem, doc):
     """Parse and handle mintmod environments."""
@@ -46,7 +50,7 @@ def handle_environment(elem, doc):
 
 
 def handle_msectionstart(elem_content, env_args, doc):
-    """Handle MSectionStart latex environments."""
+    """Handle `MSectionStart` latex environments."""
     # Use title from previously found \MSection command
     header_title = getattr(doc, 'msection_content', "No Header Found")
     header_id = getattr(doc, 'msection_id', "no-id-found")
@@ -60,10 +64,26 @@ def handle_msectionstart(elem_content, env_args, doc):
 
 
 def handle_mxcontent(elem_content, env_args, doc):
-    """Handle MXContent latex environments."""
+    """Handle `MXContent` environments."""
     title = env_args[0]
     header = pf.Header(
         pf.RawInline(title), identifier=slugify(title), level=3)
-    div = pf.Div(classes=['content'])
+    div = pf.Div(classes=MXCONTENT_CLASSES)
+    div.content.extend([header] + pandoc_parse(elem_content))
+    return div
+
+
+def handle_mexercises(elem_content, env_args, doc):
+    """Handle `MExercises` environments."""
+    header = pf.Header(pf.RawInline('Aufgaben'), level=3)  # TODO i18n?
+    div = pf.Div(classes=MEXERCISES_CLASSES)
+    div.content.extend([header] + pandoc_parse(elem_content))
+    return div
+
+
+def handle_mexercise(elem_content, env_args, doc):
+    """Handle `MExercise` environments."""
+    header = pf.Header(pf.RawInline('Aufgabe'), level=4)  # TODO i18n?
+    div = pf.Div(classes=MEXERCISE_CLASSES)
     div.content.extend([header] + pandoc_parse(elem_content))
     return div
