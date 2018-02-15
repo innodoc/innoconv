@@ -1,4 +1,10 @@
-"""Module for handling latex environments."""
+"""Module for handling latex environments.
+
+Convention: Provide a `handle_ENVNAME` function for handling `ENVNAME`
+            environment. You need to slugify environment name.
+
+Example: `handle_mxcontent` method will receive `MXContent` environment.
+"""
 
 import re
 import panflute as pf
@@ -30,16 +36,16 @@ def handle_environment(elem, doc):
         env_args.append(match.group('arg'))
         rest = match.group('rest')
 
-    function_name = "handle_env_%s" % slugify(env_name)
+    function_name = "handle_%s" % slugify(env_name)
 
     if function_name in globals():
         return globals()[function_name](rest, env_args, doc)
 
-    debug("Function %s not found" % function_name)
+    debug("Could not handle environment %s." % env_name)
     return None
 
 
-def handle_env_msectionstart(elem_content, env_args, doc):
+def handle_msectionstart(elem_content, env_args, doc):
     """Handle MSectionStart latex environments."""
     # Use title from previously found \MSection command
     header = pf.Header(
@@ -51,7 +57,7 @@ def handle_env_msectionstart(elem_content, env_args, doc):
     return div
 
 
-def handle_env_mxcontent(elem_content, env_args, doc):
+def handle_mxcontent(elem_content, env_args, doc):
     """Handle MXContent latex environments."""
     title = env_args[0]
     header = pf.Header(
