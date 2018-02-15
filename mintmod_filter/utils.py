@@ -40,9 +40,7 @@ def pandoc_parse(parse_string):
     filter_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), '__main__.py')
 
-    from_arg = '--from={}'.format('latex')
-    to_arg = '--to={}'.format('json')
-    args = [from_arg, to_arg, '--filter=%s' % filter_path]
+    args = ['--from=latex+raw_tex', '--to=json', '--filter=%s' % filter_path]
     out, err = run_pandoc(parse_string, args)
     debug_nested(fix_line_endings(err))
     out = fix_line_endings(out)
