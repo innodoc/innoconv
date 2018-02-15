@@ -1,3 +1,4 @@
 flake8==3.5.0
 panflute==1.10.6
+pydocstyle==2.1.1
 python-slugify==1.2.4

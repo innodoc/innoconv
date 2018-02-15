@@ -1,18 +1,18 @@
-"""
-Module for handling latex environments.
-"""
+"""Module for handling latex environments."""
 
 import re
 import panflute as pf
 from slugify import slugify
 from mintmod_filter.utils import debug, pandoc_parse, ParseError
 
-PATTERN_ENV = re.compile(r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
-PATTERN_ENV_ARGS = re.compile(r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
+PATTERN_ENV = re.compile(
+    r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
+PATTERN_ENV_ARGS = re.compile(
+    r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
+
 
 def handle_environment(elem, doc):
-    """Parse and handle mintmod environments"""
-
+    """Parse and handle mintmod environments."""
     match = PATTERN_ENV.search(elem.text)
     if match is None:
         raise ParseError('Could not parse environment: %s...' % elem.text[:50])
@@ -38,11 +38,9 @@ def handle_environment(elem, doc):
     debug("Function %s not found" % function_name)
     return None
 
+
 def handle_env_msectionstart(elem_content, env_args, doc):
-    """
-    Handle MSectionStart latex environments
-    """
-    debug("Hello from ", elem_content, doc, env_args)
+    """Handle MSectionStart latex environments."""
     # Use title from previously found \MSection command
     header = pf.Header(
         pf.RawInline(doc.msection_content),
@@ -52,10 +50,9 @@ def handle_env_msectionstart(elem_content, env_args, doc):
     div.content.extend([header] + pandoc_parse(elem_content))
     return div
 
+
 def handle_env_mxcontent(elem_content, env_args, doc):
-    """
-    Handle MXContent latex environments
-    """
+    """Handle MXContent latex environments."""
     title = env_args[0]
     header = pf.Header(
         pf.RawInline(title), identifier=slugify(title), level=3)

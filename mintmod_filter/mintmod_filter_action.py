@@ -21,12 +21,12 @@ MATH_REPL = (
 
 PATTERN_SPECIAL = re.compile(r'\\special{html:(.*)}')
 PATTERN_MSECTION = re.compile(r'\\MSection{([^}]*)}')
-PATTERN_ENV = re.compile(r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
-PATTERN_ENV_ARGS = re.compile(r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
+
 
 def handle_cmd_special(elem):
-    r"""Handle LaTeX command \special. It's commonly used to embed HTML code.
-    We parse the HTML and insert it.
+    r"""Handle LaTeX command \special{}.
+
+    It's commonly used to embed HTML code. We parse the HTML and insert it.
     """
     match = PATTERN_SPECIAL.match(elem.text)
     if match:
@@ -34,8 +34,9 @@ def handle_cmd_special(elem):
     debug(r'Could not find HTML in \special: %s' % elem.text)
     return elem
 
+
 def handle_cmd_msection(elem, doc):
-    """Remember MSection name for later"""
+    """Remember MSection name for later."""
     match = PATTERN_MSECTION.search(elem.text)
     if match is None:
         raise ParseError(r'Could not \MSection: %s' % elem)
@@ -45,7 +46,7 @@ def handle_cmd_msection(elem, doc):
 
 
 def mintmod_filter_action(elem, doc):
-    """Main entry point for doc.walk."""
+    """Walk document AST."""
     if isinstance(elem, pf.Math):
         for repl in MATH_REPL:
             elem.text = elem.text.replace(repl[0], repl[1])
