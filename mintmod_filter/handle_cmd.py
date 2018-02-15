@@ -21,6 +21,13 @@ def handle_cmd_msection(args, elem, doc):
     doc.msection_id = slugify(args[0])
     return []
 
+def handle_cmd_mtitle(args, elem, doc):
+    """
+    handle \MTitle{} commands that are used as further equivalents to
+    \subsubsection{}
+    """
+    header = pf.Header(pf.RawInline(args[0]), level=4)  # TODO i18n?
+    return header
 
 def handle_cmd_special(args, elem, doc):
     """
