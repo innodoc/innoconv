@@ -48,9 +48,11 @@ def handle_environment(elem, doc):
 def handle_msectionstart(elem_content, env_args, doc):
     """Handle MSectionStart latex environments."""
     # Use title from previously found \MSection command
+    header_title = getattr(doc, 'msection_content', "No Header Found")
+    header_id = getattr(doc, 'msection_id', "no-id-found")
     header = pf.Header(
-        pf.RawInline(doc.msection_content),
-        identifier=doc.msection_id, level=2
+        pf.RawInline(header_title),
+        identifier=header_id, level=2
     )
     div = pf.Div(classes=['section-start'])
     div.content.extend([header] + pandoc_parse(elem_content))
