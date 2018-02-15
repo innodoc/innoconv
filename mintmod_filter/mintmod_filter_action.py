@@ -109,7 +109,7 @@ def handle_environment(elem, doc):
 
     return elem
 
-def mintmod_filter(elem, doc):
+def mintmod_filter_action(elem, doc):
     """Main entry point for doc.walk."""
     if isinstance(elem, pf.Math):
         for repl in MATH_REPL:
