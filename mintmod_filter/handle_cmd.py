@@ -19,7 +19,18 @@ def handle_command(cmd, args, elem, doc):
         return globals()[function_name](args, elem, doc)
 
     debug("Could not handle command %s." % cmd)
-    return None
+    return handle_unknown_command(cmd, args, elem, doc)
+
+
+def handle_unknown_command(cmd, args, elem, doc):
+    """Handle unknown latex commands. Will output raw html that gives visual
+    feedback about the unknown command.
+    """
+    COLOR = "#FFA500"
+    wrap = '<div class="unknown-command %s" style="background: %s;"> \
+        Unhandled command: <code>%s</code></div>' % (cmd, COLOR, elem.text)
+    unknown_elem = pf.RawBlock(wrap, format="html")
+    return unknown_elem
 
 
 def handle_msection(args, elem, doc):
