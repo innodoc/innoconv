@@ -32,4 +32,7 @@ clean:
 lint:
 	flake8 mintmod_filter
 
-.PHONY: all clean lint
+doc:
+	$(MAKE) -C $@ html
+
+.PHONY: all clean lint doc
