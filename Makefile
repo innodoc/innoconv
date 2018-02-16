@@ -30,6 +30,6 @@ clean:
 	rm -rf content
 
 lint:
-	flake8 .
+	flake8 mintmod_filter
 
 .PHONY: all clean lint

@@ -1,9 +1,9 @@
 r"""Handle mintmod LaTex commands.
 
-Convention: Provide a `handle_CMDNAME` function for handling `\CMDNAME`
+Convention: Provide a ``handle_CMDNAME`` function for handling ``\CMDNAME``
             command. You need to slugify the name.
 
-Example: `handle_msection` method will receive the `MSection` command.
+Example: ``handle_msection`` method will receive the ``MSection`` command.
 """
 
 import panflute as pf
@@ -23,7 +23,7 @@ def handle_command(cmd, args, elem, doc):
 
 
 def handle_msection(args, elem, doc):
-    """Remember `MSection` name for later.
+    """Remember ``MSection`` name for later.
 
     `MSectionStart` environment will use this information later.
     """
@@ -31,13 +31,15 @@ def handle_msection(args, elem, doc):
     doc.msection_id = slugify(args[0])
     return []
 
+
 def handle_cmd_mtitle(args, elem, doc):
-    """
-    handle \MTitle{} commands that are used as further equivalents to
-    \subsubsection{}
+    """Handle `MTitle`` command.
+
+    These is an equivalent to ``subsubsection``
     """
     header = pf.Header(pf.RawInline(args[0]), level=4)  # TODO i18n?
     return header
+
 
 def handle_special(args, elem, doc):
     r"""Handle `special` command.
