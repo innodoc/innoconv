@@ -15,7 +15,17 @@ $ pip install -r requirements.txt
 ### Linting
 
 Adhere to [PEP8](https://www.python.org/dev/peps/pep-0008/). Before pushing
-code please run `make lint` and fix **all** linter and docstring problems.
+code please run lint and fix **all** problems.
+
+```
+$ make lint
+```
+
+### Tests
+
+```
+$ make test
+```
 
 ### Documentation
 
