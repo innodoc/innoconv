@@ -32,4 +32,7 @@ lint:
 doc:
 	$(MAKE) -C $@ html
 
-.PHONY: all tub_base clean lint doc
+test:
+	python setup.py test
+
+.PHONY: all tub_base clean lint doc test
