@@ -1,4 +1,6 @@
-# VE&MINT
+# innoConv
+
+Converter for interactive educational content.
 
 ## Development
 

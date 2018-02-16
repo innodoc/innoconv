@@ -1,10 +1,5 @@
-.. veundmint-ng documentation master file, created by
-   sphinx-quickstart on Fri Feb 16 11:41:45 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to veundmint-ng's documentation!
-========================================
+Welcome to innoConv's documentation!
+====================================
 
 .. automodule:: mintmod_filter
 
