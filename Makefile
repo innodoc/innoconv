@@ -29,4 +29,7 @@ content/tub_base/de/tree_pandoc.htmll:
 clean:
 	rm -rf content
 
-.PHONY: all clean
+lint:
+	flake8 .
+
+.PHONY: all clean lint
