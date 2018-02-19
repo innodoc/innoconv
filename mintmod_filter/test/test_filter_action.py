@@ -1,6 +1,7 @@
 import unittest
 import panflute as pf
 from mintmod_filter.filter_action import FilterAction, CLASS_UNKNOWN_CMD
+from mintmod_filter.handle_env import MXCONTENT_CLASSES
 
 
 class TestFilterAction(unittest.TestCase):
@@ -25,6 +26,20 @@ class TestFilterAction(unittest.TestCase):
         elem_mtitle = pf.RawBlock('\MTitle{Foo}', format='latex')
         ret = self._filter_elem([elem_mtitle], elem_mtitle)
         self.assertEqual(type(ret), pf.Header)
+
+    def test_known_latex_rawblock_environment(self):
+        "filter() handles known LaTeX environment"
+        elem_env = pf.RawBlock(
+            r'\begin{MXContent}{FooShort}{Foo}{STD}'
+            'FOOBARCONTENT'
+            r'\end{MXContent}',
+            format='latex')
+        ret = self._filter_elem([elem_env], elem_env)
+        self.assertEqual(type(ret), pf.Div)
+        self.assertEqual(type(ret.content[0]), pf.Header)
+        self.assertEqual(type(ret.content[1]), pf.Para)
+        for cls in MXCONTENT_CLASSES:
+            self.assertIn(cls, ret.classes)
 
     def test_unknown_latex_rawblock_input(self):
         "filter() handles unknown LaTeX command"
