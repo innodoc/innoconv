@@ -32,6 +32,7 @@ lint:
 doc:
 	$(MAKE) -C $@ html
 
+test: export PYTHONPATH=.
 test:
 	python setup.py test -r
 
