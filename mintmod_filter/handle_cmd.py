@@ -39,7 +39,7 @@ class Commands():
 
         if last_header_elem is None:
             debug("WARNING: last_header_elem undefined in handle_mlabel with"
-                "args:" % args)
+                  "args:" % args)
             return
 
         last_header_elem.identifier = args[0]
