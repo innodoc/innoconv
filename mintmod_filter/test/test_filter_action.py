@@ -4,7 +4,6 @@ from mintmod_filter.filter_action import FilterAction
 
 
 class TestFilterAction(unittest.TestCase):
-    @classmethod
     def setUp(self):
         self.fa = FilterAction()
         self.elem_str = pf.Str('foo')
