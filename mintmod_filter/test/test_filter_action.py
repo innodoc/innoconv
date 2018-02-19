@@ -29,7 +29,7 @@ class TestFilterAction(unittest.TestCase):
     def test_unknown_latex_rawblock_input(self):
         "filter() handles unknown LaTeX command"
         elem_unkown_cmd = pf.RawBlock(
-            '\ThisCommandDoesNotExist{Foo}', format='latex')
+            r'\ThisCommandDoesNotExist{Foo}', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertEqual(type(ret), pf.Div)
         self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)

@@ -11,7 +11,6 @@ from panflute.elements import from_json
 
 class ParseError(ValueError):
     """Is raised when mintmod commands could not be parsed."""
-
     pass
 
 
