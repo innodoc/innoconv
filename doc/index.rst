@@ -1,23 +1,14 @@
-Welcome to innoConv's documentation!
-====================================
-
-.. automodule:: mintmod_filter
-
-.. automodule:: mintmod_filter.filter_action
-  :members:
-
-.. automodule:: mintmod_filter.commands
-  :members:
-
-.. automodule:: mintmod_filter.environments
-  :members:
+innoConv API documentation
+==========================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   mintmod_filter
+
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

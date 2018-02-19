@@ -1,4 +1,4 @@
-"""The actual filter function."""
+"""The actual Pandoc filter."""
 
 import re
 import panflute as pf
@@ -33,6 +33,11 @@ class FilterAction:
         This function receives document elements from Pandoc and delegates
         handling of simple subtitutions, mintmod commands and
         environments.
+
+        :param elem: Element to handle
+        :type elem: :class:`panflute.base.Element`
+        :param doc: Document
+        :type doc: :class:`panflute.elements.Doc`
         """
         if isinstance(elem, pf.Math):
             return handle_math_substitutions(elem, doc)
