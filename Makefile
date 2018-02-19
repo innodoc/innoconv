@@ -24,7 +24,7 @@ content/tub_base/de/tree_pandoc.tex:
 	git clone -b pandoc git@gitlab.tubit.tu-berlin.de:nplessing/tub_base.git
 
 clean:
-	rm -rf content doc/_build/html
+	rm -rf content doc/_build/html htmlcov .coverage
 
 lint:
 	flake8 mintmod_filter
@@ -35,4 +35,13 @@ doc:
 test:
 	python setup.py test
 
-.PHONY: all tub_base clean lint doc test
+coverage: htmlcov/index.html
+	xdg-open htmlcov/index.html
+
+htmlcov/index.html: .coverage
+	coverage html
+
+.coverage:
+	coverage run --source=mintmod_filter --omit='mintmod_filter/test/*' setup.py test
+
+.PHONY: all tub_base clean lint doc test coverage

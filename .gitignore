@@ -8,3 +8,7 @@ content
 doc/_build
 dist
 innoConv.egg-info
+
+# coverage
+.coverage
+htmlcov
