@@ -6,7 +6,10 @@ Welcome to innoConv's documentation!
 .. automodule:: mintmod_filter.filter_action
   :members:
 
-.. automodule:: mintmod_filter.handle_env
+.. automodule:: mintmod_filter.commands
+  :members:
+
+.. automodule:: mintmod_filter.environments
   :members:
 
 .. toctree::

@@ -1,9 +1,9 @@
 r"""Handle mintmod LaTex commands.
 
 Convention: Provide a ``handle_CMDNAME`` function for handling ``CMDNAME``
-            command. You need to slugify the name.
+command. You need to slugify the command name.
 
-Example: ``handle_msection`` method will receive the ``MSection`` command.
+Example: ``handle_msection`` method will receive the ``\MSection`` command.
 """
 
 import panflute as pf

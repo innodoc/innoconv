@@ -1,9 +1,10 @@
-"""Handle mintmod LaTeX environments.
+r"""Handle mintmod LaTeX environments.
 
-Convention: Provide a `handle_ENVNAME` function for handling `ENVNAME`
-            environment. You need to slugify environment name.
+Convention: Provide a ``handle_ENVNAME`` function for handling ``ENVNAME``
+environment. You need to slugify the environment name.
 
-Example: `handle_mxcontent` method will receive `MXContent` environment.
+Example: ``handle_mxcontent`` method will receive the
+``\begin{MXContent}…\end{MXContent}`` environment.
 """
 
 import panflute as pf
