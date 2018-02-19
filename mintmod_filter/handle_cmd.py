@@ -7,7 +7,7 @@ Example: ``handle_msection`` method will receive the ``MSection`` command.
 """
 
 import panflute as pf
-from utils import handle_header
+from mintmod_filter.utils import handle_header
 
 
 class Commands():
