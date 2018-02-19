@@ -45,7 +45,7 @@ class Commands():
         last_header_elem.identifier = args[0]
 
     def handle_special(self, args, elem, doc):
-        r"""Handle `special` command.
+        """Handle `special` command.
 
         This command is used to embed HTML in LaTeX source.
         """
@@ -56,3 +56,25 @@ class Commands():
             return pf.RawBlock(html_code)
         else:
             return None
+
+    def handle_msubject(self, args, elem, doc):
+        """Handle `MSubject{title}` command.
+
+        Command defines the document title.
+        """
+        meta = doc.metadata
+        meta['title'] = pf.MetaString(args[0])
+        doc.metadata = meta
+        return []
+
+    def handle_mdeclaresiteuxid(self, args, elem, doc):
+        """Handle `MDeclareSiteUXID` command.
+
+        This command is used to embed IDs. This is not relevant anymore and
+        becomes a no-op.
+        """
+        return self._noop()
+
+    def _noop(self):
+        """Return no elements."""
+        return []
