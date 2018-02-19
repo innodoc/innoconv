@@ -21,7 +21,7 @@ content/tub_base/de/de.tex:
 content/tub_base/de/tree_pandoc.tex:
 	mkdir -p content && \
 	cd content && \
-	git clone -b pandoc git@gitlab.tubit.tu-berlin.de:nplessing/tub_base.git
+	git clone -b pandoc git@gitlab.tubit.tu-berlin.de:innodoc/tub_base.git
 
 clean:
 	rm -rf content doc/_build/html htmlcov .coverage
