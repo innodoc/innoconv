@@ -41,11 +41,14 @@ def pandoc_parse(parse_string):
 
     args = ['--from=latex+raw_tex', '--to=json', '--filter=%s' % filter_path]
     out, err = run_pandoc(parse_string, args)
-    debug_nested(fix_line_endings(err))
-    out = fix_line_endings(out)
-    out = json.loads(out, object_pairs_hook=from_json)
-    out = out.content.list
-    return out
+    if err is not None:
+        debug_nested(fix_line_endings(err))
+    if out is not None:
+        out = fix_line_endings(out)
+        out = json.loads(out, object_pairs_hook=from_json)
+        out = out.content.list
+        return out
+    return []
 
 
 def run_pandoc(text='', args=None):
@@ -61,13 +64,19 @@ def run_pandoc(text='', args=None):
     out, err = proc.communicate(input=text.encode('utf-8'))
     exitcode = proc.returncode
     if exitcode != 0:
-        raise IOError(err)
+        debug('Pandoc process exited with non-zero return code.')
+        debug('-- BEGIN of Pandoc output --')
+        debug_nested(fix_line_endings(err))
+        debug('-- END of Pandoc output --')
+        return None, None
     return out.decode('utf-8'), err.decode('utf-8')
 
 
-def fix_line_endings(_string):
+def fix_line_endings(repl):
     r"""Replace \r\n with \n."""
-    return "\n".join(_string.splitlines())
+    if type(repl) == bytes:
+        repl = str(repl, 'utf-8')
+    return "\n".join(repl.splitlines())
 
 
 def handle_header(level, title, id=None, elem=None, doc=None):
