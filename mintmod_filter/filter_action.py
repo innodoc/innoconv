@@ -7,7 +7,7 @@ from slugify import slugify
 from mintmod_filter.utils import debug, ParseError
 from mintmod_filter.environments import Environments
 from mintmod_filter.commands import Commands
-from mintmod_filter.handle_math_substitutions import handle_math_substitutions
+from mintmod_filter.math_substitutions import handle_math_substitutions
 
 PATTERN_LATEX_CMD = re.compile(r'\\(.*?){', re.DOTALL)
 PATTERN_CMD_ARGS = re.compile(r'{(.*?)}')
