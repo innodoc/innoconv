@@ -1,6 +1,7 @@
 import unittest
 import panflute as pf
-from mintmod_filter.filter_action import FilterAction, CLASS_UNKNOWN_CMD
+from mintmod_filter.filter_action import (FilterAction, ParseError,
+                                          CLASS_UNKNOWN_CMD, CLASS_UNKNOWN_ENV)
 from mintmod_filter.handle_env import MXCONTENT_CLASSES
 
 
@@ -27,6 +28,22 @@ class TestFilterAction(unittest.TestCase):
         ret = self._filter_elem([elem_mtitle], elem_mtitle)
         self.assertEqual(type(ret), pf.Header)
 
+    def test_unknown_latex_rawblock_command(self):
+        "filter() handles unknown LaTeX command"
+        elem_unkown_cmd = pf.RawBlock(
+            r'\ThisCommandDoesNotExist{Foo}', format='latex')
+        ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
+        self.assertEqual(type(ret), pf.Div)
+        self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)
+        self.assertIn('thiscommanddoesnotexist', ret.classes)
+
+    def test_invalid_latex_rawblock_command(self):
+        "filter() raises ParseError on invalid command"
+        elem_invalid_cmd = pf.RawBlock(
+            'This is not a valid LaTeX command', format='latex')
+        with self.assertRaises(ParseError):
+            self._filter_elem([elem_invalid_cmd], elem_invalid_cmd)
+
     def test_known_latex_rawblock_environment(self):
         "filter() handles known LaTeX environment"
         elem_env = pf.RawBlock(
@@ -41,21 +58,27 @@ class TestFilterAction(unittest.TestCase):
         for cls in MXCONTENT_CLASSES:
             self.assertIn(cls, ret.classes)
 
-    def test_unknown_latex_rawblock_input(self):
-        "filter() handles unknown LaTeX command"
-        elem_unkown_cmd = pf.RawBlock(
-            r'\ThisCommandDoesNotExist{Foo}', format='latex')
-        ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
+    def test_unknown_latex_rawblock_environment(self):
+        "filter() handles unknown LaTeX environment"
+        elem_env = pf.RawBlock(
+            r'\begin{ThisEnvDoesNotExist}'
+            'FOOBARCONTENT'
+            r'\end{ThisEnvDoesNotExist}',
+            format='latex')
+        ret = self._filter_elem([elem_env], elem_env)
         self.assertEqual(type(ret), pf.Div)
-        self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)
-        self.assertIn('thiscommanddoesnotexist', ret.classes)
+        self.assertIn(CLASS_UNKNOWN_ENV, ret.classes)
+        self.assertIn('thisenvdoesnotexist', ret.classes)
 
-    def test_unhandled_rawblock_input(self):
-        "filter() handles unknown RawBlock"
-        elem_unkown_raw_block = pf.RawBlock(
-            'NotAValidLatexCommand', format='latex')
-        ret = self._filter_elem([elem_unkown_raw_block], elem_unkown_raw_block)
-        self.assertIsNone(ret)
+    def test_invalid_latex_rawblock_environment(self):
+        "filter() raises ParseError on invalid environment"
+        elem_invalid_env = pf.RawBlock(
+            r'\begin'
+            'FOOBARCONTENT'
+            r'\end{ThisEnvDoesNotExist}',
+            format='latex')
+        with self.assertRaises(ParseError):
+            self._filter_elem([elem_invalid_env], elem_invalid_env)
 
     def _filter_elem(self, elem_list, test_elem):
         self.doc.content.extend(elem_list)

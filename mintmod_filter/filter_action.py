@@ -48,7 +48,8 @@ class FilterAction:
                     return self._handle_command(
                         cmd_name, args, elem, doc)
             else:
-                debug('Unhandled RawBlock: %s' % elem.text)
+                raise ParseError(
+                    'Could not parse LaTeX command: %s...' % elem.text)
         return None
 
     def _handle_command(self, cmd_name, args, elem, doc):
@@ -80,7 +81,7 @@ class FilterAction:
         match = PATTERN_ENV.search(elem.text)
         if match is None:
             raise ParseError(
-                'Could not parse environment: %s...' % elem.text[:50])
+                'Could not parse LaTeX environment: %s...' % elem.text[:50])
 
         env_name = match.group('env_name')
         inner_code = match.groups()[1]
