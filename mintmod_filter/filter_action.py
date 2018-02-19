@@ -17,6 +17,8 @@ PATTERN_ENV_ARGS = re.compile(
     r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
 
 COLOR_UNKNOWN = '#FFA500'
+CLASS_UNKNOWN_CMD = 'unkown-cmd'
+CLASS_UNKNOWN_ENV = 'unkown-environment'
 
 
 class FilterAction:
@@ -35,40 +37,44 @@ class FilterAction:
         if isinstance(elem, pf.Math):
             return handle_math_substitutions(elem, doc)
         elif isinstance(elem, pf.RawBlock) and elem.format == 'latex':
-            latex_args = []
+            args = []
             match = PATTERN_LATEX_CMD.match(elem.text)
             if match:
-                latex_cmd = match.groups()[0]
-                latex_args = re.findall(PATTERN_CMD_ARGS, elem.text)
-                if latex_cmd.startswith('begin'):
+                cmd_name = match.groups()[0]
+                args = re.findall(PATTERN_CMD_ARGS, elem.text)
+                if cmd_name.startswith('begin'):
                     return self._handle_environment(elem, doc)
                 else:
                     return self._handle_command(
-                        latex_cmd, latex_args, elem, doc)
+                        cmd_name, args, elem, doc)
             else:
                 debug('Unhandled RawBlock: %s' % elem.text)
         return None
 
-    def _handle_command(self, cmd, args, elem, doc):
+    def _handle_command(self, cmd_name, args, elem, doc):
         """Parse and handle mintmod commands."""
-        function_name = 'handle_%s' % slugify(cmd)
+        function_name = 'handle_%s' % slugify(cmd_name)
         func = getattr(self._commands, function_name, None)
         if callable(func):
             return func(args, elem, doc)
-        return self._handle_unknown_command(cmd, args, elem, doc)
+        return self._handle_unknown_command(cmd_name, args, elem, doc)
 
-    def _handle_unknown_command(self, cmd, args, elem, doc):
+    def _handle_unknown_command(self, cmd_name, args, elem, doc):
         """Handle unknown latex commands.
 
         Will output raw HTML that gives visual feedback about the unknown
         command.
         """
-        debug("Could not handle command %s." % cmd)
-        wrap = '<div class="unknown-command %s" style="background: %s;"> \
-            Unhandled command: <code>%s</code></div>' % \
-            (cmd, COLOR_UNKNOWN, elem.text)
-        unknown_elem = pf.RawBlock(wrap, format="html")
-        return unknown_elem
+        debug("Could not handle command %s." % cmd_name)
+        classes = [CLASS_UNKNOWN_CMD, slugify(cmd_name)]
+        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN}
+        div = pf.Div(classes=classes, attributes=attrs)
+        div.content.extend([
+            pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),
+                              pf.Str('command:')),
+                    pf.Space(), pf.Code(elem.text))
+        ])
+        return div
 
     def _handle_environment(self, elem, doc):
         """Parse and handle mintmod environments."""
@@ -94,17 +100,23 @@ class FilterAction:
         func = getattr(self._environments, function_name, None)
         if callable(func):
             return func(rest, env_args, doc)
-        return self._handle_unknown_environment(env_name, env_args, rest, doc)
+        return self._handle_unknown_environment(
+            env_name, env_args, rest, elem, doc)
 
-    def _handle_unknown_environment(self, env_name, args, elem_content, doc):
+    def _handle_unknown_environment(self, env_name, args, elem_content, elem,
+                                    doc):
         """Handle unknown latex environment.
 
         Will output raw HTML that gives visual feedback about the unknown
         environment.
         """
         debug("Could not handle environment %s." % env_name)
-        wrap = '<div class="unknown-environment %s" style="background: %s;"> \
-            Unhandled environment: <code>%s</code></div>' % \
-            (env_name, COLOR_UNKNOWN, elem_content)
-        unknown_elem = pf.RawBlock(wrap, format="html")
-        return unknown_elem
+        classes = [CLASS_UNKNOWN_ENV, slugify(env_name)]
+        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN}
+        div = pf.Div(classes=classes, attributes=attrs)
+        div.content.extend([
+            pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),
+                              pf.Str('environment:')),
+                    pf.LineBreak(), pf.Code(elem.text))
+        ])
+        return div
