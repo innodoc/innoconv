@@ -1,9 +1,9 @@
 import unittest
 import panflute as pf
-from mintmod_filter.handle_cmd import Commands
+from mintmod_filter.commands import Commands
 
 
-class TestHandleCommands(unittest.TestCase):
+class TestCommands(unittest.TestCase):
 
     def setUp(self):
         self.commands = Commands()

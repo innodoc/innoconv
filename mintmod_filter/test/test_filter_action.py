@@ -2,7 +2,7 @@ import unittest
 import panflute as pf
 from mintmod_filter.filter_action import (FilterAction, ParseError,
                                           CLASS_UNKNOWN_CMD, CLASS_UNKNOWN_ENV)
-from mintmod_filter.handle_env import MXCONTENT_CLASSES
+from mintmod_filter.environments import MXCONTENT_CLASSES
 
 
 class TestFilterAction(unittest.TestCase):

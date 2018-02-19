@@ -5,8 +5,8 @@ import panflute as pf
 from slugify import slugify
 
 from mintmod_filter.utils import debug, ParseError
-from mintmod_filter.handle_env import Environments
-from mintmod_filter.handle_cmd import Commands
+from mintmod_filter.environments import Environments
+from mintmod_filter.commands import Commands
 from mintmod_filter.handle_math_substitutions import handle_math_substitutions
 
 PATTERN_LATEX_CMD = re.compile(r'\\(.*?){', re.DOTALL)
