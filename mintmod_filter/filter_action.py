@@ -62,8 +62,7 @@ class FilterAction:
     def _handle_unknown_command(self, cmd_name, args, elem, doc):
         """Handle unknown latex commands.
 
-        Will output raw HTML that gives visual feedback about the unknown
-        command.
+        Output visual feedback about the unknown command.
         """
         debug("Could not handle command %s." % cmd_name)
         classes = [CLASS_UNKNOWN_CMD, slugify(cmd_name)]
@@ -107,8 +106,7 @@ class FilterAction:
                                     doc):
         """Handle unknown latex environment.
 
-        Will output raw HTML that gives visual feedback about the unknown
-        environment.
+        Output visual feedback about the unknown environment.
         """
         debug("Could not handle environment %s." % env_name)
         classes = [CLASS_UNKNOWN_ENV, slugify(env_name)]
