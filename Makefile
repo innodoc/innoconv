@@ -33,15 +33,12 @@ doc:
 	$(MAKE) -C $@ html
 
 test:
-	python setup.py test
+	python setup.py test -r
 
 coverage: htmlcov/index.html
 	xdg-open htmlcov/index.html
 
-htmlcov/index.html: .coverage
+htmlcov/index.html: test
 	coverage html
-
-.coverage:
-	coverage run --source=mintmod_filter --omit='mintmod_filter/test/*' setup.py test
 
 .PHONY: all tub_base clean lint doc test coverage
