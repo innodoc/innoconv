@@ -8,7 +8,7 @@ Example: `handle_mxcontent` method will receive `MXContent` environment.
 
 import panflute as pf
 from slugify import slugify
-from mintmod_filter.utils import pandoc_parse
+from mintmod_filter.utils import pandoc_parse, debug
 
 MXCONTENT_CLASSES = ['content']
 MEXERCISES_CLASSES = ['content', 'exercises']
@@ -19,12 +19,12 @@ class Environments():
     def handle_msectionstart(self, elem_content, env_args, doc):
         """Handle `MSectionStart` environment."""
         # Use title from previously found \MSection command
-        header_title = getattr(doc, 'msection_content', "No Header Found")
-        header_id = getattr(doc, 'msection_id', "no-id-found")
-        header = pf.Header(
-            pf.RawInline(header_title),
-            identifier=header_id, level=2
-        )
+
+        header = getattr(doc, "last_header_elem", None)
+        if header is None:
+            debug("warning handle_msectionstart did not find a previously \
+            found header element.")
+
         div = pf.Div(classes=['section-start'])
         div.content.extend([header] + pandoc_parse(elem_content))
         return div

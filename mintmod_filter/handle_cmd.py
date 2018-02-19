@@ -7,7 +7,7 @@ Example: ``handle_msection`` method will receive the ``MSection`` command.
 """
 
 import panflute as pf
-from slugify import slugify
+from utils import handle_header
 
 
 class Commands():
@@ -16,17 +16,19 @@ class Commands():
 
         `MSectionStart` environment will use this information later.
         """
-        doc.msection_content = args[0]
-        doc.msection_id = slugify(args[0])
+        handle_header(title=args[0], level=2, doc=doc)
         return []
 
-    def handle_cmd_mtitle(self, args, elem, doc):
+    def handle_msubsection(self, args, elem, doc):
+        """Handle `MSubsection`"""
+        return handle_header(title=args[0], level=3, doc=doc)
+
+    def handle_mtitle(self, args, elem, doc):
         """Handle `MTitle`` command.
 
         These is an equivalent to ``subsubsection``
         """
-        header = pf.Header(pf.RawInline(args[0]), level=4)  # TODO i18n?
-        return header
+        return handle_header(title=args[0], level=4, doc=doc)
 
     def handle_special(self, args, elem, doc):
         r"""Handle `special` command.

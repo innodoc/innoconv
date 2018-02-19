@@ -4,7 +4,7 @@ import os
 import json
 from subprocess import Popen, PIPE
 from shutil import which
-
+from slugify import slugify
 import panflute as pf
 from panflute.elements import from_json
 
@@ -69,3 +69,17 @@ def run_pandoc(text='', args=None):
 def fix_line_endings(_string):
     r"""Replace \r\n with \n."""
     return "\n".join(_string.splitlines())
+
+
+def handle_header(level, title, id=None, elem=None, doc=None):
+    """Handle headers in the document
+
+    Because headers need to be referenced by other elements, references to the
+    found headers are stored in the doc properties.
+    """
+    if id is None:
+        id = slugify(title)
+    header = pf.Header(pf.RawInline(title), identifier=id, level=level)
+    doc.last_header_elem = header
+
+    return header
