@@ -30,8 +30,8 @@ class FilterAction:
         """
         Receive document elements.
 
-        This function receives document elements from Pandoc and handles
-        delegats handling of simple subtitions, mintmod commands and
+        This function receives document elements from Pandoc and delegates
+        handling of simple subtitutions, mintmod commands and
         environments.
         """
         if isinstance(elem, pf.Math):
