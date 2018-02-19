@@ -9,16 +9,16 @@ from mintmod_filter.environments import Environments
 from mintmod_filter.commands import Commands
 from mintmod_filter.math_substitutions import handle_math_substitutions
 
-PATTERN_LATEX_CMD = re.compile(r'\\(.*?){', re.DOTALL)
-PATTERN_CMD_ARGS = re.compile(r'{(.*?)}')
+PATTERN_LATEX_CMD = re.compile(r'\\([A-Za-z0-9_]+)', re.DOTALL)
+PATTERN_CMD_ARGS = re.compile(r'{([^}]+)}')
 PATTERN_ENV = re.compile(
     r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
 PATTERN_ENV_ARGS = re.compile(
     r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
 
 COLOR_UNKNOWN = '#FFA500'
-CLASS_UNKNOWN_CMD = 'unkown-cmd'
-CLASS_UNKNOWN_ENV = 'unkown-environment'
+CLASS_UNKNOWN_CMD = 'unknown-cmd'
+CLASS_UNKNOWN_ENV = 'unknown-environment'
 
 
 class FilterAction:
@@ -37,16 +37,14 @@ class FilterAction:
         if isinstance(elem, pf.Math):
             return handle_math_substitutions(elem, doc)
         elif isinstance(elem, pf.RawBlock) and elem.format == 'latex':
-            args = []
             match = PATTERN_LATEX_CMD.match(elem.text)
             if match:
                 cmd_name = match.groups()[0]
-                args = re.findall(PATTERN_CMD_ARGS, elem.text)
                 if cmd_name.startswith('begin'):
                     return self._handle_environment(elem, doc)
                 else:
-                    return self._handle_command(
-                        cmd_name, args, elem, doc)
+                    args = re.findall(PATTERN_CMD_ARGS, elem.text)
+                    return self._handle_command(cmd_name, args, elem, doc)
             else:
                 raise ParseError(
                     'Could not parse LaTeX command: %s...' % elem.text)

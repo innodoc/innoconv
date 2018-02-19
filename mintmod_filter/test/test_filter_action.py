@@ -28,10 +28,19 @@ class TestFilterAction(unittest.TestCase):
         ret = self._filter_elem([elem_mtitle], elem_mtitle)
         self.assertEqual(type(ret), pf.Header)
 
+    def test_unknown_latex_rawblock_command_with_param(self):
+        "filter() handles unknown LaTeX command"
+        elem_unkown_cmd = pf.RawBlock(
+            r'\ThisCommandAlsoDoesNotExist{foo}{bar}', format='latex')
+        ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
+        self.assertEqual(type(ret), pf.Div)
+        self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)
+        self.assertIn('thiscommandalsodoesnotexist', ret.classes)
+
     def test_unknown_latex_rawblock_command(self):
         "filter() handles unknown LaTeX command"
         elem_unkown_cmd = pf.RawBlock(
-            r'\ThisCommandDoesNotExist{Foo}', format='latex')
+            r'\ThisCommandDoesNotExist', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertEqual(type(ret), pf.Div)
         self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)
@@ -73,7 +82,7 @@ class TestFilterAction(unittest.TestCase):
     def test_invalid_latex_rawblock_environment(self):
         "filter() raises ParseError on invalid environment"
         elem_invalid_env = pf.RawBlock(
-            r'\begin'
+            r'/begin'
             'FOOBARCONTENT'
             r'\end{ThisEnvDoesNotExist}',
             format='latex')
