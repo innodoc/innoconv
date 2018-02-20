@@ -1,9 +1,9 @@
-r"""Handle mintmod LaTex commands.
+"""Handle mintmod LaTeX commands.
 
 Convention: Provide a ``handle_CMDNAME`` function for handling ``CMDNAME``
 command. You need to slugify the command name.
 
-Example: ``handle_msection`` method will receive the ``\MSection`` command.
+Example: ``handle_msection`` method will receive the ``MSection`` command.
 """
 
 import panflute as pf
@@ -14,27 +14,27 @@ class Commands():
     def handle_msection(self, args, elem, doc):
         """Remember ``MSection`` name for later.
 
-        `MSectionStart` environment will use this information later.
+        ``MSectionStart`` environment will use this information later.
         """
         handle_header(title=args[0], level=2, doc=doc, auto_id=True)
         return []
 
     def handle_msubsection(self, args, elem, doc):
-        """Handle `MSubsection`"""
+        """Handle ``MSubsection``"""
         return handle_header(title=args[0], level=3, doc=doc, auto_id=True)
 
     def handle_mtitle(self, args, elem, doc):
-        """Handle `MTitle`` command.
+        """Handle ``MTitle`` command.
 
         These is an equivalent to ``subsubsection``
         """
         return handle_header(title=args[0], level=4, doc=doc, auto_id=True)
 
     def handle_mlabel(self, args, elem, doc):
-        """Handle `MLabel` command.
+        """Handle ``MLabel`` command.
 
-        Will search for the previous header element and update its id to the
-        id defined in the `MLabel` command."""
+        Will search for the previous header element and update its ID to the
+        ID defined in the ``MLabel`` command."""
         last_header_elem = getattr(doc, "last_header_elem", None)
 
         if last_header_elem is None:
@@ -45,7 +45,7 @@ class Commands():
         last_header_elem.identifier = args[0]
 
     def handle_special(self, args, elem, doc):
-        """Handle `special` command.
+        """Handle ``special`` command.
 
         This command is used to embed HTML in LaTeX source.
         """
@@ -55,7 +55,7 @@ class Commands():
         return None
 
     def handle_msubject(self, args, elem, doc):
-        """Handle `MSubject{title}` command.
+        """Handle ``MSubject{title}`` command.
 
         Command defines the document title.
         """
@@ -65,7 +65,7 @@ class Commands():
         return []
 
     def handle_mdeclaresiteuxid(self, args, elem, doc):
-        """Handle `MDeclareSiteUXID` command.
+        """Handle ``MDeclareSiteUXID`` command.
 
         This command is used to embed IDs. This is not relevant anymore and
         becomes a no-op.
@@ -73,7 +73,7 @@ class Commands():
         return self._noop()
 
     def handle_mmodstartbox(self, args, elem, doc):
-        """Handle `MModStartBox` command.
+        """Handle ``MModStartBox`` command.
 
         This command displays a table of content for the current chapter. This
         is handled elswhere and becomes a no-op.

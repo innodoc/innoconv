@@ -8,3 +8,6 @@ mintmod_filter
    :caption: Sub-modules:
 
    mintmod_filter.filter_action
+   mintmod_filter.commands
+   mintmod_filter.environments
+   mintmod_filter.utils

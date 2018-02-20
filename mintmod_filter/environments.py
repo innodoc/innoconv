@@ -20,7 +20,7 @@ MEXAMPLE_CLASSES = ['example']
 
 class Environments():
     def handle_msectionstart(self, elem_content, env_args, doc):
-        """Handle `MSectionStart` environment."""
+        """Handle ``MSectionStart`` environment."""
         # Use title from previously found \MSection command
 
         header = getattr(doc, "last_header_elem", None)
@@ -33,7 +33,7 @@ class Environments():
         return div
 
     def handle_mxcontent(self, elem_content, env_args, doc):
-        """Handle `MXContent` environment."""
+        """Handle ``MXContent`` environment."""
         title = env_args[0]
         return self._handle_content_box(
             title, MXCONTENT_CLASSES,
@@ -41,35 +41,35 @@ class Environments():
         )
 
     def handle_mexercises(self, elem_content, env_args, doc):
-        """Handle `MExercises` environment."""
+        """Handle ``MExercises`` environment."""
         return self._handle_content_box(
             'Aufgaben', MEXERCISES_CLASSES,
             elem_content, doc, level=3
         )
 
     def handle_mexercise(self, elem_content, env_args, doc):
-        """Handle `MExercise` environment."""
+        """Handle ``MExercise`` environment."""
         return self._handle_content_box(
             'Aufgabe', MEXERCISE_CLASSES,
             elem_content, doc
         )
 
     def handle_minfo(self, elem_content, env_args, doc):
-        """Handle `MInfo` environment."""
+        """Handle ``MInfo`` environment."""
         return self._handle_content_box(
             'Info', MINFO_CLASSES,
             elem_content, doc
         )
 
     def handle_mexperiment(self, elem_content, env_args, doc):
-        """Handle `MExperiment` environment."""
+        """Handle ``MExperiment`` environment."""
         return self._handle_content_box(
             'Experiment', MEXPERIMENT_CLASSES,
             elem_content, doc
         )
 
     def handle_mexample(self, elem_content, env_args, doc):
-        """Handle `MExample` command."""
+        """Handle ``MExample`` command."""
         return self._handle_content_box(
             'Beispiel', MEXAMPLE_CLASSES,
             elem_content, doc

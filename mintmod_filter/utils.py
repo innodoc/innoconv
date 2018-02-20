@@ -34,10 +34,10 @@ def debug_elem(elem):
 
 
 def pandoc_parse(parse_string):
-    """Parse `parse_string` using Pandoc and this filter.
+    """Parse ``parse_string`` using Pandoc and this filter.
 
-    The panflute helper function `convert_text` does not print debug messages.
-    So we have our own version.
+    The panflute helper function ``convert_text`` does not print debug
+    messages. So we have our own version.
     """
     filter_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), '__main__.py')
