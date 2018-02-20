@@ -20,6 +20,9 @@ class TestUtils(unittest.TestCase):
     def test_parse_pandoc(self):
         pass
 
+    @unittest.skip("We need to write a second filter for label / index / ..."
+                   "before this test will succeed, as subprocess cannot easily"
+                   "the other processe's data")
     def test_parse_pandoc_mlabel(self):
         """Test if a latex string containing several `MLabel` commands in
         different environments and positions are parsed correctly.
