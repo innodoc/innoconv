@@ -15,6 +15,7 @@ MEXERCISES_CLASSES = ['content', 'exercises']
 MEXERCISE_CLASSES = ['exercise']
 MINFO_CLASSES = ['info']
 MEXPERIMENT_CLASSES = ['experiment']
+MEXAMPLE_CLASSES = ['example']
 
 
 class Environments():
@@ -36,31 +37,43 @@ class Environments():
         title = env_args[0]
         return self._handle_content_box(
             title, MXCONTENT_CLASSES,
-            elem_content, doc, level=3, auto_id=True)
+            elem_content, doc, level=3, auto_id=True
+        )
 
     def handle_mexercises(self, elem_content, env_args, doc):
         """Handle `MExercises` environment."""
         return self._handle_content_box(
             'Aufgaben', MEXERCISES_CLASSES,
-            elem_content, doc, level=3)
+            elem_content, doc, level=3
+        )
 
     def handle_mexercise(self, elem_content, env_args, doc):
         """Handle `MExercise` environment."""
         return self._handle_content_box(
             'Aufgabe', MEXERCISE_CLASSES,
-            elem_content, doc)
+            elem_content, doc
+        )
 
     def handle_minfo(self, elem_content, env_args, doc):
         """Handle `MInfo` environment."""
         return self._handle_content_box(
             'Info', MINFO_CLASSES,
-            elem_content, doc)
+            elem_content, doc
+        )
 
     def handle_mexperiment(self, elem_content, env_args, doc):
         """Handle `MExperiment` environment."""
         return self._handle_content_box(
             'Experiment', MEXPERIMENT_CLASSES,
-            elem_content, doc)
+            elem_content, doc
+        )
+
+    def handle_mexample(self, elem_content, env_args, doc):
+        """Handle `MExample` command."""
+        return self._handle_content_box(
+            'Beispiel', MEXAMPLE_CLASSES,
+            elem_content, doc
+        )
 
     def _handle_content_box(self, title, div_classes,
                             elem_content, doc, level=4, auto_id=False):

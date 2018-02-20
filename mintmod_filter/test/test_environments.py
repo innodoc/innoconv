@@ -1,7 +1,8 @@
 import unittest
 import panflute as pf
 from mintmod_filter.environments import Environments,\
-    MINFO_CLASSES, MEXPERIMENT_CLASSES, MEXERCISE_CLASSES
+    MINFO_CLASSES, MEXPERIMENT_CLASSES, MEXERCISE_CLASSES, MEXERCISES_CLASSES,\
+    MEXAMPLE_CLASSES
 
 
 class TestEnvironments(unittest.TestCase):
@@ -11,24 +12,36 @@ class TestEnvironments(unittest.TestCase):
         self.doc = pf.Doc()
 
     def test_handle_minfo(self):
-        self._handle_content_box(
+        self._test_content_box(
             self.environments.handle_minfo,
             MINFO_CLASSES, 'Info'
         )
 
     def test_handle_mexperiment(self):
-        self._handle_content_box(
+        self._test_content_box(
             self.environments.handle_mexperiment,
             MEXPERIMENT_CLASSES, 'Experiment'
         )
 
     def test_handle_mexercise(self):
-        self._handle_content_box(
+        self._test_content_box(
             self.environments.handle_mexercise,
             MEXERCISE_CLASSES, 'Aufgabe'
         )
 
-    def _handle_content_box(self, command, div_classes, title):
+    def test_handle_mexercises(self):
+        self._test_content_box(
+            self.environments.handle_mexercises,
+            MEXERCISES_CLASSES, 'Aufgaben'
+        )
+
+    def test_handle_mexample(self):
+        self._test_content_box(
+            self.environments.handle_mexample,
+            MEXAMPLE_CLASSES, 'Beispiel'
+        )
+
+    def _test_content_box(self, command, div_classes, title):
         """Test if content boxes (e.g. Exercises, Examples, Experiment, Info)
         are handled correctly
         """
