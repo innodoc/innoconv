@@ -5,8 +5,7 @@ venv
 
 # build
 content
-doc/_build
-dist
+build
 innoConv.egg-info
 
 # coverage

@@ -12,25 +12,41 @@ $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-### Linting
+### Commands
+
+#### Build tub_base
+
+```
+$ ./setup.py build_tub_base
+```
+
+#### Linting
 
 Adhere to [PEP8](https://www.python.org/dev/peps/pep-0008/). Before pushing
 code please run lint and fix **all** problems.
 
 ```
-$ make lint
+$ ./setup.py lint
 ```
 
-### Tests
+#### Tests
 
 ```
-$ make test
+$ ./setup.py test
 ```
 
-### Documentation
+#### Build HTML coverage report
+
+Do this after calling `./setup.py test`.
 
 ```
-$ make doc
+$ ./setup.py coverage
 ```
 
-You can find the documentation in `doc/_build/html`.
+#### Documentation
+
+```
+$ ./setup.py build_doc
+```
+
+You can find the documentation in `build/sphinx`.
