@@ -1,6 +1,9 @@
 import unittest
+import os
 import panflute as pf
 from mintmod_filter.utils import pandoc_parse
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 TEX_MLABEL = r"""\MSubSection{foo}
 \MLabel{label1}
@@ -18,7 +21,39 @@ Here is a text with another \MLabel{paralabel}
 class TestUtils(unittest.TestCase):
 
     def test_parse_pandoc(self):
-        pass
+        "parse_pandoc() returns valid output if given test document"
+        with open(os.path.join(SCRIPT_DIR, 'files', 'test.tex'), 'r') as f:
+            content = f.read()
+        doc = pandoc_parse(content)
+        h1 = doc[0]
+        para1 = doc[1]
+        h2 = doc[2]
+        para2 = doc[3]
+
+        content_test = (
+            (type(h1), pf.Header),
+            (type(h1), pf.Header),
+            (type(h1.content[0]), pf.Str),
+            (h1.content[0].text, 'Test'),
+            (type(h1.content[1]), pf.Space),
+            (type(h1.content[2]), pf.Str),
+            (h1.content[2].text, 'heading'),
+            (h1.content[2].text, 'heading'),
+            (type(para1), pf.Para),
+            (len(para1.content), 121),
+            (type(h2), pf.Header),
+            (h2.content[0].text, 'Another'),
+            (type(para1), pf.Para),
+            (len(para2.content), 149),
+        )
+
+        for c in content_test:
+            self.assertEqual(c[0], c[1])
+
+    def test_parse_pandoc_empty(self):
+        "parse_pandoc() returns [] if given empty document"
+        ret = pandoc_parse('')
+        self.assertEqual(ret, [])
 
     @unittest.skip("We need to write a second filter for label / index / ..."
                    "before this test will succeed, as subprocess cannot easily"
