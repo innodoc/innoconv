@@ -27,7 +27,7 @@ clean:
 	rm -rf content doc/_build/html htmlcov .coverage
 
 lint:
-	flake8 mintmod_filter
+	flake8 mintmod_filter setup.py
 
 doc:
 	$(MAKE) -C $@ html
