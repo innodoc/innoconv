@@ -16,19 +16,19 @@ class Commands():
 
         `MSectionStart` environment will use this information later.
         """
-        handle_header(title=args[0], level=2, doc=doc)
+        handle_header(title=args[0], level=2, doc=doc, auto_id=True)
         return []
 
     def handle_msubsection(self, args, elem, doc):
         """Handle `MSubsection`"""
-        return handle_header(title=args[0], level=3, doc=doc)
+        return handle_header(title=args[0], level=3, doc=doc, auto_id=True)
 
     def handle_mtitle(self, args, elem, doc):
         """Handle `MTitle`` command.
 
         These is an equivalent to ``subsubsection``
         """
-        return handle_header(title=args[0], level=4, doc=doc)
+        return handle_header(title=args[0], level=4, doc=doc, auto_id=True)
 
     def handle_mlabel(self, args, elem, doc):
         """Handle `MLabel` command.

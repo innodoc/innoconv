@@ -13,6 +13,7 @@ from mintmod_filter.utils import pandoc_parse, debug, handle_header
 MXCONTENT_CLASSES = ['content']
 MEXERCISES_CLASSES = ['content', 'exercises']
 MEXERCISE_CLASSES = ['exercise']
+MINFO_CLASSES = ['info']
 
 
 class Environments():
@@ -32,7 +33,7 @@ class Environments():
     def handle_mxcontent(self, elem_content, env_args, doc):
         """Handle `MXContent` environment."""
         title = env_args[0]
-        header = handle_header(title=title, level=3, doc=doc)
+        header = handle_header(title=title, level=3, doc=doc, auto_id=True)
         div = pf.Div(classes=MXCONTENT_CLASSES)
         div.content.extend([header] + pandoc_parse(elem_content))
         return div
@@ -48,5 +49,12 @@ class Environments():
         """Handle `MExercise` environment."""
         header = handle_header(title='Aufgabe', level=4, doc=doc)  # TODO i18n
         div = pf.Div(classes=MEXERCISE_CLASSES)
+        div.content.extend([header] + pandoc_parse(elem_content))
+        return div
+
+    def handle_minfo(self, elem_content, env_args, doc):
+        """Handle `MInfo` environment."""
+        header = handle_header(title='Info', level=4, doc=doc)  # TODO i18n
+        div = pf.Div(classes=MINFO_CLASSES)
         div.content.extend([header] + pandoc_parse(elem_content))
         return div

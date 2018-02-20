@@ -79,14 +79,16 @@ def fix_line_endings(repl):
     return "\n".join(repl.splitlines())
 
 
-def handle_header(level, title, id=None, elem=None, doc=None):
+def handle_header(level, title, auto_id=False, elem=None, doc=None):
     """Handle headers in the document
 
     Because headers need to be referenced by other elements, references to the
     found headers are stored in the doc properties.
     """
-    if id is None:
+    if auto_id:
         id = slugify(title)
+    else:
+        id = ""
     header = pf.Header(pf.RawInline(title), identifier=id, level=level)
     doc.last_header_elem = header
 
