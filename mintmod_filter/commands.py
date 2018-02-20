@@ -80,6 +80,14 @@ class Commands():
         """
         return self._noop()
 
+    def handle_mpragma(self, args, elem, doc):
+        """Handle ``MPragma`` command.
+
+        This command was used to embed build time flags for mintmod. It becomes
+        a no-op.
+        """
+        return self._noop()
+
     def _noop(self):
         """Return no elements."""
         return []
