@@ -27,12 +27,6 @@ def debug_nested(msg, *args, **kwargs):
         pf.debug('[nested] %s' % msg, *args, **kwargs)
 
 
-def debug_elem(elem):
-    """Print debug info about element."""
-    debug('[MINTMOD] Element debug (%s)' % type(elem))
-    debug(elem)
-
-
 def pandoc_parse(parse_string):
     """Parse ``parse_string`` using Pandoc and this filter.
 
