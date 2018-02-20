@@ -14,6 +14,7 @@ MXCONTENT_CLASSES = ['content']
 MEXERCISES_CLASSES = ['content', 'exercises']
 MEXERCISE_CLASSES = ['exercise']
 MINFO_CLASSES = ['info']
+MEXPERIMENT_CLASSES = ['experiment']
 
 
 class Environments():
@@ -33,28 +34,42 @@ class Environments():
     def handle_mxcontent(self, elem_content, env_args, doc):
         """Handle `MXContent` environment."""
         title = env_args[0]
-        header = handle_header(title=title, level=3, doc=doc, auto_id=True)
-        div = pf.Div(classes=MXCONTENT_CLASSES)
-        div.content.extend([header] + pandoc_parse(elem_content))
-        return div
+        return self._handle_content_box(
+            title, MXCONTENT_CLASSES,
+            elem_content, doc, level=3, auto_id=True)
 
     def handle_mexercises(self, elem_content, env_args, doc):
         """Handle `MExercises` environment."""
-        header = handle_header(title='Aufgaben', level=3, doc=doc)  # TODO i18n
-        div = pf.Div(classes=MEXERCISES_CLASSES)
-        div.content.extend([header] + pandoc_parse(elem_content))
-        return div
+        return self._handle_content_box(
+            'Aufgaben', MEXERCISES_CLASSES,
+            elem_content, doc, level=3)
 
     def handle_mexercise(self, elem_content, env_args, doc):
         """Handle `MExercise` environment."""
-        header = handle_header(title='Aufgabe', level=4, doc=doc)  # TODO i18n
-        div = pf.Div(classes=MEXERCISE_CLASSES)
-        div.content.extend([header] + pandoc_parse(elem_content))
-        return div
+        return self._handle_content_box(
+            'Aufgabe', MEXERCISE_CLASSES,
+            elem_content, doc)
 
     def handle_minfo(self, elem_content, env_args, doc):
         """Handle `MInfo` environment."""
-        header = handle_header(title='Info', level=4, doc=doc)  # TODO i18n
-        div = pf.Div(classes=MINFO_CLASSES)
+        return self._handle_content_box(
+            'Info', MINFO_CLASSES,
+            elem_content, doc)
+
+    def handle_mexperiment(self, elem_content, env_args, doc):
+        """Handle `MExperiment` environment."""
+        return self._handle_content_box(
+            'Experiment', MEXPERIMENT_CLASSES,
+            elem_content, doc)
+
+    def _handle_content_box(self, title, div_classes,
+                            elem_content, doc, level=4, auto_id=False):
+        """Convenience function for handling content boxes that only differ
+        by having diffent titles and classes."""
+        # TODO i18n
+        header = handle_header(
+            title=title, level=level, doc=doc, auto_id=auto_id
+        )
+        div = pf.Div(classes=div_classes)
         div.content.extend([header] + pandoc_parse(elem_content))
         return div
