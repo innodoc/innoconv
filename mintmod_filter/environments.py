@@ -16,7 +16,8 @@ MEXERCISE_CLASSES = ['exercise']
 MINFO_CLASSES = ['info']
 MEXPERIMENT_CLASSES = ['experiment']
 MEXAMPLE_CLASSES = ['example']
-
+MHINT_CLASSES = ['hint']
+MHINT_TEXT_CLASSES = ['hint-text']
 
 class Environments():
     def handle_msectionstart(self, elem_content, env_args, doc):
@@ -74,6 +75,16 @@ class Environments():
             'Beispiel', MEXAMPLE_CLASSES,
             elem_content, doc
         )
+
+    def handle_mhint(self, elem_content, env_args, doc):
+        """Handle `MHint` command."""
+        div = pf.Div(classes=MHINT_CLASSES)
+
+        div.content.extend([
+            pf.Plain(pf.Span(pf.Str(env_args[0]), classes=MHINT_TEXT_CLASSES))
+        ] + pandoc_parse(elem_content))
+
+        return div
 
     def _handle_content_box(self, title, div_classes,
                             elem_content, doc, level=4, auto_id=False):
