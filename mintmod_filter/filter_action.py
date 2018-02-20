@@ -53,6 +53,13 @@ class FilterAction:
             else:
                 raise ParseError(
                     'Could not parse LaTeX command: %s...' % elem.text)
+        elif isinstance(elem, pf.RawInline) and elem.format == 'latex':
+            # no inline environments are allowed
+            match = PATTERN_LATEX_CMD.match(elem.text)
+            if match:
+                cmd_name = match.groups()[0]
+                args = re.findall(PATTERN_CMD_ARGS, elem.text)
+                return self._handle_command(cmd_name, args, elem, doc)
         return None
 
     def _handle_command(self, cmd_name, args, elem, doc):
@@ -71,13 +78,24 @@ class FilterAction:
         debug("Could not handle command %s." % cmd_name)
         classes = [CLASS_UNKNOWN_CMD, slugify(cmd_name)]
         attrs = {'style': 'background: %s;' % COLOR_UNKNOWN}
-        div = pf.Div(classes=classes, attributes=attrs)
-        div.content.extend([
-            pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),
-                              pf.Str('command:')),
-                    pf.Space(), pf.Code(elem.text))
-        ])
-        return div
+
+        if isinstance(elem, pf.Block):
+            div = pf.Div(classes=classes, attributes=attrs)
+            div.content.extend([
+                pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),
+                                  pf.Str('command:')),
+                        pf.Space(), pf.Code(elem.text))
+            ])
+            return div
+        elif isinstance(elem, pf.Inline):
+            span = pf.Span(classes=classes, attributes=attrs)
+            span.content.extend([
+                    pf.Strong(
+                        pf.Str('Unhandled'), pf.Space(),
+                        pf.Str('command:')
+                    ), pf.Space(), pf.Code(elem.text)
+            ])
+            return span
 
     def _handle_environment(self, elem, doc):
         """Parse and handle mintmod environments."""

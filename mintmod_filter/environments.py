@@ -42,7 +42,6 @@ class Environments():
 
     def handle_mexercises(self, elem_content, env_args, doc):
         """Handle `MExercises` environment."""
-        debug("handling mexercise with content %" % elem_content)
         return self._handle_content_box(
             'Aufgaben', MEXERCISES_CLASSES,
             elem_content, doc, level=3
