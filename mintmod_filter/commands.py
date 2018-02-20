@@ -75,6 +75,14 @@ class Commands():
         """
         return self._noop()
 
+    def handle_mmodstartbox(self, args, elem, doc):
+        """Handle `MModStartBox` command.
+
+        This command displays a table of content for the current chapter. This
+        is handled elswhere and becomes a no-op.
+        """
+        return self._noop()
+
     def _noop(self):
         """Return no elements."""
         return []
