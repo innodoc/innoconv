@@ -49,13 +49,10 @@ class Commands():
 
         This command is used to embed HTML in LaTeX source.
         """
-        # TODO: is this ok to do? should check for format==html?
-        #       other output formats may not be able to handle this
         if "html:" in args[0]:
             html_code = args[0].replace("html:", "")
             return pf.RawBlock(html_code)
-        else:
-            return None
+        return None
 
     def handle_msubject(self, args, elem, doc):
         """Handle `MSubject{title}` command.
