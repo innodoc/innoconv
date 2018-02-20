@@ -17,9 +17,11 @@ BUILD_ROOT = os.path.join(ROOT_DIR, 'build')
 TUB_BASE_REPO = 'git@gitlab.tubit.tu-berlin.de:innodoc/tub_base.git'
 TUB_BASE_BRANCH = 'pandoc'
 
-MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' + \
+MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' \
                    'VEUNDMINT_TUB_Brueckenkurs/raw/multilang/src/tex/%s'
 
+BOOTSTRAP_CSS = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/' \
+                'bootstrap.min.css'
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 log = logging.getLogger('setup.py')
@@ -89,6 +91,7 @@ class BuildTUBBaseCommand(BaseCommand):
         _run(['pandoc', '--from=latex+raw_tex', '--to=html5+empty_paragraphs',
               '--standalone', '--mathjax',
               '--filter=../../../mintmod_filter/__main__.py',
+              '--css=%s' % BOOTSTRAP_CSS,
               '--output=%s' % filename_out, 'tree_pandoc.tex'],
              cwd=project_root_lang)
 
