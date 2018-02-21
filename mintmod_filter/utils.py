@@ -73,3 +73,28 @@ def fix_line_endings(repl):
     if type(repl) == bytes:
         repl = str(repl, 'utf-8')
     return "\n".join(repl.splitlines())
+
+
+def destringify(string):
+    """Takes a string and transforms it into list of Str and Space objects.
+
+    This function breaks down strings with whitespace. It could be done by
+    calling :func:`pandoc_parse` but doesn't have the overhead involed.
+
+    :Example:
+
+        >>> destringify('foo  bar\tbaz')
+        [Str(foo), Space, Str(bar), Space, Str(baz)]
+
+    :param string: String to transform
+    :type string: str
+
+    :returns: list of :class:`panflute.Str` and :class:`panflute.Space`
+    """
+    ret = []
+    split = string.split()
+    for word in split:
+        ret.append(pf.Str(word))
+        if split.index(word) != len(split) - 1:
+            ret.append(pf.Space())
+    return ret

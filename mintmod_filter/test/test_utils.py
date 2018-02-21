@@ -1,7 +1,7 @@
 import unittest
 import os
 import panflute as pf
-from mintmod_filter.utils import pandoc_parse
+from mintmod_filter.utils import pandoc_parse, destringify
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -81,3 +81,59 @@ class TestUtils(unittest.TestCase):
         # para1 = ast_native[2]
         # self.assertIsInstance(para1, pf.Para)
         # self.assertEqual(para1.identifier, "paralabel")
+
+    def test_destringify(self):
+        str = 'This is a  really\tnice    string.'
+        comp = [
+            pf.Str('This'),
+            pf.Space(),
+            pf.Str('is'),
+            pf.Space(),
+            pf.Str('a'),
+            pf.Space(),
+            pf.Str('really'),
+            pf.Space(),
+            pf.Str('nice'),
+            pf.Space(),
+            pf.Str('string.'),
+        ]
+        ret = destringify(str)
+        self.assertIsInstance(ret, list)
+        self._compare_list(ret, comp)
+        # for i, token in enumerate(ret):
+        #     _type = type(comp[i])
+        #     self.assertIsInstance(token, _type)
+        #     if _type == pf.Str:
+        #         self.assertEqual(token.text, comp[i].text)
+
+    def test_destringify_empty(self):
+        str = ''
+        ret = destringify(str)
+        self.assertIsInstance(ret, list)
+        self.assertListEqual(ret, [])
+
+    def test_destringify_empty_whitespace(self):
+        str = '   '
+        ret = destringify(str)
+        self.assertIsInstance(ret, list)
+        self.assertListEqual(ret, [])
+
+    def test_destringify_one_word(self):
+        str = 'foobar'
+        ret = destringify(str)
+        self.assertIsInstance(ret, list)
+        self._compare_list(ret, [pf.Str('foobar')])
+
+    def test_destringify_leading_trailing_whitespace(self):
+        str = '  foo bar  '
+        comp = [pf.Str('foo'), pf.Space(), pf.Str('bar')]
+        ret = destringify(str)
+        self.assertIsInstance(ret, list)
+        self._compare_list(ret, comp)
+
+    def _compare_list(self, l1, l2):
+        for i, l1_elem in enumerate(l1):
+            _type = type(l2[i])
+            self.assertIsInstance(l1_elem, _type)
+            if _type == pf.Str:
+                self.assertEqual(l1_elem.text, l2[i].text)
