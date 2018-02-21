@@ -12,6 +12,8 @@ from colorama import init as colorama_init, Style
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 CONTENT_ROOT = os.path.join(ROOT_DIR, 'content')
+BUILD_ROOT = os.path.join(ROOT_DIR, 'build')
+
 TUB_BASE_REPO = 'git@gitlab.tubit.tu-berlin.de:innodoc/tub_base.git'
 TUB_BASE_BRANCH = 'pandoc'
 
@@ -62,7 +64,7 @@ class BuildTUBBaseCommand(BaseCommand):
         project_root_lang = os.path.join(project_root, 'de')
 
         # clone source
-        _run(['mkdir', '-p', 'content'])
+        _run(['mkdir', '-p', CONTENT_ROOT])
         if os.path.isdir(project_root):
             log.info('Content source directory already exists.')
         else:
@@ -81,11 +83,17 @@ class BuildTUBBaseCommand(BaseCommand):
                  cwd=project_root_lang)
 
         # build html
+        filename_out_path = os.path.join(BUILD_ROOT, 'tub_base', 'de')
+        filename_out = os.path.join(filename_out_path, 'tree_pandoc.html')
+        _run(['mkdir', '-p', filename_out_path])
         _run(['pandoc', '--from=latex+raw_tex', '--to=html5+empty_paragraphs',
               '--standalone', '--mathjax',
               '--filter=../../../mintmod_filter/__main__.py',
-              '--output=tree_pandoc.html', 'tree_pandoc.tex'],
+              '--output=%s' % filename_out, 'tree_pandoc.tex'],
              cwd=project_root_lang)
+
+        log.info('%sBuild finished:%s %s' % (
+            Style.BRIGHT, Style.NORMAL, filename_out))
 
 
 class LintCommand(BaseCommand):
@@ -112,7 +120,7 @@ class CoverageCommand(BaseCommand):
 class CleanCommand(clean):
     def run(self):
         super().run()
-        _run(['rm', '-rf', os.path.join(ROOT_DIR, 'build', 'sphinx')])
+        _run(['rm', '-rf', BUILD_ROOT])
         _run(['rm', '-rf', CONTENT_ROOT])
         _run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         _run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
