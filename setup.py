@@ -2,14 +2,16 @@
 import distutils.cmd
 from distutils.command.clean import clean
 import os
+import logging
 from setuptools import setup
 from setuptools.command.test import test as SetuptoolsTestCommand
 import subprocess
 import sys
-from pip.commands.install import logger
+from colorama import init as colorama_init, Style
 
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+CONTENT_ROOT = os.path.join(ROOT_DIR, 'content')
 TUB_BASE_REPO = 'git@gitlab.tubit.tu-berlin.de:innodoc/tub_base.git'
 TUB_BASE_BRANCH = 'pandoc'
 
@@ -17,8 +19,14 @@ MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' + \
                    'VEUNDMINT_TUB_Brueckenkurs/raw/multilang/src/tex/%s'
 
 
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+log = logging.getLogger('setup.py')
+colorama_init()
+
+
 def _run(command, err_msg='Command failed!', cwd=ROOT_DIR):
-    logger.info('Running command %s', command)
+    log.info('%sCommand%s %s' % (
+        Style.BRIGHT, Style.NORMAL, ' '.join(command)))
     # make mintmod_filter module available
     env = os.environ.copy()
     env['PYTHONPATH'] = ROOT_DIR
@@ -26,9 +34,9 @@ def _run(command, err_msg='Command failed!', cwd=ROOT_DIR):
     proc = subprocess.Popen(command, cwd=cwd, env=env)
     out, err = proc.communicate()
     if out:
-        logger.log(out)
+        log.info(out)
     if err:
-        logger.error(err)
+        log.error(err)
     if proc.returncode != 0:
         raise RuntimeError(err_msg)
 
@@ -43,24 +51,41 @@ class BaseCommand(distutils.cmd.Command):
         pass
 
 
+# TODO: this should be named BuildProjectCommand and work for arbitrary
+#       local/remote projects
 class BuildTUBBaseCommand(BaseCommand):
     description = 'Build tub_base content'
 
     def run(self):
+        project_root = os.path.join(CONTENT_ROOT, 'tub_base')
+        # TODO: this should work for arbitrary language codes
+        project_root_lang = os.path.join(project_root, 'de')
+
         # clone source
         _run(['mkdir', '-p', 'content'])
-        if not os.path.isdir(os.path.join(ROOT_DIR, 'content', 'tub_base')):
+        if os.path.isdir(project_root):
+            log.info('Content source directory already exists.')
+        else:
+            log.info('Cloning source repository.')
             _run(['git', 'clone', '-q', '-b', TUB_BASE_BRANCH, TUB_BASE_REPO],
-                 cwd=os.path.join(ROOT_DIR, 'content'))
+                 cwd=CONTENT_ROOT)
+
         # fetch de.tex
-        _run(['wget', '--quiet', MINTMOD_BASE_URL % 'de.tex'],
-             cwd=os.path.join(ROOT_DIR, 'content', 'tub_base', 'de'))
+        filename_base = 'de.tex'
+        filename_path = os.path.join(project_root_lang, filename_base)
+        if os.path.isfile(filename_path):
+            log.info('File already exists: %s' % filename_base)
+        else:
+            log.info('Fetching file: %s' % filename_base)
+            _run(['wget', '--quiet', MINTMOD_BASE_URL % filename_base],
+                 cwd=project_root_lang)
+
         # build html
         _run(['pandoc', '--from=latex+raw_tex', '--to=html5+empty_paragraphs',
               '--standalone', '--mathjax',
               '--filter=../../../mintmod_filter/__main__.py',
               '--output=tree_pandoc.html', 'tree_pandoc.tex'],
-             cwd=os.path.join(ROOT_DIR, 'content', 'tub_base', 'de'))
+             cwd=project_root_lang)
 
 
 class LintCommand(BaseCommand):
@@ -88,7 +113,7 @@ class CleanCommand(clean):
     def run(self):
         super().run()
         _run(['rm', '-rf', os.path.join(ROOT_DIR, 'build', 'sphinx')])
-        _run(['rm', '-rf', os.path.join(ROOT_DIR, 'content')])
+        _run(['rm', '-rf', CONTENT_ROOT])
         _run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         _run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
 
@@ -117,7 +142,6 @@ def setup_package():
         license='GPLv3',
         long_description=open('README.md').read(),
     )
-
     setup(**metadata)
 
 
@@ -125,5 +149,5 @@ if __name__ == '__main__':
     try:
         setup_package()
     except RuntimeError as err:
-        logger.error('%s: %s' % (type(err).__name__, err))
+        log.error('%s: %s' % (type(err).__name__, err))
         sys.exit(-1)
