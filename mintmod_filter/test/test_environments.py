@@ -54,16 +54,16 @@ class TestEnvironments(unittest.TestCase):
         # the handling of the env should return a div with the given classes
         div = command(elem_content, [], self.doc)
         self.assertIsInstance(div, pf.Div)
-        self.assertEquals(div.classes, div_classes)
+        self.assertEqual(div.classes, div_classes)
 
         # it should return a header without an id but with the correct title
         self.assertIsInstance(div.content[0], pf.Header)
-        self.assertEquals(div.content[0].identifier, "")
-        self.assertEquals(div.content[0].content[0].text, title)
+        self.assertEqual(div.content[0].identifier, "")
+        self.assertEqual(div.content[0].content[0].text, title)
 
         # and the content of the environment should be parsed correctly
         self.assertIsInstance(div.content[1], pf.BulletList)
-        self.assertEquals(div.content[1].content[0].content[0]
-                             .content[0].content[0].text, "item1")
+        self.assertEqual(div.content[1].content[0].content[0].content[0]
+                         .content[0].text, "item1")
 
         # TODO set and test a unique identifier to info boxes (and others)

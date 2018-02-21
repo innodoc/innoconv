@@ -68,16 +68,16 @@ class TestUtils(unittest.TestCase):
 
         header1 = ast_native[0]
         self.assertIsInstance(header1, pf.Header)
-        self.assertEquals(header1.identifier, "label1")
+        self.assertEqual(header1.identifier, "label1")
 
         header2 = ast_native[1]
         self.assertIsInstance(header2, pf.Header)
-        self.assertEquals(header2.identifier, "label2")
+        self.assertEqual(header2.identifier, "label2")
 
         header3 = ast_native[2].content[0]
         self.assertIsInstance(header3, pf.Header)
-        self.assertEquals(header3.identifier, "LABEL_BASE_SITE_ONE")
+        self.assertEqual(header3.identifier, "LABEL_BASE_SITE_ONE")
 
         # para1 = ast_native[2]
         # self.assertIsInstance(para1, pf.Para)
-        # self.assertEquals(para1.identifier, "paralabel")
+        # self.assertEqual(para1.identifier, "paralabel")
