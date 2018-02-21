@@ -19,6 +19,7 @@ MEXAMPLE_CLASSES = ['example']
 MHINT_CLASSES = ['hint']
 MHINT_TEXT_CLASSES = ['hint-text']
 
+
 class Environments():
     def handle_msectionstart(self, elem_content, env_args, doc):
         """Handle ``MSectionStart`` environment."""
@@ -77,7 +78,7 @@ class Environments():
         )
 
     def handle_mhint(self, elem_content, env_args, doc):
-        """Handle `MHint` command."""
+        """Handle ``MHint`` command."""
         div = pf.Div(classes=MHINT_CLASSES)
 
         div.content.extend([
@@ -86,8 +87,8 @@ class Environments():
 
         return div
 
-    def _handle_content_box(self, title, div_classes,
-                            elem_content, doc, level=4, auto_id=False):
+    def _handle_content_box(self, title, div_classes, elem_content, doc,
+                            level=4, auto_id=False):
         """Convenience function for handling content boxes that only differ
         by having diffent titles and classes."""
         # TODO i18n
