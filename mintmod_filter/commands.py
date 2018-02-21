@@ -7,7 +7,8 @@ Example: ``handle_msection`` method will receive the ``MSection`` command.
 """
 
 import panflute as pf
-from mintmod_filter.utils import handle_header, debug
+from mintmod_filter.elements import create_header
+from mintmod_filter.utils import debug
 
 
 class Commands():
@@ -16,19 +17,19 @@ class Commands():
 
         ``MSectionStart`` environment will use this information later.
         """
-        handle_header(title=args[0], level=2, doc=doc, auto_id=True)
+        create_header(args[0], level=2, doc=doc, auto_id=True)
         return []
 
     def handle_msubsection(self, args, elem, doc):
         """Handle ``MSubsection``"""
-        return handle_header(title=args[0], level=3, doc=doc, auto_id=True)
+        return create_header(args[0], level=3, doc=doc, auto_id=True)
 
     def handle_mtitle(self, args, elem, doc):
         """Handle ``MTitle`` command.
 
         These is an equivalent to ``subsubsection``
         """
-        return handle_header(title=args[0], level=4, doc=doc, auto_id=True)
+        return create_header(args[0], level=4, doc=doc, auto_id=True)
 
     def handle_mlabel(self, args, elem, doc):
         """Handle ``MLabel`` command.
@@ -39,10 +40,11 @@ class Commands():
 
         if last_header_elem is None:
             debug("WARNING: last_header_elem undefined in handle_mlabel with"
-                  "args:" % args)
-            return
+                  "args: %s" % args)
+            return None
 
         last_header_elem.identifier = args[0]
+        return []
 
     def handle_special(self, args, elem, doc):
         """Handle ``special`` command.
