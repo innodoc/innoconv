@@ -1,4 +1,4 @@
-commands
+Commands
 ========
 
 .. automodule:: mintmod_filter.commands
