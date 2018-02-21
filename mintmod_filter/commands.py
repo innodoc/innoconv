@@ -66,6 +66,13 @@ class Commands():
         doc.metadata = meta
         return []
 
+    def handle_mssectionlabelprefix(self, args, elem, doc):
+        """Handle ``MSsectionlabelprefix`` command.
+
+        This command inserts a translation.
+        """
+        return pf.Str('Abschnitt')  # TODO: i18n
+
     def handle_mdeclaresiteuxid(self, args, elem, doc):
         """Handle ``MDeclareSiteUXID`` command.
 
