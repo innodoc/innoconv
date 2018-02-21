@@ -3,6 +3,7 @@ import distutils.cmd
 from distutils.command.clean import clean
 import os
 from setuptools import setup
+from setuptools.command.test import test as SetuptoolsTestCommand
 import subprocess
 import sys
 from pip.commands.install import logger
@@ -69,7 +70,7 @@ class LintCommand(BaseCommand):
         _run(['flake8', 'mintmod_filter', 'setup.py'])
 
 
-class TestCommand(BaseCommand):
+class TestCommand(SetuptoolsTestCommand):
     description = 'Run test suite'
 
     def run(self):
