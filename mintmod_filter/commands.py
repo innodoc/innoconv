@@ -66,6 +66,15 @@ class Commands():
         doc.metadata = meta
         return []
 
+    def handle_msref(self, args, elem, doc):
+        """Handle ``MSRef`` command.
+
+        This command inserts an fragment-style link.
+        """
+        url = '#%s' % args[0]
+        description = args[1]
+        return pf.Link(pf.Str(description), url=url)
+
     def handle_mssectionlabelprefix(self, args, elem, doc):
         """Handle ``MSsectionlabelprefix`` command.
 
