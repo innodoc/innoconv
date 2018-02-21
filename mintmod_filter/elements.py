@@ -2,7 +2,7 @@
 
 from slugify import slugify
 import panflute as pf
-from mintmod_filter.utils import pandoc_parse
+from mintmod_filter.utils import destringify, pandoc_parse
 
 
 def create_header(title_str, doc, level=0, auto_id=False):
@@ -11,9 +11,8 @@ def create_header(title_str, doc, level=0, auto_id=False):
     Because headers need to be referenced by other elements, references to the
     found headers are stored in the doc properties.
     """
-    # TODO: Create sequence of Str, Space here instead of RawInline
-    title = pf.RawInline(title_str)
-    header = pf.Header(title, level=level)
+    title = destringify(title_str)
+    header = pf.Header(*title, level=level)
     if auto_id:
         header.identifier = slugify(title_str)
     doc.last_header_elem = header

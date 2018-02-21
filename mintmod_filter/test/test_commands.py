@@ -17,8 +17,13 @@ class TestCommands(unittest.TestCase):
         last_header_elem = getattr(self.doc, "last_header_elem", None)
 
         self.assertIsInstance(last_header_elem, pf.Header)
-        self.assertIsInstance(last_header_elem.content[0], pf.RawInline)
-        self.assertEqual(last_header_elem.content[0].text, "A Test Title")
+        self.assertIsInstance(last_header_elem.content[0], pf.Str)
+        self.assertEqual(last_header_elem.content[0].text, 'A')
+        self.assertIsInstance(last_header_elem.content[1], pf.Space)
+        self.assertIsInstance(last_header_elem.content[2], pf.Str)
+        self.assertEqual(last_header_elem.content[2].text, 'Test')
+        self.assertIsInstance(last_header_elem.content[4], pf.Str)
+        self.assertEqual(last_header_elem.content[4].text, 'Title')
         self.assertEqual(last_header_elem.identifier, "a-test-title")
         self.assertEqual(last_header_elem.level, 2)
 
