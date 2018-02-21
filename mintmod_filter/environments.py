@@ -8,16 +8,8 @@ Example: ``handle_mxcontent`` method will receive the
 """
 
 import panflute as pf
+from mintmod_filter.constants import CSS_CLASSES
 from mintmod_filter.utils import pandoc_parse, debug, handle_header
-
-MXCONTENT_CLASSES = ['content']
-MEXERCISES_CLASSES = ['content', 'exercises']
-MEXERCISE_CLASSES = ['exercise']
-MINFO_CLASSES = ['info']
-MEXPERIMENT_CLASSES = ['experiment']
-MEXAMPLE_CLASSES = ['example']
-MHINT_CLASSES = ['hint']
-MHINT_TEXT_CLASSES = ['hint-text']
 
 
 class Environments():
@@ -38,51 +30,52 @@ class Environments():
         """Handle ``MXContent`` environment."""
         title = env_args[0]
         return self._handle_content_box(
-            title, MXCONTENT_CLASSES,
+            title, CSS_CLASSES['MXCONTENT'],
             elem_content, doc, level=3, auto_id=True
         )
 
     def handle_mexercises(self, elem_content, env_args, doc):
         """Handle ``MExercises`` environment."""
         return self._handle_content_box(
-            'Aufgaben', MEXERCISES_CLASSES,
+            'Aufgaben', CSS_CLASSES['MEXERCISES'],
             elem_content, doc, level=3
         )
 
     def handle_mexercise(self, elem_content, env_args, doc):
         """Handle ``MExercise`` environment."""
         return self._handle_content_box(
-            'Aufgabe', MEXERCISE_CLASSES,
+            'Aufgabe', CSS_CLASSES['MEXERCISE'],
             elem_content, doc
         )
 
     def handle_minfo(self, elem_content, env_args, doc):
         """Handle ``MInfo`` environment."""
         return self._handle_content_box(
-            'Info', MINFO_CLASSES,
+            'Info', CSS_CLASSES['MINFO'],
             elem_content, doc
         )
 
     def handle_mexperiment(self, elem_content, env_args, doc):
         """Handle ``MExperiment`` environment."""
         return self._handle_content_box(
-            'Experiment', MEXPERIMENT_CLASSES,
+            'Experiment', CSS_CLASSES['MEXPERIMENT'],
             elem_content, doc
         )
 
     def handle_mexample(self, elem_content, env_args, doc):
         """Handle ``MExample`` command."""
         return self._handle_content_box(
-            'Beispiel', MEXAMPLE_CLASSES,
+            'Beispiel', CSS_CLASSES['MEXAMPLE'],
             elem_content, doc
         )
 
     def handle_mhint(self, elem_content, env_args, doc):
         """Handle ``MHint`` command."""
-        div = pf.Div(classes=MHINT_CLASSES)
+        div = pf.Div(classes=CSS_CLASSES['MHINT'])
 
         div.content.extend([
-            pf.Plain(pf.Span(pf.Str(env_args[0]), classes=MHINT_TEXT_CLASSES))
+            pf.Plain(pf.Span(pf.Str(env_args[0]),
+                             classes=CSS_CLASSES['MHINT_TEXT']))
         ] + pandoc_parse(elem_content))
 
         return div

@@ -1,8 +1,7 @@
 import unittest
 import panflute as pf
-from mintmod_filter.environments import Environments,\
-    MINFO_CLASSES, MEXPERIMENT_CLASSES, MEXERCISE_CLASSES, MEXERCISES_CLASSES,\
-    MEXAMPLE_CLASSES
+from mintmod_filter.constants import CSS_CLASSES
+from mintmod_filter.environments import Environments
 
 
 class TestEnvironments(unittest.TestCase):
@@ -14,34 +13,34 @@ class TestEnvironments(unittest.TestCase):
     def test_handle_minfo(self):
         self._test_content_box(
             self.environments.handle_minfo,
-            MINFO_CLASSES, 'Info'
+            CSS_CLASSES['MINFO'], 'Info'
         )
 
     def test_handle_mexperiment(self):
         self._test_content_box(
             self.environments.handle_mexperiment,
-            MEXPERIMENT_CLASSES, 'Experiment'
+            CSS_CLASSES['MEXPERIMENT'], 'Experiment'
         )
 
     def test_handle_mexercise(self):
         self._test_content_box(
             self.environments.handle_mexercise,
-            MEXERCISE_CLASSES, 'Aufgabe'
+            CSS_CLASSES['MEXERCISE'], 'Aufgabe'
         )
 
     def test_handle_mexercises(self):
         self._test_content_box(
             self.environments.handle_mexercises,
-            MEXERCISES_CLASSES, 'Aufgaben'
+            CSS_CLASSES['MEXERCISES'], 'Aufgaben'
         )
 
     def test_handle_mexample(self):
         self._test_content_box(
             self.environments.handle_mexample,
-            MEXAMPLE_CLASSES, 'Beispiel'
+            CSS_CLASSES['MEXAMPLE'], 'Beispiel'
         )
 
-    def _test_content_box(self, command, div_classes, title):
+    def _test_content_box(self, command, css_classes, title):
         """Test if content boxes (e.g. Exercises, Examples, Experiment, Info)
         are handled correctly
         """
@@ -54,7 +53,7 @@ class TestEnvironments(unittest.TestCase):
         # the handling of the env should return a div with the given classes
         div = command(elem_content, [], self.doc)
         self.assertIsInstance(div, pf.Div)
-        self.assertEqual(div.classes, div_classes)
+        self.assertEqual(div.classes, css_classes)
 
         # it should return a header without an id but with the correct title
         self.assertIsInstance(div.content[0], pf.Header)

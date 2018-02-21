@@ -7,18 +7,9 @@ from slugify import slugify
 from mintmod_filter.utils import debug, ParseError
 from mintmod_filter.environments import Environments
 from mintmod_filter.commands import Commands
+from mintmod_filter.constants import (
+    REGEX_PATTERNS, CSS_CLASSES, COLOR_UNKNOWN_CMD, COLOR_UNKNOWN_ENV)
 from mintmod_filter.math_substitutions import handle_math_substitutions
-
-PATTERN_LATEX_CMD = re.compile(r'\\([A-Za-z0-9_]+)', re.DOTALL)
-PATTERN_CMD_ARGS = re.compile(r'{([^}]+)}')
-PATTERN_ENV = re.compile(
-    r'\A\\begin{(?P<env_name>[^}]+)}(.+)\\end{(?P=env_name)}\Z', re.DOTALL)
-PATTERN_ENV_ARGS = re.compile(
-    r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL)
-
-COLOR_UNKNOWN = '#FFA500'
-CLASS_UNKNOWN_CMD = 'unknown-cmd'
-CLASS_UNKNOWN_ENV = 'unknown-environment'
 
 
 class FilterAction:
@@ -42,23 +33,23 @@ class FilterAction:
         if isinstance(elem, pf.Math):
             return handle_math_substitutions(elem, doc)
         elif isinstance(elem, pf.RawBlock) and elem.format == 'latex':
-            match = PATTERN_LATEX_CMD.match(elem.text)
+            match = REGEX_PATTERNS['CMD'].match(elem.text)
             if match:
                 cmd_name = match.groups()[0]
                 if cmd_name.startswith('begin'):
                     return self._handle_environment(elem, doc)
                 else:
-                    args = re.findall(PATTERN_CMD_ARGS, elem.text)
+                    args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
                     return self._handle_command(cmd_name, args, elem, doc)
             else:
                 raise ParseError(
                     'Could not parse LaTeX command: %s...' % elem.text)
         elif isinstance(elem, pf.RawInline) and elem.format == 'latex':
             # no inline environments are allowed
-            match = PATTERN_LATEX_CMD.match(elem.text)
+            match = REGEX_PATTERNS['CMD'].match(elem.text)
             if match:
                 cmd_name = match.groups()[0]
-                args = re.findall(PATTERN_CMD_ARGS, elem.text)
+                args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
                 return self._handle_command(cmd_name, args, elem, doc)
         return None
 
@@ -76,8 +67,8 @@ class FilterAction:
         Output visual feedback about the unknown command.
         """
         debug("Could not handle command %s." % cmd_name)
-        classes = [CLASS_UNKNOWN_CMD, slugify(cmd_name)]
-        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN}
+        classes = CSS_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
+        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_CMD}
 
         if isinstance(elem, pf.Block):
             div = pf.Div(classes=classes, attributes=attrs)
@@ -99,7 +90,7 @@ class FilterAction:
 
     def _handle_environment(self, elem, doc):
         """Parse and handle mintmod environments."""
-        match = PATTERN_ENV.search(elem.text)
+        match = REGEX_PATTERNS['ENV'].search(elem.text)
         if match is None:
             raise ParseError(
                 'Could not parse LaTeX environment: %s...' % elem.text[:50])
@@ -111,7 +102,7 @@ class FilterAction:
         env_args = []
         rest = inner_code
         while True:
-            match = PATTERN_ENV_ARGS.search(rest)
+            match = REGEX_PATTERNS['ENV_ARGS'].search(rest)
             if match is None:
                 break
             env_args.append(match.group('arg'))
@@ -131,8 +122,8 @@ class FilterAction:
         Output visual feedback about the unknown environment.
         """
         debug("Could not handle environment %s." % env_name)
-        classes = [CLASS_UNKNOWN_ENV, slugify(env_name)]
-        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN}
+        classes = CSS_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
+        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_ENV}
         div = pf.Div(classes=classes, attributes=attrs)
         div.content.extend([
             pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),

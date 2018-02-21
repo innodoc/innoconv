@@ -1,8 +1,7 @@
 import unittest
 import panflute as pf
-from mintmod_filter.filter_action import (FilterAction, ParseError,
-                                          CLASS_UNKNOWN_CMD, CLASS_UNKNOWN_ENV)
-from mintmod_filter.environments import MXCONTENT_CLASSES
+from mintmod_filter.constants import CSS_CLASSES
+from mintmod_filter.filter_action import FilterAction, ParseError
 
 
 class TestFilterAction(unittest.TestCase):
@@ -34,7 +33,8 @@ class TestFilterAction(unittest.TestCase):
             r'\ThisCommandAlsoDoesNotExist{foo}{bar}', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertEqual(type(ret), pf.Div)
-        self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)
+        for cls in CSS_CLASSES['UNKNOWN_CMD']:
+            self.assertIn(cls, ret.classes)
         self.assertIn('thiscommandalsodoesnotexist', ret.classes)
 
     def test_unknown_latex_rawblock_command(self):
@@ -43,7 +43,8 @@ class TestFilterAction(unittest.TestCase):
             r'\ThisCommandDoesNotExist', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertEqual(type(ret), pf.Div)
-        self.assertIn(CLASS_UNKNOWN_CMD, ret.classes)
+        for cls in CSS_CLASSES['UNKNOWN_CMD']:
+            self.assertIn(cls, ret.classes)
         self.assertIn('thiscommanddoesnotexist', ret.classes)
 
     def test_invalid_latex_rawblock_command(self):
@@ -64,7 +65,7 @@ class TestFilterAction(unittest.TestCase):
         self.assertEqual(type(ret), pf.Div)
         self.assertEqual(type(ret.content[0]), pf.Header)
         self.assertEqual(type(ret.content[1]), pf.Para)
-        for cls in MXCONTENT_CLASSES:
+        for cls in CSS_CLASSES['MXCONTENT']:
             self.assertIn(cls, ret.classes)
 
     def test_unknown_latex_rawblock_environment(self):
@@ -76,7 +77,8 @@ class TestFilterAction(unittest.TestCase):
             format='latex')
         ret = self._filter_elem([elem_env], elem_env)
         self.assertEqual(type(ret), pf.Div)
-        self.assertIn(CLASS_UNKNOWN_ENV, ret.classes)
+        for cls in CSS_CLASSES['UNKNOWN_ENV']:
+            self.assertIn(cls, ret.classes)
         self.assertIn('thisenvdoesnotexist', ret.classes)
 
     def test_invalid_latex_rawblock_environment(self):
