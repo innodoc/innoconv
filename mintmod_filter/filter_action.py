@@ -4,7 +4,7 @@ import re
 import panflute as pf
 from slugify import slugify
 
-from mintmod_filter.utils import debug, ParseError
+from mintmod_filter.utils import debug, destringify, ParseError
 from mintmod_filter.environments import Environments
 from mintmod_filter.commands import Commands
 from mintmod_filter.constants import (
@@ -70,22 +70,17 @@ class FilterAction:
         classes = CSS_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
         attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_CMD}
 
+        msg = [
+            pf.Strong(*destringify('Unhandled command:')),
+            pf.Space(), pf.Code(elem.text),
+        ]
         if isinstance(elem, pf.Block):
             div = pf.Div(classes=classes, attributes=attrs)
-            div.content.extend([
-                pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),
-                                  pf.Str('command:')),
-                        pf.Space(), pf.Code(elem.text))
-            ])
+            div.content.extend([pf.Para(*msg)])
             return div
         elif isinstance(elem, pf.Inline):
             span = pf.Span(classes=classes, attributes=attrs)
-            span.content.extend([
-                    pf.Strong(
-                        pf.Str('Unhandled'), pf.Space(),
-                        pf.Str('command:')
-                    ), pf.Space(), pf.Code(elem.text)
-            ])
+            span.content.extend(msg)
             return span
 
     def _handle_environment(self, elem, doc):
@@ -125,9 +120,7 @@ class FilterAction:
         classes = CSS_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
         attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_ENV}
         div = pf.Div(classes=classes, attributes=attrs)
-        div.content.extend([
-            pf.Para(pf.Strong(pf.Str('Unhandled'), pf.Space(),
-                              pf.Str('environment:')),
-                    pf.LineBreak(), pf.Code(elem.text))
-        ])
+        msg = pf.Para(pf.Strong(*destringify('Unhandled environment:')),
+                      pf.LineBreak(), pf.Code(elem.text))
+        div.content.extend([msg])
         return div

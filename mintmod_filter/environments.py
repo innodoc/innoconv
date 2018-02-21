@@ -9,7 +9,7 @@ Example: ``handle_mxcontent`` method will receive the
 
 import panflute as pf
 from mintmod_filter.constants import CSS_CLASSES
-from mintmod_filter.utils import pandoc_parse, debug
+from mintmod_filter.utils import pandoc_parse, debug, destringify
 from mintmod_filter.elements import create_content_box
 
 
@@ -74,7 +74,7 @@ class Environments():
         div = pf.Div(classes=CSS_CLASSES['MHINT'])
 
         div.content.extend([
-            pf.Plain(pf.Span(pf.Str(env_args[0]),
+            pf.Plain(pf.Span(*destringify(env_args[0]),
                              classes=CSS_CLASSES['MHINT_TEXT']))
         ] + pandoc_parse(elem_content))
 

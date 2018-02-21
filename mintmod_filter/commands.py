@@ -8,7 +8,7 @@ Example: ``handle_msection`` method will receive the ``MSection`` command.
 
 import panflute as pf
 from mintmod_filter.elements import create_header
-from mintmod_filter.utils import debug
+from mintmod_filter.utils import debug, destringify
 
 
 class Commands():
@@ -72,8 +72,8 @@ class Commands():
         This command inserts an fragment-style link.
         """
         url = '#%s' % args[0]
-        description = args[1]
-        return pf.Link(pf.Str(description), url=url)
+        description = destringify(args[1])
+        return pf.Link(*description, url=url)
 
     def handle_mssectionlabelprefix(self, args, elem, doc):
         """Handle ``MSsectionlabelprefix`` command.
