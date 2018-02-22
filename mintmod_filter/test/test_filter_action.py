@@ -21,22 +21,23 @@ class TestFilterAction(unittest.TestCase):
         "filter() returns Math if given Math element"
         elem_math = pf.Math(r'1+2')
         ret = self._filter_elem([pf.Para(elem_math)], elem_math)
-        self.assertEqual(type(ret), pf.Math)
+        self.assertIsInstance(ret, pf.Math)
 
     def test_known_command(self):
         "filter() handles known LaTeX command"
         elem_mtitle = pf.RawBlock(r'\MTitle{Foo}', format='latex')
         ret = self._filter_elem([elem_mtitle], elem_mtitle)
-        self.assertEqual(type(ret), pf.Header)
+        self.assertIsInstance(ret, pf.Header)
 
     def test_unknown_command_param(self):
         "filter() handles unknown LaTeX command"
         elem_unkown_cmd = pf.RawBlock(
             r'\ThisCommandAlsoDoesNotExist{foo}{bar}', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
-        self.assertEqual(type(ret), pf.Div)
+        self.assertIsInstance(ret, pf.Div)
         for cls in CSS_CLASSES['UNKNOWN_CMD']:
-            self.assertIn(cls, ret.classes)
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)
         self.assertIn('thiscommandalsodoesnotexist', ret.classes)
 
     def test_unknown_command(self):
@@ -44,9 +45,10 @@ class TestFilterAction(unittest.TestCase):
         elem_unkown_cmd = pf.RawBlock(
             r'\ThisCommandDoesNotExist', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
-        self.assertEqual(type(ret), pf.Div)
+        self.assertIsInstance(ret, pf.Div)
         for cls in CSS_CLASSES['UNKNOWN_CMD']:
-            self.assertIn(cls, ret.classes)
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)
         self.assertIn('thiscommanddoesnotexist', ret.classes)
 
     def test_invalid_command(self):
@@ -64,11 +66,12 @@ class TestFilterAction(unittest.TestCase):
             r'\end{MXContent}',
             format='latex')
         ret = self._filter_elem([elem_env], elem_env)
-        self.assertEqual(type(ret), pf.Div)
-        self.assertEqual(type(ret.content[0]), pf.Header)
-        self.assertEqual(type(ret.content[1]), pf.Para)
+        self.assertIsInstance(ret, pf.Div)
+        self.assertIsInstance(ret.content[0], pf.Header)
+        self.assertIsInstance(ret.content[1], pf.Para)
         for cls in CSS_CLASSES['MXCONTENT']:
-            self.assertIn(cls, ret.classes)
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)
 
     def test_unknown_environment(self):
         "filter() handles unknown LaTeX environment"
@@ -78,9 +81,10 @@ class TestFilterAction(unittest.TestCase):
             r'\end{ThisEnvDoesNotExist}',
             format='latex')
         ret = self._filter_elem([elem_env], elem_env)
-        self.assertEqual(type(ret), pf.Div)
+        self.assertIsInstance(ret, pf.Div)
         for cls in CSS_CLASSES['UNKNOWN_ENV']:
-            self.assertIn(cls, ret.classes)
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)
         self.assertIn('thisenvdoesnotexist', ret.classes)
 
     def test_invalid_environment(self):
