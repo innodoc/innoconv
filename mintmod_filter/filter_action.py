@@ -70,9 +70,10 @@ class FilterAction:
         func = getattr(self._commands, function_name, None)
         if callable(func):
             return func(args, elem)
-        return self._handle_unknown_command(cmd_name, args, elem)
+        return self._handle_unknown_command(cmd_name, elem)
 
-    def _handle_unknown_command(self, cmd_name, args, elem):
+    @staticmethod
+    def _handle_unknown_command(cmd_name, elem):
         """Handle unknown latex commands.
 
         Output visual feedback about the unknown command.
@@ -119,9 +120,10 @@ class FilterAction:
         func = getattr(self._environments, function_name, None)
         if callable(func):
             return func(rest, env_args)
-        return self._handle_unknown_environment(env_name, env_args, rest, elem)
+        return self._handle_unknown_environment(env_name, elem)
 
-    def _handle_unknown_environment(self, env_name, args, elem_content, elem):
+    @staticmethod
+    def _handle_unknown_environment(env_name, elem):
         """Handle unknown latex environment.
 
         Output visual feedback about the unknown environment.
