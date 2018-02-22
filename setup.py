@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
+# pylint: disable=missing-docstring
+
+"""Define project commands."""
+
+
 import distutils.cmd
 from distutils.command.clean import clean
 import os
 import logging
-from setuptools import setup
-from setuptools.command.test import test as SetuptoolsTestCommand
 import subprocess
 import sys
+from setuptools import setup
 from colorama import init as colorama_init, Style
 
 
@@ -24,35 +28,41 @@ BOOTSTRAP_CSS = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/' \
                 'bootstrap.min.css'
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
-log = logging.getLogger('setup.py')
 colorama_init()
 
 
-def _run(command, err_msg='Command failed!', cwd=ROOT_DIR):
-    log.info('%sCommand%s %s' % (
-        Style.BRIGHT, Style.NORMAL, ' '.join(command)))
-    # make mintmod_filter module available
-    env = os.environ.copy()
-    env['PYTHONPATH'] = ROOT_DIR
-
-    proc = subprocess.Popen(command, cwd=cwd, env=env)
-    out, err = proc.communicate()
-    if out:
-        log.info(out)
-    if err:
-        log.error(err)
-    if proc.returncode != 0:
-        raise RuntimeError(err_msg)
+def get_logger():
+    return logging.getLogger('setup.py')
 
 
 class BaseCommand(distutils.cmd.Command):
     user_options = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log = get_logger()
 
     def initialize_options(self):
         pass
 
     def finalize_options(self):
         pass
+
+    def _run(self, command, err_msg='Command failed!', cwd=ROOT_DIR):
+        self.log.info(
+            '%sCommand%s %s', Style.BRIGHT, Style.NORMAL, ' '.join(command))
+        # make mintmod_filter module available
+        env = os.environ.copy()
+        env['PYTHONPATH'] = ROOT_DIR
+
+        proc = subprocess.Popen(command, cwd=cwd, env=env)
+        out, err_out = proc.communicate()
+        if out:
+            self.log.info(out)
+        if err_out:
+            self.log.error(err_out)
+        if proc.returncode != 0:
+            raise RuntimeError(err_msg)
 
 
 # TODO: this should be named BuildProjectCommand and work for arbitrary
@@ -66,67 +76,79 @@ class BuildTUBBaseCommand(BaseCommand):
         project_root_lang = os.path.join(project_root, 'de')
 
         # clone source
-        _run(['mkdir', '-p', CONTENT_ROOT])
+        self._run(['mkdir', '-p', CONTENT_ROOT])
         if os.path.isdir(project_root):
-            log.info('Content source directory already exists.')
+            self.log.info('Content source directory already exists.')
         else:
-            log.info('Cloning source repository.')
-            _run(['git', 'clone', '-q', '-b', TUB_BASE_BRANCH, TUB_BASE_REPO],
-                 cwd=CONTENT_ROOT)
+            self.log.info('Cloning source repository.')
+            self._run(
+                ['git', 'clone', '-q', '-b', TUB_BASE_BRANCH, TUB_BASE_REPO],
+                cwd=CONTENT_ROOT)
 
         # fetch de.tex
         filename_base = 'de.tex'
         filename_path = os.path.join(project_root_lang, filename_base)
         if os.path.isfile(filename_path):
-            log.info('File already exists: %s' % filename_base)
+            self.log.info('File already exists: %s', filename_base)
         else:
-            log.info('Fetching file: %s' % filename_base)
-            _run(['wget', '--quiet', MINTMOD_BASE_URL % filename_base],
-                 cwd=project_root_lang)
+            self.log.info('Fetching file: %s', filename_base)
+            self._run(['wget', '--quiet', MINTMOD_BASE_URL % filename_base],
+                      cwd=project_root_lang)
 
         # build html
         filename_out_path = os.path.join(BUILD_ROOT, 'tub_base', 'de')
         filename_out = os.path.join(filename_out_path, 'tree_pandoc.html')
-        _run(['mkdir', '-p', filename_out_path])
-        _run(['pandoc', '--from=latex+raw_tex', '--to=html5+empty_paragraphs',
-              '--standalone', '--mathjax',
-              '--filter=../../../mintmod_filter/__main__.py',
-              '--css=%s' % BOOTSTRAP_CSS,
-              '--output=%s' % filename_out, 'tree_pandoc.tex'],
-             cwd=project_root_lang)
+        self._run(['mkdir', '-p', filename_out_path])
+        self._run(['pandoc', '--from=latex+raw_tex',
+                   '--to=html5+empty_paragraphs',
+                   '--standalone', '--mathjax',
+                   '--filter=../../../mintmod_filter/__main__.py',
+                   '--css=%s' % BOOTSTRAP_CSS,
+                   '--output=%s' % filename_out, 'tree_pandoc.tex'],
+                  cwd=project_root_lang)
 
-        log.info('%sBuild finished:%s %s' % (
-            Style.BRIGHT, Style.NORMAL, filename_out))
+        self.log.info(
+            '%sBuild finished:%s %s', Style.BRIGHT, Style.NORMAL, filename_out)
 
 
-class LintCommand(BaseCommand):
+class Flake8Command(BaseCommand):
     description = 'Run flake8 on Python source files'
 
     def run(self):
-        _run(['flake8', 'mintmod_filter', 'setup.py'])
+        self._run(['flake8', 'mintmod_filter', 'setup.py'])
 
 
-class TestCommand(SetuptoolsTestCommand):
+class PylintCommand(BaseCommand):
+    description = 'Run pylint on Python source files'
+
+    def run(self):
+        self._run(['pylint', '--output-format=colorized', 'mintmod_filter'])
+
+
+class TestCommand(BaseCommand):
     description = 'Run test suite'
 
     def run(self):
-        _run(['green', '-r', 'mintmod_filter'])
+        self._run(['green', '-r', 'mintmod_filter'])
 
 
 class CoverageCommand(BaseCommand):
     description = 'Generate HTML coverage report'
 
     def run(self):
-        _run(['coverage', 'html'])
+        if not os.path.isfile(os.path.join(ROOT_DIR, '.coverage')):
+            self.log.error(
+                'Run "./setup.py test" first to generate a ".coverage".')
+        self._run(['coverage', 'html'])
 
 
-class CleanCommand(clean):
+class CleanCommand(clean, BaseCommand):
     def run(self):
         super().run()
-        _run(['rm', '-rf', BUILD_ROOT])
-        _run(['rm', '-rf', CONTENT_ROOT])
-        _run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
-        _run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
+        self._run(['rm', '-rf', BUILD_ROOT])
+        self._run(['rm', '-rf', CONTENT_ROOT])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
 
 
 def setup_package():
@@ -139,7 +161,8 @@ def setup_package():
             'build_tub_base': BuildTUBBaseCommand,
             'clean': CleanCommand,
             'coverage': CoverageCommand,
-            'lint': LintCommand,
+            'flake8': Flake8Command,
+            'pylint': PylintCommand,
             'test': TestCommand,
         },
         entry_points={
@@ -160,5 +183,5 @@ if __name__ == '__main__':
     try:
         setup_package()
     except RuntimeError as err:
-        log.error('%s: %s' % (type(err).__name__, err))
+        get_logger().error('%s: %s', type(err).__name__, err)
         sys.exit(-1)

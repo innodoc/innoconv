@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import unittest
 import os
 import panflute as pf

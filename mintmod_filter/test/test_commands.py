@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import unittest
 import panflute as pf
 from mintmod_filter.commands import Commands
