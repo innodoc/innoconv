@@ -1,13 +1,12 @@
 """Handle mintmod LaTeX environments."""
 
 import panflute as pf
-from mintmod_filter.base import BaseLatexToken
 from mintmod_filter.constants import CSS_CLASSES
 from mintmod_filter.utils import pandoc_parse, debug, destringify
 from mintmod_filter.elements import create_content_box
 
 
-class Environments(BaseLatexToken):
+class Environments():
 
     r"""Handlers for environments are defined here.
 
@@ -18,10 +17,10 @@ class Environments(BaseLatexToken):
     ``\begin{MXContent}…\end{MXContent}`` environment.
     """
 
-    def handle_msectionstart(self, elem_content, env_args):
+    def handle_msectionstart(self, elem_content, env_args, elem):
         """Handle ``MSectionStart`` environment."""
         # Use title from previously found \MSection command
-        header = getattr(self.doc, "last_header_elem", None)
+        header = getattr(elem.doc, "last_header_elem", None)
         if header is None:
             debug("warning handle_msectionstart did not find a previously \
             found header element.")
@@ -30,50 +29,50 @@ class Environments(BaseLatexToken):
         div.content.extend([header] + pandoc_parse(elem_content))
         return div
 
-    def handle_mxcontent(self, elem_content, env_args):
+    def handle_mxcontent(self, elem_content, env_args, elem):
         """Handle ``MXContent`` environment."""
         title = env_args[0]
         return create_content_box(
             title, CSS_CLASSES['MXCONTENT'],
-            elem_content, self.doc, level=3, auto_id=True
+            elem_content, elem.doc, level=3, auto_id=True
         )
 
-    def handle_mexercises(self, elem_content, env_args):
+    def handle_mexercises(self, elem_content, env_args, elem):
         """Handle ``MExercises`` environment."""
         return create_content_box(
             'Aufgaben', CSS_CLASSES['MEXERCISES'],
-            elem_content, self.doc, level=3
+            elem_content, elem.doc, level=3
         )
 
-    def handle_mexercise(self, elem_content, env_args):
+    def handle_mexercise(self, elem_content, env_args, elem):
         """Handle ``MExercise`` environment."""
         return create_content_box(
             'Aufgabe', CSS_CLASSES['MEXERCISE'],
-            elem_content, self.doc
+            elem_content, elem.doc
         )
 
-    def handle_minfo(self, elem_content, env_args):
+    def handle_minfo(self, elem_content, env_args, elem):
         """Handle ``MInfo`` environment."""
         return create_content_box(
             'Info', CSS_CLASSES['MINFO'],
-            elem_content, self.doc
+            elem_content, elem.doc
         )
 
-    def handle_mexperiment(self, elem_content, env_args):
+    def handle_mexperiment(self, elem_content, env_args, elem):
         """Handle ``MExperiment`` environment."""
         return create_content_box(
             'Experiment', CSS_CLASSES['MEXPERIMENT'],
-            elem_content, self.doc
+            elem_content, elem.doc
         )
 
-    def handle_mexample(self, elem_content, env_args):
+    def handle_mexample(self, elem_content, env_args, elem):
         """Handle ``MExample`` command."""
         return create_content_box(
             'Beispiel', CSS_CLASSES['MEXAMPLE'],
-            elem_content, self.doc
+            elem_content, elem.doc
         )
 
-    def handle_mhint(self, elem_content, env_args):
+    def handle_mhint(self, elem_content, env_args, elem):
         """Handle ``MHint`` command."""
         div = pf.Div(classes=CSS_CLASSES['MHINT'])
 

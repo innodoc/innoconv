@@ -33,8 +33,6 @@ class FilterAction:
         :param doc: Document
         :type doc: :class:`panflute.elements.Doc`
         """
-        self._commands.doc = doc
-        self._environments.doc = doc
 
         # simple command subtitutions in Math environments
         if isinstance(elem, pf.Math):
@@ -119,7 +117,7 @@ class FilterAction:
         function_name = 'handle_%s' % slugify(env_name)
         func = getattr(self._environments, function_name, None)
         if callable(func):
-            return func(rest, env_args)
+            return func(rest, env_args, elem)
         return self._handle_unknown_environment(env_name, elem)
 
     @staticmethod

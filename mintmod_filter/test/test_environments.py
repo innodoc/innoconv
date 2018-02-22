@@ -11,7 +11,6 @@ class TestEnvironments(unittest.TestCase):
     def setUp(self):
         self.doc = pf.Doc()
         self.environments = Environments()
-        self.environments.doc = self.doc
 
     def test_handle_minfo(self):
         self._test_content_box(
@@ -43,7 +42,7 @@ class TestEnvironments(unittest.TestCase):
             CSS_CLASSES['MEXAMPLE'], 'Beispiel'
         )
 
-    def _test_content_box(self, command, css_classes, title):
+    def _test_content_box(self, handler, css_classes, title):
         """Test if content boxes (e.g. Exercises, Examples, Experiment, Info)
         are handled correctly
         """
@@ -53,12 +52,14 @@ class TestEnvironments(unittest.TestCase):
         \item{item2}
         \end{itemize}"""
 
-        # the handling of the env should return a div with the given classes
-        div = command(elem_content, [])
+        # should return a div with the given classes
+        self.doc.content.extend([pf.RawBlock(elem_content, format='latex')])
+        elem = self.doc.content[0]  # this sets up elem.parent
+        div = handler(elem_content, [], elem)
         self.assertIsInstance(div, pf.Div)
         self.assertEqual(div.classes, css_classes)
 
-        # it should return a header without an id but with the correct title
+        # should return a header without an id but with the correct title
         self.assertIsInstance(div.content[0], pf.Header)
         self.assertEqual(div.content[0].identifier, "")
         self.assertEqual(div.content[0].content[0].text, title)

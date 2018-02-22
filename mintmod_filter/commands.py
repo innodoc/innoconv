@@ -1,12 +1,13 @@
 """Handle mintmod LaTeX commands."""
 
+# pylint: disable=unused-argument,no-self-use
+
 import panflute as pf
-from mintmod_filter.base import BaseLatexToken
 from mintmod_filter.elements import create_header
 from mintmod_filter.utils import debug, destringify
 
 
-class Commands(BaseLatexToken):
+class Commands():
 
     """Handlers for commands are defined here.
 
@@ -21,26 +22,26 @@ class Commands(BaseLatexToken):
 
         ``MSectionStart`` environment will use this information later.
         """
-        create_header(args[0], level=2, doc=self.doc, auto_id=True)
+        create_header(args[0], level=2, doc=elem.doc, auto_id=True)
         return []
 
     def handle_msubsection(self, args, elem):
         """Handle ``MSubsection``"""
-        return create_header(args[0], level=3, doc=self.doc, auto_id=True)
+        return create_header(args[0], level=3, doc=elem.doc, auto_id=True)
 
     def handle_mtitle(self, args, elem):
         """Handle ``MTitle`` command.
 
         These is an equivalent to ``subsubsection``
         """
-        return create_header(args[0], level=4, doc=self.doc, auto_id=True)
+        return create_header(args[0], level=4, doc=elem.doc, auto_id=True)
 
     def handle_mlabel(self, args, elem):
         """Handle ``MLabel`` command.
 
         Will search for the previous header element and update its ID to the
         ID defined in the ``MLabel`` command."""
-        last_header_elem = getattr(self.doc, "last_header_elem", None)
+        last_header_elem = getattr(elem.doc, "last_header_elem", None)
 
         if last_header_elem is None:
             debug("WARNING: last_header_elem undefined in handle_mlabel with"
@@ -65,7 +66,7 @@ class Commands(BaseLatexToken):
 
         Command defines the document title.
         """
-        self.doc.metadata['title'] = pf.MetaString(args[0])
+        elem.doc.metadata['title'] = pf.MetaString(args[0])
         return []
 
     def handle_msref(self, args, elem):
@@ -108,6 +109,7 @@ class Commands(BaseLatexToken):
         """
         return self._noop()
 
-    def _noop(self):
+    @staticmethod
+    def _noop():
         """Return no elements."""
         return []

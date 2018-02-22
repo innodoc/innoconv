@@ -8,16 +8,16 @@ from mintmod_filter.commands import Commands
 class TestCommands(unittest.TestCase):
 
     def setUp(self):
-        self.doc = pf.Doc()
         self.commands = Commands()
-        self.commands.doc = self.doc
 
     def test_handle_msection(self):
-        ret = self.commands.handle_msection(["A Test Title"], None)
+        doc = pf.Doc(pf.RawBlock(r'\MSection{A Test Title}'), format='latex')
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.commands.handle_msection(["A Test Title"], elem)
 
         self.assertEqual(ret, [])
 
-        last_header_elem = getattr(self.doc, "last_header_elem", None)
+        last_header_elem = getattr(doc, "last_header_elem")
 
         self.assertIsInstance(last_header_elem, pf.Header)
         self.assertIsInstance(last_header_elem.content[0], pf.Str)
@@ -31,7 +31,10 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.level, 2)
 
     def test_handle_msref(self):
-        ret = self.commands.handle_msref(['fooid', 'linktext'], None)
+        doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.commands.handle_msref(['fooid', 'linktext'], elem)
         self.assertIsInstance(ret, pf.Link)
+        self.assertIsInstance(ret.content[0], pf.Str)
         self.assertEqual(ret.content[0].text, 'linktext')
         self.assertEqual(ret.url, '#fooid')

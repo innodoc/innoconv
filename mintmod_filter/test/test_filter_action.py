@@ -25,8 +25,9 @@ class TestFilterAction(unittest.TestCase):
 
     def test_known_command(self):
         "filter() handles known LaTeX command"
-        elem_mtitle = pf.RawBlock(r'\MTitle{Foo}', format='latex')
-        ret = self._filter_elem([elem_mtitle], elem_mtitle)
+        self.doc.content.extend([pf.RawBlock(r'\MTitle{Foo}', format='latex')])
+        elem = self.doc.content[0]  # this sets up elem.parent
+        ret = self._filter_elem([elem], elem)
         self.assertIsInstance(ret, pf.Header)
 
     def test_unknown_command_param(self):
@@ -60,11 +61,12 @@ class TestFilterAction(unittest.TestCase):
 
     def test_known_environment(self):
         "filter() handles known LaTeX environment"
-        elem_env = pf.RawBlock(
+        self.doc.content.extend([pf.RawBlock(
             r'\begin{MXContent}{FooShort}{Foo}{STD}'
             'FOOBARCONTENT'
             r'\end{MXContent}',
-            format='latex')
+            format='latex')])
+        elem_env = self.doc.content[0]  # this sets up elem.parent
         ret = self._filter_elem([elem_env], elem_env)
         self.assertIsInstance(ret, pf.Div)
         self.assertIsInstance(ret.content[0], pf.Header)
