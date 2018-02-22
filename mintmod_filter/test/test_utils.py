@@ -32,25 +32,33 @@ class TestParsePandoc(unittest.TestCase):
         h_2 = doc[2]
         para_2 = doc[3]
 
-        content_test = (
-            (type(h_1), pf.Header),
-            (type(h_1), pf.Header),
-            (type(h_1.content[0]), pf.Str),
+        # test types
+        type_tests = (
+            (h_1, pf.Header),
+            (h_1, pf.Header),
+            (h_1.content[0], pf.Str),
+            (h_1.content[1], pf.Space),
+            (h_1.content[2], pf.Str),
+            (para_1, pf.Para),
+            (h_2, pf.Header),
+            (para_1, pf.Para),
+        )
+        for elem in type_tests:
+            with self.subTest(_type=type(elem[0])):
+                self.assertIsInstance(elem[0], elem[1])
+
+        # test content
+        content_tests = (
             (h_1.content[0].text, 'Test'),
-            (type(h_1.content[1]), pf.Space),
-            (type(h_1.content[2]), pf.Str),
             (h_1.content[2].text, 'heading'),
-            (h_1.content[2].text, 'heading'),
-            (type(para_1), pf.Para),
             (len(para_1.content), 121),
-            (type(h_2), pf.Header),
             (h_2.content[0].text, 'Another'),
-            (type(para_1), pf.Para),
+            (h_2.content[2].text, 'heading'),
             (len(para_2.content), 149),
         )
-
-        for elem in content_test:
-            self.assertEqual(elem[0], elem[1])
+        for elem in content_tests:
+            with self.subTest(value=elem[0]):
+                self.assertEqual(elem[0], elem[1])
 
     def test_parse_pandoc_empty(self):
         "parse_pandoc() returns [] if given empty document"
@@ -105,12 +113,6 @@ class TestDestringify(unittest.TestCase):
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self._compare_list(ret, comp)
-        # TODO
-        # for i, token in enumerate(ret):
-        #     _type = type(comp[i])
-        #     self.assertIsInstance(token, _type)
-        #     if _type == pf.Str:
-        #         self.assertEqual(token.text, comp[i].text)
 
     def test_empty(self):
         string = ''
@@ -140,6 +142,9 @@ class TestDestringify(unittest.TestCase):
     def _compare_list(self, l_1, l_2):
         for i, l_1_elem in enumerate(l_1):
             _type = type(l_2[i])
-            self.assertIsInstance(l_1_elem, _type)
-            if _type == pf.Str:
-                self.assertEqual(l_1_elem.text, l_2[i].text)
+            with self.subTest(i=i):
+                with self.subTest(_type=_type):
+                    self.assertIsInstance(l_1_elem, _type)
+                if _type == pf.Str:
+                    with self.subTest(text=l_1_elem.text):
+                        self.assertEqual(l_1_elem.text, l_2[i].text)
