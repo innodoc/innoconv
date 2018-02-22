@@ -20,37 +20,37 @@ Here is a text with another \MLabel{paralabel}
 \end{MXContent}"""
 
 
-class TestUtils(unittest.TestCase):
+class TestParsePandoc(unittest.TestCase):
 
     def test_parse_pandoc(self):
         "parse_pandoc() returns valid output if given test document"
-        with open(os.path.join(SCRIPT_DIR, 'files', 'test.tex'), 'r') as f:
-            content = f.read()
+        with open(os.path.join(SCRIPT_DIR, 'files', 'test.tex'), 'r') as file:
+            content = file.read()
         doc = pandoc_parse(content)
-        h1 = doc[0]
-        para1 = doc[1]
-        h2 = doc[2]
-        para2 = doc[3]
+        h_1 = doc[0]
+        para_1 = doc[1]
+        h_2 = doc[2]
+        para_2 = doc[3]
 
         content_test = (
-            (type(h1), pf.Header),
-            (type(h1), pf.Header),
-            (type(h1.content[0]), pf.Str),
-            (h1.content[0].text, 'Test'),
-            (type(h1.content[1]), pf.Space),
-            (type(h1.content[2]), pf.Str),
-            (h1.content[2].text, 'heading'),
-            (h1.content[2].text, 'heading'),
-            (type(para1), pf.Para),
-            (len(para1.content), 121),
-            (type(h2), pf.Header),
-            (h2.content[0].text, 'Another'),
-            (type(para1), pf.Para),
-            (len(para2.content), 149),
+            (type(h_1), pf.Header),
+            (type(h_1), pf.Header),
+            (type(h_1.content[0]), pf.Str),
+            (h_1.content[0].text, 'Test'),
+            (type(h_1.content[1]), pf.Space),
+            (type(h_1.content[2]), pf.Str),
+            (h_1.content[2].text, 'heading'),
+            (h_1.content[2].text, 'heading'),
+            (type(para_1), pf.Para),
+            (len(para_1.content), 121),
+            (type(h_2), pf.Header),
+            (h_2.content[0].text, 'Another'),
+            (type(para_1), pf.Para),
+            (len(para_2.content), 149),
         )
 
-        for c in content_test:
-            self.assertEqual(c[0], c[1])
+        for elem in content_test:
+            self.assertEqual(elem[0], elem[1])
 
     def test_parse_pandoc_empty(self):
         "parse_pandoc() returns [] if given empty document"
@@ -80,12 +80,15 @@ class TestUtils(unittest.TestCase):
         self.assertIsInstance(header3, pf.Header)
         self.assertEqual(header3.identifier, "LABEL_BASE_SITE_ONE")
 
-        # para1 = ast_native[2]
-        # self.assertIsInstance(para1, pf.Para)
-        # self.assertEqual(para1.identifier, "paralabel")
+        # para_1 = ast_native[2]
+        # self.assertIsInstance(para_1, pf.Para)
+        # self.assertEqual(para_1.identifier, "paralabel")
 
-    def test_destringify(self):
-        str = 'This is a  really\tnice    string.'
+
+class TestDestringify(unittest.TestCase):
+
+    def test_regular(self):
+        string = 'This is a  really\tnice    string.'
         comp = [
             pf.Str('This'),
             pf.Space(),
@@ -99,43 +102,44 @@ class TestUtils(unittest.TestCase):
             pf.Space(),
             pf.Str('string.'),
         ]
-        ret = destringify(str)
+        ret = destringify(string)
         self.assertIsInstance(ret, list)
         self._compare_list(ret, comp)
+        # TODO
         # for i, token in enumerate(ret):
         #     _type = type(comp[i])
         #     self.assertIsInstance(token, _type)
         #     if _type == pf.Str:
         #         self.assertEqual(token.text, comp[i].text)
 
-    def test_destringify_empty(self):
-        str = ''
-        ret = destringify(str)
+    def test_empty(self):
+        string = ''
+        ret = destringify(string)
         self.assertIsInstance(ret, list)
         self.assertListEqual(ret, [])
 
-    def test_destringify_empty_whitespace(self):
-        str = '   '
-        ret = destringify(str)
+    def test_empty_whitespace(self):
+        string = '   '
+        ret = destringify(string)
         self.assertIsInstance(ret, list)
         self.assertListEqual(ret, [])
 
-    def test_destringify_one_word(self):
-        str = 'foobar'
-        ret = destringify(str)
+    def test_one_word(self):
+        string = 'foobar'
+        ret = destringify(string)
         self.assertIsInstance(ret, list)
         self._compare_list(ret, [pf.Str('foobar')])
 
-    def test_destringify_leading_trailing_whitespace(self):
-        str = '  foo bar  '
+    def test_whitespace(self):
+        string = '  foo bar  '
         comp = [pf.Str('foo'), pf.Space(), pf.Str('bar')]
-        ret = destringify(str)
+        ret = destringify(string)
         self.assertIsInstance(ret, list)
         self._compare_list(ret, comp)
 
-    def _compare_list(self, l1, l2):
-        for i, l1_elem in enumerate(l1):
-            _type = type(l2[i])
-            self.assertIsInstance(l1_elem, _type)
+    def _compare_list(self, l_1, l_2):
+        for i, l_1_elem in enumerate(l_1):
+            _type = type(l_2[i])
+            self.assertIsInstance(l_1_elem, _type)
             if _type == pf.Str:
-                self.assertEqual(l1_elem.text, l2[i].text)
+                self.assertEqual(l_1_elem.text, l_2[i].text)

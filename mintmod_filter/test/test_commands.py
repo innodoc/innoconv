@@ -8,11 +8,12 @@ from mintmod_filter.commands import Commands
 class TestCommands(unittest.TestCase):
 
     def setUp(self):
-        self.commands = Commands()
         self.doc = pf.Doc()
+        self.commands = Commands()
+        self.commands.doc = self.doc
 
     def test_handle_msection(self):
-        ret = self.commands.handle_msection(["A Test Title"], None, self.doc)
+        ret = self.commands.handle_msection(["A Test Title"], None)
 
         self.assertEqual(ret, [])
 
@@ -30,7 +31,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.level, 2)
 
     def test_handle_msref(self):
-        ret = self.commands.handle_msref(['fooid', 'linktext'], None, self.doc)
+        ret = self.commands.handle_msref(['fooid', 'linktext'], None)
         self.assertIsInstance(ret, pf.Link)
         self.assertEqual(ret.content[0].text, 'linktext')
         self.assertEqual(ret.url, '#fooid')

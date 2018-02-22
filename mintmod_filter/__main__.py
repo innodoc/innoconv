@@ -6,10 +6,10 @@ from panflute import run_filter
 from mintmod_filter.filter_action import FilterAction
 
 
-def main(doc=None):
+def main():
     """Execute filter."""
     filter_action = FilterAction()
-    return run_filter(filter_action.filter, doc=doc)
+    return run_filter(filter_action.filter)
 
 
 if __name__ == '__main__':

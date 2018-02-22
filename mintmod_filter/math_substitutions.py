@@ -13,7 +13,7 @@ MATH_SUBSTITIONS = (
 )
 
 
-def handle_math_substitutions(elem, doc):
+def handle_math_substitutions(elem):
     """Handle simple mintmod text substitutions in math environments."""
     for repl in MATH_SUBSTITIONS:
         elem.text = elem.text.replace(repl[0], repl[1])

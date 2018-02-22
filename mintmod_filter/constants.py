@@ -1,3 +1,5 @@
+"""All project constants are defined here."""
+
 import re
 
 # regex patterns

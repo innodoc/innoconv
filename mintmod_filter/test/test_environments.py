@@ -9,8 +9,9 @@ from mintmod_filter.environments import Environments
 class TestEnvironments(unittest.TestCase):
 
     def setUp(self):
-        self.environments = Environments()
         self.doc = pf.Doc()
+        self.environments = Environments()
+        self.environments.doc = self.doc
 
     def test_handle_minfo(self):
         self._test_content_box(
@@ -53,7 +54,7 @@ class TestEnvironments(unittest.TestCase):
         \end{itemize}"""
 
         # the handling of the env should return a div with the given classes
-        div = command(elem_content, [], self.doc)
+        div = command(elem_content, [])
         self.assertIsInstance(div, pf.Div)
         self.assertEqual(div.classes, css_classes)
 

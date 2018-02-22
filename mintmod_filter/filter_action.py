@@ -13,6 +13,9 @@ from mintmod_filter.math_substitutions import handle_math_substitutions
 
 
 class FilterAction:
+
+    """The Pandoc filter is defined in this class."""
+
     def __init__(self):
         self._commands = Commands()
         self._environments = Environments()
@@ -30,38 +33,46 @@ class FilterAction:
         :param doc: Document
         :type doc: :class:`panflute.elements.Doc`
         """
+        self._commands.doc = doc
+        self._environments.doc = doc
+
+        # simple command subtitutions in Math environments
         if isinstance(elem, pf.Math):
-            return handle_math_substitutions(elem, doc)
+            return handle_math_substitutions(elem)
+
+        # block commands and environments
         elif isinstance(elem, pf.RawBlock) and elem.format == 'latex':
             match = REGEX_PATTERNS['CMD'].match(elem.text)
             if match:
                 cmd_name = match.groups()[0]
                 if cmd_name.startswith('begin'):
-                    return self._handle_environment(elem, doc)
-                else:
-                    args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
-                    return self._handle_command(cmd_name, args, elem, doc)
+                    return self._handle_environment(elem)
+                args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
+                return self._handle_command(cmd_name, args, elem)
             else:
                 raise ParseError(
                     'Could not parse LaTeX command: %s...' % elem.text)
+
+        # inline commands
         elif isinstance(elem, pf.RawInline) and elem.format == 'latex':
             # no inline environments are allowed
             match = REGEX_PATTERNS['CMD'].match(elem.text)
             if match:
                 cmd_name = match.groups()[0]
                 args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
-                return self._handle_command(cmd_name, args, elem, doc)
-        return None
+                return self._handle_command(cmd_name, args, elem)
 
-    def _handle_command(self, cmd_name, args, elem, doc):
+        return None  # element unchanged
+
+    def _handle_command(self, cmd_name, args, elem):
         """Parse and handle mintmod commands."""
         function_name = 'handle_%s' % slugify(cmd_name)
         func = getattr(self._commands, function_name, None)
         if callable(func):
-            return func(args, elem, doc)
-        return self._handle_unknown_command(cmd_name, args, elem, doc)
+            return func(args, elem)
+        return self._handle_unknown_command(cmd_name, args, elem)
 
-    def _handle_unknown_command(self, cmd_name, args, elem, doc):
+    def _handle_unknown_command(self, cmd_name, args, elem):
         """Handle unknown latex commands.
 
         Output visual feedback about the unknown command.
@@ -82,8 +93,9 @@ class FilterAction:
             span = pf.Span(classes=classes, attributes=attrs)
             span.content.extend(msg)
             return span
+        return None
 
-    def _handle_environment(self, elem, doc):
+    def _handle_environment(self, elem):
         """Parse and handle mintmod environments."""
         match = REGEX_PATTERNS['ENV'].search(elem.text)
         if match is None:
@@ -106,12 +118,10 @@ class FilterAction:
         function_name = 'handle_%s' % slugify(env_name)
         func = getattr(self._environments, function_name, None)
         if callable(func):
-            return func(rest, env_args, doc)
-        return self._handle_unknown_environment(
-            env_name, env_args, rest, elem, doc)
+            return func(rest, env_args)
+        return self._handle_unknown_environment(env_name, env_args, rest, elem)
 
-    def _handle_unknown_environment(self, env_name, args, elem_content, elem,
-                                    doc):
+    def _handle_unknown_environment(self, env_name, args, elem_content, elem):
         """Handle unknown latex environment.
 
         Output visual feedback about the unknown environment.

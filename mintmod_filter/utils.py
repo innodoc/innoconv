@@ -70,7 +70,7 @@ def run_pandoc(text='', args=None):
 
 def fix_line_endings(repl):
     r"""Replace \r\n with \n."""
-    if type(repl) == bytes:
+    if isinstance(repl, bytes):
         repl = str(repl, 'utf-8')
     return "\n".join(repl.splitlines())
 
