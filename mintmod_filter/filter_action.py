@@ -67,7 +67,7 @@ class FilterAction:
         function_name = 'handle_%s' % slugify(cmd_name)
         func = getattr(self._commands, function_name, None)
         if callable(func):
-            return func(args)
+            return func(args, elem)
         return self._handle_unknown_command(cmd_name, elem)
 
     @staticmethod

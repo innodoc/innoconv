@@ -14,6 +14,7 @@ REGEX_PATTERNS = {
 
 # CSS classes
 CSS_CLASSES = {
+    'IMAGE': ['img'],
     'MXCONTENT': ['content'],
     'MEXERCISES': ['content', 'exercises'],
     'MEXERCISE': ['exercise'],

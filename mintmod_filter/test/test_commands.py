@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,invalid-name
 
 import unittest
 import panflute as pf
@@ -13,7 +13,7 @@ class TestCommands(unittest.TestCase):
     def test_handle_msection(self):
         doc = pf.Doc(pf.RawBlock(r'\MSection{A Test Title}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
-        ret = self.commands.handle_msection(["A Test Title"])
+        ret = self.commands.handle_msection(["A Test Title"], elem)
 
         self.assertEqual(ret, [])
 
@@ -33,8 +33,59 @@ class TestCommands(unittest.TestCase):
     def test_handle_msref(self):
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
-        ret = self.commands.handle_msref(['fooid', 'linktext'])
+        ret = self.commands.handle_msref(['fooid', 'linktext'], elem)
         self.assertIsInstance(ret, pf.Link)
         self.assertIsInstance(ret.content[0], pf.Str)
         self.assertEqual(ret.content[0].text, 'linktext')
         self.assertEqual(ret.url, '#fooid')
+
+    def test_handle_msubject(self):
+        doc = pf.Doc(pf.RawBlock(r'\MSubject{footitle}', format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.commands.handle_msubject(['footitle'], elem)
+        self.assertEqual(ret, [])
+        self.assertIsInstance(doc.metadata, pf.MetaMap)
+        # pylint: disable=no-member
+        self.assertEqual(doc.get_metadata('title'), 'footitle')
+
+    def test_handle_mugraphics_block(self):
+        content = r'\MUGraphics{foobar.png}{width=0.3\linewidth}{Footitle}'
+        doc = pf.Doc(pf.RawBlock(content, format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        elem_args = ['foobar.png', r'width=0.3\linewidth', 'Footitle']
+        ret = self.commands.handle_mugraphics(elem_args, elem)
+        self.assertIsInstance(ret, pf.Div)
+        img = ret.content[0].content[0]
+        self.assertIsInstance(img, pf.Image)
+        self.assertEqual(img.url, 'foobar.png')
+        self.assertEqual(img.title, 'Footitle')
+
+    def test_handle_mugraphics_inline(self):
+        content = r'\MUGraphics{foobar.png}{width=0.3\linewidth}{Footitle}'
+        doc = pf.Doc(pf.Para(pf.RawInline(content, format='latex')))
+        elem = doc.content[0].content[0]  # this sets up elem.parent
+        elem_args = ['foobar.png', r'width=0.3\linewidth', 'Footitle']
+        ret = self.commands.handle_mugraphics(elem_args, elem)
+        self.assertIsInstance(ret, pf.Image)
+        self.assertEqual(ret.url, 'foobar.png')
+        self.assertEqual(ret.title, 'Footitle')
+
+    def test_handle_mugraphicssolo_block(self):
+        content = r'\MUGraphicsSolo{foobar.png}{width=0.3\linewidth}{}'
+        doc = pf.Doc(pf.RawBlock(content, format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        elem_args = ['foobar.png', r'width=0.3\linewidth', '']
+        ret = self.commands.handle_mugraphicssolo(elem_args, elem)
+        self.assertIsInstance(ret, pf.Div)
+        img = ret.content[0].content[0]
+        self.assertIsInstance(img, pf.Image)
+        self.assertEqual(img.url, 'foobar.png')
+
+    def test_handle_mugraphicssolo_inline(self):
+        content = r'\MUGraphicsSolo{foo.jpg}{width=0.3\linewidth}{}'
+        doc = pf.Doc(pf.Para(pf.RawInline(content, format='latex')))
+        elem = doc.content[0].content[0]  # this sets up elem.parent
+        elem_args = ['foo.jpg', r'width=0.3\linewidth', '']
+        ret = self.commands.handle_mugraphicssolo(elem_args, elem)
+        self.assertIsInstance(ret, pf.Image)
+        self.assertEqual(ret.url, 'foo.jpg')

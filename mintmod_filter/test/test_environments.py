@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,invalid-name
 
 import unittest
 import panflute as pf
