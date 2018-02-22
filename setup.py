@@ -97,7 +97,7 @@ class BuildTUBBaseCommand(BaseCommand):
 
         # build html
         filename_out_path = os.path.join(BUILD_ROOT, 'tub_base', 'de')
-        filename_out = os.path.join(filename_out_path, 'tree_pandoc.html')
+        filename_out = os.path.join(filename_out_path, 'index.html')
         self._run(['mkdir', '-p', filename_out_path])
         self._run(['pandoc', '--from=latex+raw_tex',
                    '--to=html5+empty_paragraphs',
