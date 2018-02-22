@@ -13,7 +13,7 @@ class TestCommands(unittest.TestCase):
     def test_handle_msection(self):
         doc = pf.Doc(pf.RawBlock(r'\MSection{A Test Title}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
-        ret = self.commands.handle_msection(["A Test Title"], elem)
+        ret = self.commands.handle_msection(["A Test Title"])
 
         self.assertEqual(ret, [])
 
@@ -33,7 +33,7 @@ class TestCommands(unittest.TestCase):
     def test_handle_msref(self):
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
-        ret = self.commands.handle_msref(['fooid', 'linktext'], elem)
+        ret = self.commands.handle_msref(['fooid', 'linktext'])
         self.assertIsInstance(ret, pf.Link)
         self.assertIsInstance(ret.content[0], pf.Str)
         self.assertEqual(ret.content[0].text, 'linktext')

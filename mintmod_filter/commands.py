@@ -14,9 +14,7 @@ class Commands():
     Example: ``handle_msection`` method will receive the ``MSection`` command.
     """
 
-    # pylint: disable=unused-argument,no-self-use
-
-    def handle_msection(self, args, elem):
+    def handle_msection(self, args):
         """Remember ``MSection`` name for later.
 
         ``MSectionStart`` environment will use this information later.
@@ -24,18 +22,18 @@ class Commands():
         create_header(args[0], level=2, doc=elem.doc, auto_id=True)
         return []
 
-    def handle_msubsection(self, args, elem):
+    def handle_msubsection(self, args):
         """Handle ``MSubsection``"""
         return create_header(args[0], level=3, doc=elem.doc, auto_id=True)
 
-    def handle_mtitle(self, args, elem):
+    def handle_mtitle(self, args):
         """Handle ``MTitle`` command.
 
         These is an equivalent to ``subsubsection``
         """
         return create_header(args[0], level=4, doc=elem.doc, auto_id=True)
 
-    def handle_mlabel(self, args, elem):
+    def handle_mlabel(self, args):
         """Handle ``MLabel`` command.
 
         Will search for the previous header element and update its ID to the
@@ -50,7 +48,7 @@ class Commands():
         last_header_elem.identifier = args[0]
         return []
 
-    def handle_special(self, args, elem):
+    def handle_special(self, args):
         """Handle ``special`` command.
 
         This command is used to embed HTML in LaTeX source.
@@ -60,7 +58,7 @@ class Commands():
             return pf.RawBlock(html_code)
         return None
 
-    def handle_msubject(self, args, elem):
+    def handle_msubject(self, args):
         """Handle ``MSubject{title}`` command.
 
         Command defines the document title.
@@ -68,7 +66,7 @@ class Commands():
         elem.doc.metadata['title'] = pf.MetaString(args[0])
         return []
 
-    def handle_msref(self, args, elem):
+    def handle_msref(self, args):
         """Handle ``MSRef`` command.
 
         This command inserts an fragment-style link.
@@ -77,14 +75,14 @@ class Commands():
         description = destringify(args[1])
         return pf.Link(*description, url=url)
 
-    def handle_mssectionlabelprefix(self, args, elem):
+    def handle_mssectionlabelprefix(self, args):
         """Handle ``MSsectionlabelprefix`` command.
 
         This command inserts a translation.
         """
         return pf.Str('Abschnitt')  # TODO: i18n
 
-    def handle_mdeclaresiteuxid(self, args, elem):
+    def handle_mdeclaresiteuxid(self, args):
         """Handle ``MDeclareSiteUXID`` command.
 
         This command is used to embed IDs. This is not relevant anymore and
@@ -92,7 +90,7 @@ class Commands():
         """
         return self._noop()
 
-    def handle_mmodstartbox(self, args, elem):
+    def handle_mmodstartbox(self, args):
         """Handle ``MModStartBox`` command.
 
         This command displays a table of content for the current chapter. This
@@ -100,7 +98,7 @@ class Commands():
         """
         return self._noop()
 
-    def handle_mpragma(self, args, elem):
+    def handle_mpragma(self, args):
         """Handle ``MPragma`` command.
 
         This command was used to embed build time flags for mintmod. It becomes
