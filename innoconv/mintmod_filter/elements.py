@@ -2,7 +2,7 @@
 
 from slugify import slugify
 import panflute as pf
-from mintmod_filter.utils import destringify, pandoc_parse
+from innoconv.utils import destringify, pandoc_parse
 
 
 def create_header(title_str, doc, level=0, auto_id=False):

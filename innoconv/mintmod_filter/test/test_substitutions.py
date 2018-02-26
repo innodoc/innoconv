@@ -2,7 +2,7 @@
 
 import unittest
 import panflute as pf
-from mintmod_filter.substitutions import handle_math_substitutions
+from innoconv.mintmod_filter.substitutions import handle_math_substitutions
 
 
 class TestHandleSubstitutions(unittest.TestCase):

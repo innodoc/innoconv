@@ -28,5 +28,7 @@ ELEMENT_CLASSES = {
 }
 
 # colors
-COLOR_UNKNOWN_CMD = '#ffa500'
-COLOR_UNKNOWN_ENV = '#ff4d00'
+COLORS = {
+    'UNKNOWN_CMD': '#ffa500',
+    'UNKNOWN_ENV': '#ff4d00',
+}

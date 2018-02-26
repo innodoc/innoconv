@@ -2,8 +2,8 @@
 
 import unittest
 import panflute as pf
-from mintmod_filter.constants import ELEMENT_CLASSES
-from mintmod_filter.environments import Environments
+from innoconv.constants import ELEMENT_CLASSES
+from innoconv.mintmod_filter.environments import Environments
 
 
 class TestEnvironments(unittest.TestCase):

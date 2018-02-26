@@ -1,9 +1,9 @@
 """Handle mintmod LaTeX commands."""
 
 import panflute as pf
-from mintmod_filter.constants import ELEMENT_CLASSES
-from mintmod_filter.elements import create_header
-from mintmod_filter.utils import debug, destringify
+from innoconv.constants import ELEMENT_CLASSES
+from innoconv.utils import debug, destringify
+from innoconv.mintmod_filter.elements import create_header
 
 
 class Commands():

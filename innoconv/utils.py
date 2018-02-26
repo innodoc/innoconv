@@ -8,11 +8,6 @@ import panflute as pf
 from panflute.elements import from_json
 
 
-class ParseError(ValueError):
-    """Is raised when mintmod commands could not be parsed."""
-    pass
-
-
 def debug(msg, *args, **kwargs):
     """Print debug message."""
     pf.debug('[MINTMOD] %s' % msg, *args, **kwargs)
@@ -33,7 +28,8 @@ def pandoc_parse(parse_string):
     messages. So we have our own version.
     """
     filter_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), '__main__.py')
+        os.path.dirname(os.path.realpath(__file__)),
+        'mintmod_filter', '__main__.py')
 
     args = ['--from=latex+raw_tex', '--to=json', '--filter=%s' % filter_path]
     out, err = run_pandoc(parse_string, args)

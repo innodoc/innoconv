@@ -2,7 +2,7 @@
 
 import unittest
 import panflute as pf
-from mintmod_filter.commands import Commands
+from innoconv.mintmod_filter.commands import Commands
 
 
 class TestCommands(unittest.TestCase):

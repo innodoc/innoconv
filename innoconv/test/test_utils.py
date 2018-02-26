@@ -3,7 +3,7 @@
 import unittest
 import os
 import panflute as pf
-from mintmod_filter.utils import pandoc_parse, destringify
+from innoconv.utils import pandoc_parse, destringify
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

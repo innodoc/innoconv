@@ -102,7 +102,7 @@ class BuildTUBBaseCommand(BaseCommand):
         self._run(['pandoc', '--from=latex+raw_tex',
                    '--to=html5+empty_paragraphs',
                    '--standalone', '--mathjax',
-                   '--filter=../../../mintmod_filter/__main__.py',
+                   '--filter=../../../innoconv/mintmod_filter/__main__.py',
                    '--css=%s' % BOOTSTRAP_CSS,
                    '--output=%s' % filename_out, 'tree_pandoc.tex'],
                   cwd=project_root_lang)
@@ -115,21 +115,21 @@ class Flake8Command(BaseCommand):
     description = 'Run flake8 on Python source files'
 
     def run(self):
-        self._run(['flake8', 'mintmod_filter', 'setup.py'])
+        self._run(['flake8', 'innoconv', 'setup.py'])
 
 
 class PylintCommand(BaseCommand):
     description = 'Run pylint on Python source files'
 
     def run(self):
-        self._run(['pylint', '--output-format=colorized', 'mintmod_filter'])
+        self._run(['pylint', '--output-format=colorized', 'innoconv'])
 
 
 class TestCommand(BaseCommand):
     description = 'Run test suite'
 
     def run(self):
-        self._run(['green', '-r', 'mintmod_filter'])
+        self._run(['green', '-r', 'innoconv'])
 
 
 class CoverageCommand(BaseCommand):
@@ -167,11 +167,11 @@ def setup_package():
         },
         entry_points={
             'console_scripts': [
-                'mintmod_filter = mintmod_filter.__main__:main',
+                'mintmod_filter = innoconv.mintmod_filter.__main__:main',
             ],
         },
         packages=[
-            'mintmod_filter',
+            'innoconv',
         ],
         license='GPLv3',
         long_description=open('README.md').read(),

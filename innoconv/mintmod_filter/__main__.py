@@ -3,7 +3,7 @@
 """Pandoc filter main entry."""
 
 from panflute import run_filter
-from mintmod_filter.filter_action import FilterAction
+from innoconv.mintmod_filter.filter_action import FilterAction
 
 
 def main():

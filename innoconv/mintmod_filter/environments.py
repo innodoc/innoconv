@@ -1,9 +1,9 @@
 """Handle mintmod LaTeX environments."""
 
 import panflute as pf
-from mintmod_filter.constants import ELEMENT_CLASSES
-from mintmod_filter.utils import pandoc_parse, debug, destringify
-from mintmod_filter.elements import create_content_box
+from innoconv.constants import ELEMENT_CLASSES
+from innoconv.utils import pandoc_parse, debug, destringify
+from innoconv.mintmod_filter.elements import create_content_box
 
 
 class Environments():

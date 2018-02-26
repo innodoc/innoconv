@@ -4,12 +4,12 @@ import re
 import panflute as pf
 from slugify import slugify
 
-from mintmod_filter.utils import debug, destringify, ParseError
-from mintmod_filter.environments import Environments
-from mintmod_filter.commands import Commands
-from mintmod_filter.constants import (
-    REGEX_PATTERNS, ELEMENT_CLASSES, COLOR_UNKNOWN_CMD, COLOR_UNKNOWN_ENV)
-from mintmod_filter.substitutions import handle_math_substitutions
+from innoconv.errors import ParseError
+from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES, COLORS
+from innoconv.utils import debug, destringify
+from innoconv.mintmod_filter.environments import Environments
+from innoconv.mintmod_filter.commands import Commands
+from innoconv.mintmod_filter.substitutions import handle_math_substitutions
 
 
 class FilterAction:
@@ -83,7 +83,7 @@ class FilterAction:
         """
         debug("Could not handle command %s." % cmd_name)
         classes = ELEMENT_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
-        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_CMD}
+        attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_CMD']}
 
         msg = [
             pf.Strong(*destringify('Unhandled command:')),
@@ -133,7 +133,7 @@ class FilterAction:
         """
         debug("Could not handle environment %s." % env_name)
         classes = ELEMENT_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
-        attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_ENV}
+        attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_ENV']}
         div = pf.Div(classes=classes, attributes=attrs)
         msg = pf.Para(pf.Strong(*destringify('Unhandled environment:')),
                       pf.LineBreak(), pf.Code(elem.text))
