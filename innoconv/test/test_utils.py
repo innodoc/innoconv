@@ -65,6 +65,7 @@ class TestParsePandoc(unittest.TestCase):
         ret = pandoc_parse('')
         self.assertEqual(ret, [])
 
+    # TODO: should be moved to integration tests
     @unittest.skip("We need to write a second filter for label / index / ..."
                    "before this test will succeed, as subprocess cannot easily"
                    "the other processe's data")
