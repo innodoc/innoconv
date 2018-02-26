@@ -34,6 +34,11 @@ class FilterAction:
         :type doc: :class:`panflute.elements.Doc`
         """
 
+        if elem is None:
+            raise ValueError('elem must not be None!')
+        if doc is None:
+            raise ValueError('doc must not be None!')
+
         # simple command subtitutions in Math environments
         if isinstance(elem, pf.Math):
             return handle_math_substitutions(elem)
