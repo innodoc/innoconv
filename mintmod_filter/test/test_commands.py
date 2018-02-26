@@ -105,3 +105,13 @@ class TestCommands(unittest.TestCase):
         ret = self.commands.handle_mugraphicssolo(elem_args, elem)
         self.assertIsInstance(ret, pf.Image)
         self.assertEqual(ret.url, 'foo.jpg')
+
+    def test_handle_glqq(self):
+        elem = pf.RawInline(r'\glqq', format='latex')
+        elem_repl = self.commands.handle_glqq([], elem)
+        self.assertEqual(elem_repl.text, r'„')
+
+    def test_handle_grqq(self):
+        elem = pf.RawInline(r'\grqq', format='latex')
+        elem_repl = self.commands.handle_grqq([], elem)
+        self.assertEqual(elem_repl.text, r'“')

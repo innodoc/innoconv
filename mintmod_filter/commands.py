@@ -143,6 +143,17 @@ class Commands():
         return pf.Str('Abschnitt')  # TODO: i18n
 
     ###########################################################################
+    # Simple substitutions
+
+    def handle_glqq(self, args, elem):
+        """Handle ``glqq`` command."""
+        return pf.Str('„')
+
+    def handle_grqq(self, args, elem):
+        """Handle ``grqq`` command."""
+        return pf.Str('“')
+
+    ###########################################################################
     # No-ops
 
     def handle_mdeclaresiteuxid(self, args, elem):

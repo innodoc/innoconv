@@ -9,7 +9,7 @@ from mintmod_filter.environments import Environments
 from mintmod_filter.commands import Commands
 from mintmod_filter.constants import (
     REGEX_PATTERNS, CSS_CLASSES, COLOR_UNKNOWN_CMD, COLOR_UNKNOWN_ENV)
-from mintmod_filter.math_substitutions import handle_math_substitutions
+from mintmod_filter.substitutions import handle_math_substitutions
 
 
 class FilterAction:

@@ -2,10 +2,10 @@
 
 import unittest
 import panflute as pf
-from mintmod_filter.math_substitutions import handle_math_substitutions
+from mintmod_filter.substitutions import handle_math_substitutions
 
 
-class TestHandleMathSubstitutions(unittest.TestCase):
+class TestHandleSubstitutions(unittest.TestCase):
     def test_handle_math_substitutions(self):
         elem_math = pf.Math(r'\N \R')
         elem_math_repl = handle_math_substitutions(elem_math)
