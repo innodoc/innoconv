@@ -24,7 +24,7 @@ class MintmodFilterAction:
         """
         Receive document elements.
 
-        This function receives document elements from Pandoc and delegates
+        This method receives document elements from Pandoc and delegates
         handling of simple subtitutions, mintmod commands and
         environments.
 
