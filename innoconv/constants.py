@@ -4,7 +4,7 @@ import re
 
 # regex patterns
 REGEX_PATTERNS = {
-    'CMD': re.compile(r'\\([A-Za-z0-9_]+)', re.DOTALL),
+    'CMD': re.compile(r'\\([^\\\s{]+)', re.DOTALL),
     'CMD_ARGS': re.compile(r'{([^}]+)}'),
     'ENV': re.compile(r'\A\\begin{(?P<env_name>[^}]+)}(.+)'
                       r'\\end{(?P=env_name)}\Z', re.DOTALL),

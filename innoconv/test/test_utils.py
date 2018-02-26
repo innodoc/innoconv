@@ -3,7 +3,9 @@
 import unittest
 import os
 import panflute as pf
-from innoconv.utils import pandoc_parse, destringify
+
+from innoconv.errors import ParseError
+from innoconv.utils import pandoc_parse, destringify, parse_cmd
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -154,3 +156,29 @@ class TestDestringify(unittest.TestCase):
                 if _type == pf.Str:
                     with self.subTest(text=l_1_elem.text):
                         self.assertEqual(l_1_elem.text, l_2[i].text)
+
+
+class TestParseCmd(unittest.TestCase):
+
+    def test_parse_cmd_with_args(self):
+        """Parse ``foobar`` command with arguments"""
+        cmd_name, cmd_args = parse_cmd(r'\foobar{foo}{bar}{baz}')
+        self.assertEqual(cmd_name, 'foobar')
+        self.assertEqual(cmd_args, ['foo', 'bar', 'baz'])
+
+    def test_parse_cmd_without_args(self):
+        """Parse ``foobar`` command without arguments"""
+        cmd_name, cmd_args = parse_cmd(r'\foobar')
+        self.assertEqual(cmd_name, 'foobar')
+        self.assertEqual(cmd_args, [])
+
+    def test_parse_cmd_colon(self):
+        """Parse ``:`` command"""
+        cmd_name, cmd_args = parse_cmd(r'\:')
+        self.assertEqual(cmd_name, ':')
+        self.assertEqual(cmd_args, [])
+
+    def test_parse_cmd_fail(self):
+        """It should fail on invalid command"""
+        with self.assertRaises(ParseError):
+            parse_cmd('not-a-valid-command')

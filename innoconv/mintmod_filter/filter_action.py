@@ -1,12 +1,11 @@
 """The actual Pandoc filter."""
 
-import re
 import panflute as pf
 from slugify import slugify
 
 from innoconv.errors import ParseError
 from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES, COLORS
-from innoconv.utils import debug, destringify
+from innoconv.utils import debug, destringify, parse_cmd
 from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.commands import Commands
 from innoconv.mintmod_filter.substitutions import handle_math_substitutions
@@ -43,36 +42,27 @@ class MintmodFilterAction:
         if isinstance(elem, pf.Math):
             return handle_math_substitutions(elem)
 
-        # block commands and environments
-        elif isinstance(elem, pf.RawBlock) and elem.format == 'latex':
-            match = REGEX_PATTERNS['CMD'].match(elem.text)
-            if match:
-                cmd_name = match.groups()[0]
-                if cmd_name.startswith('begin'):
+        elif hasattr(elem, 'format') and elem.format == 'latex':
+            # block commands and environments
+            if isinstance(elem, pf.RawBlock):
+                cmd_name, cmd_args = parse_cmd(elem.text)
+                if cmd_name == 'begin':
                     return self._handle_environment(elem)
-                args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
-                return self._handle_command(cmd_name, args, elem)
-            else:
-                raise ParseError(
-                    'Could not parse LaTeX command: %s...' % elem.text)
+                return self._handle_command(cmd_name, cmd_args, elem)
 
-        # inline commands
-        elif isinstance(elem, pf.RawInline) and elem.format == 'latex':
-            # no inline environments are allowed
-            match = REGEX_PATTERNS['CMD'].match(elem.text)
-            if match:
-                cmd_name = match.groups()[0]
-                args = re.findall(REGEX_PATTERNS['CMD_ARGS'], elem.text)
-                return self._handle_command(cmd_name, args, elem)
+            # inline commands (no inline environments!)
+            elif isinstance(elem, pf.RawInline):
+                cmd_name, cmd_args = parse_cmd(elem.text)
+                return self._handle_command(cmd_name, cmd_args, elem)
 
         return None  # element unchanged
 
-    def _handle_command(self, cmd_name, args, elem):
+    def _handle_command(self, cmd_name, cmd_args, elem):
         """Parse and handle mintmod commands."""
         function_name = 'handle_%s' % slugify(cmd_name)
         func = getattr(self._commands, function_name, None)
         if callable(func):
-            return func(args, elem)
+            return func(cmd_args, elem)
         return self._handle_unknown_command(cmd_name, elem)
 
     @staticmethod

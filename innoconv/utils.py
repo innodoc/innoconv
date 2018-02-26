@@ -2,10 +2,14 @@
 
 import os
 import json
+import re
 from subprocess import Popen, PIPE
 from shutil import which
 import panflute as pf
 from panflute.elements import from_json
+
+from innoconv.constants import REGEX_PATTERNS
+from innoconv.errors import ParseError
 
 
 def debug(msg, *args, **kwargs):
@@ -94,3 +98,22 @@ def destringify(string):
         if split.index(word) != len(split) - 1:
             ret.append(pf.Space())
     return ret
+
+
+def parse_cmd(text):
+    r"""
+    Parse a LaTeX command using regular expressions.
+
+    Parses a command like: ``\foo{bar}{baz}``
+
+    :param string: String to parse
+    :type string: str
+
+    :returns: `str` cmd_name, list of `str` cmd_args
+    """
+    match = REGEX_PATTERNS['CMD'].match(text)
+    if not match:
+        raise ParseError("Could not parse LaTeX command: '%s'" % text)
+    cmd_name = match.groups()[0]
+    cmd_args = re.findall(REGEX_PATTERNS['CMD_ARGS'], text)
+    return cmd_name, cmd_args
