@@ -12,8 +12,8 @@ REGEX_PATTERNS = {
         r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL),
 }
 
-# CSS classes
-CSS_CLASSES = {
+# element classes
+ELEMENT_CLASSES = {
     'IMAGE': ['img'],
     'MXCONTENT': ['content'],
     'MEXERCISES': ['content', 'exercises'],

@@ -1,7 +1,7 @@
 """Handle mintmod LaTeX commands."""
 
 import panflute as pf
-from mintmod_filter.constants import CSS_CLASSES
+from mintmod_filter.constants import ELEMENT_CLASSES
 from mintmod_filter.elements import create_header
 from mintmod_filter.utils import debug, destringify
 
@@ -102,7 +102,7 @@ class Commands():
         if isinstance(elem, pf.RawInline):
             return img
         elif isinstance(elem, pf.RawBlock):
-            div = pf.Div(classes=CSS_CLASSES['IMAGE'])
+            div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
             div.content.extend([pf.Plain(img)])
             return div
         return None
@@ -117,7 +117,7 @@ class Commands():
         if isinstance(elem, pf.RawInline):
             return img
         elif isinstance(elem, pf.RawBlock):
-            div = pf.Div(classes=CSS_CLASSES['IMAGE'])
+            div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
             div.content.extend([pf.Plain(img)])
             return div
         return None

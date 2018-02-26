@@ -2,7 +2,7 @@
 
 import unittest
 import panflute as pf
-from mintmod_filter.constants import CSS_CLASSES
+from mintmod_filter.constants import ELEMENT_CLASSES
 from mintmod_filter.filter_action import FilterAction, ParseError
 
 
@@ -36,7 +36,7 @@ class TestFilterAction(unittest.TestCase):
             r'\ThisCommandAlsoDoesNotExist{foo}{bar}', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertIsInstance(ret, pf.Div)
-        for cls in CSS_CLASSES['UNKNOWN_CMD']:
+        for cls in ELEMENT_CLASSES['UNKNOWN_CMD']:
             with self.subTest(cls=cls):
                 self.assertIn(cls, ret.classes)
         self.assertIn('thiscommandalsodoesnotexist', ret.classes)
@@ -47,7 +47,7 @@ class TestFilterAction(unittest.TestCase):
             r'\ThisCommandDoesNotExist', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertIsInstance(ret, pf.Div)
-        for cls in CSS_CLASSES['UNKNOWN_CMD']:
+        for cls in ELEMENT_CLASSES['UNKNOWN_CMD']:
             with self.subTest(cls=cls):
                 self.assertIn(cls, ret.classes)
         self.assertIn('thiscommanddoesnotexist', ret.classes)
@@ -71,7 +71,7 @@ class TestFilterAction(unittest.TestCase):
         self.assertIsInstance(ret, pf.Div)
         self.assertIsInstance(ret.content[0], pf.Header)
         self.assertIsInstance(ret.content[1], pf.Para)
-        for cls in CSS_CLASSES['MXCONTENT']:
+        for cls in ELEMENT_CLASSES['MXCONTENT']:
             with self.subTest(cls=cls):
                 self.assertIn(cls, ret.classes)
 
@@ -84,7 +84,7 @@ class TestFilterAction(unittest.TestCase):
             format='latex')
         ret = self._filter_elem([elem_env], elem_env)
         self.assertIsInstance(ret, pf.Div)
-        for cls in CSS_CLASSES['UNKNOWN_ENV']:
+        for cls in ELEMENT_CLASSES['UNKNOWN_ENV']:
             with self.subTest(cls=cls):
                 self.assertIn(cls, ret.classes)
         self.assertIn('thisenvdoesnotexist', ret.classes)

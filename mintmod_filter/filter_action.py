@@ -8,7 +8,7 @@ from mintmod_filter.utils import debug, destringify, ParseError
 from mintmod_filter.environments import Environments
 from mintmod_filter.commands import Commands
 from mintmod_filter.constants import (
-    REGEX_PATTERNS, CSS_CLASSES, COLOR_UNKNOWN_CMD, COLOR_UNKNOWN_ENV)
+    REGEX_PATTERNS, ELEMENT_CLASSES, COLOR_UNKNOWN_CMD, COLOR_UNKNOWN_ENV)
 from mintmod_filter.substitutions import handle_math_substitutions
 
 
@@ -82,7 +82,7 @@ class FilterAction:
         Output visual feedback about the unknown command.
         """
         debug("Could not handle command %s." % cmd_name)
-        classes = CSS_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
+        classes = ELEMENT_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
         attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_CMD}
 
         msg = [
@@ -132,7 +132,7 @@ class FilterAction:
         Output visual feedback about the unknown environment.
         """
         debug("Could not handle environment %s." % env_name)
-        classes = CSS_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
+        classes = ELEMENT_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
         attrs = {'style': 'background: %s;' % COLOR_UNKNOWN_ENV}
         div = pf.Div(classes=classes, attributes=attrs)
         msg = pf.Para(pf.Strong(*destringify('Unhandled environment:')),

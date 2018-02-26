@@ -2,7 +2,7 @@
 
 import unittest
 import panflute as pf
-from mintmod_filter.constants import CSS_CLASSES
+from mintmod_filter.constants import ELEMENT_CLASSES
 from mintmod_filter.environments import Environments
 
 
@@ -15,34 +15,34 @@ class TestEnvironments(unittest.TestCase):
     def test_handle_minfo(self):
         self._test_content_box(
             self.environments.handle_minfo,
-            CSS_CLASSES['MINFO'], 'Info'
+            ELEMENT_CLASSES['MINFO'], 'Info'
         )
 
     def test_handle_mexperiment(self):
         self._test_content_box(
             self.environments.handle_mexperiment,
-            CSS_CLASSES['MEXPERIMENT'], 'Experiment'
+            ELEMENT_CLASSES['MEXPERIMENT'], 'Experiment'
         )
 
     def test_handle_mexercise(self):
         self._test_content_box(
             self.environments.handle_mexercise,
-            CSS_CLASSES['MEXERCISE'], 'Aufgabe'
+            ELEMENT_CLASSES['MEXERCISE'], 'Aufgabe'
         )
 
     def test_handle_mexercises(self):
         self._test_content_box(
             self.environments.handle_mexercises,
-            CSS_CLASSES['MEXERCISES'], 'Aufgaben'
+            ELEMENT_CLASSES['MEXERCISES'], 'Aufgaben'
         )
 
     def test_handle_mexample(self):
         self._test_content_box(
             self.environments.handle_mexample,
-            CSS_CLASSES['MEXAMPLE'], 'Beispiel'
+            ELEMENT_CLASSES['MEXAMPLE'], 'Beispiel'
         )
 
-    def _test_content_box(self, handler, css_classes, title):
+    def _test_content_box(self, handler, element_classes, title):
         """Test if content boxes (e.g. Exercises, Examples, Experiment, Info)
         are handled correctly
         """
@@ -57,7 +57,7 @@ class TestEnvironments(unittest.TestCase):
         elem = self.doc.content[0]  # this sets up elem.parent
         div = handler(elem_content, [], elem)
         self.assertIsInstance(div, pf.Div)
-        self.assertEqual(div.classes, css_classes)
+        self.assertEqual(div.classes, element_classes)
 
         # should return a header without an id but with the correct title
         self.assertIsInstance(div.content[0], pf.Header)
