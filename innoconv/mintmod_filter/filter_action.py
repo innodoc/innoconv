@@ -12,7 +12,7 @@ from innoconv.mintmod_filter.commands import Commands
 from innoconv.mintmod_filter.substitutions import handle_math_substitutions
 
 
-class FilterAction:
+class MintmodFilterAction:
 
     """The Pandoc filter is defined in this class."""
 

@@ -3,13 +3,14 @@
 import unittest
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
-from innoconv.mintmod_filter.filter_action import FilterAction, ParseError
+from innoconv.errors import ParseError
+from innoconv.mintmod_filter.filter_action import MintmodFilterAction
 
 
 class TestFilterAction(unittest.TestCase):
     def setUp(self):
         self.doc = pf.Doc()
-        self.filter_action = FilterAction()
+        self.filter_action = MintmodFilterAction()
 
     def test_str_input(self):
         "filter() returns None if given Str element"

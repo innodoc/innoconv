@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-"""Pandoc filter main entry."""
+"""Main entry for Pandoc filter ``mintmod_filter``."""
 
 from panflute import run_filter
-from innoconv.mintmod_filter.filter_action import FilterAction
+from innoconv.mintmod_filter.filter_action import MintmodFilterAction
 
 
 def main():
     """Execute filter."""
-    filter_action = FilterAction()
+    filter_action = MintmodFilterAction()
     return run_filter(filter_action.filter)
 
 
