@@ -39,6 +39,22 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.content[0].text, 'linktext')
         self.assertEqual(ret.url, '#fooid')
 
+    def test_handle_mextlink(self):
+        block = pf.Para(
+            pf.RawInline(
+                r'\MExtLink{https://www.example.com/}{Example link}',
+                format='latex'
+            )
+        )
+        doc = pf.Doc(block)
+        elem = doc.content[0].content[0]  # this sets up elem.parent
+        ret = self.commands.handle_mextlink(
+            ['https://www.example.com/', 'Example link'], elem)
+        self.assertIsInstance(ret, pf.Link)
+        self.assertIsInstance(ret.content[0], pf.Str)
+        self.assertEqual(ret.content[0].text, 'Example')
+        self.assertEqual(ret.url, 'https://www.example.com/')
+
     def test_handle_msubject(self):
         doc = pf.Doc(pf.RawBlock(r'\MSubject{footitle}', format='latex'))
         elem = doc.content[0]  # this sets up elem.parent

@@ -79,6 +79,15 @@ class Commands():
         description = destringify(args[1])
         return pf.Link(*description, url=url)
 
+    def handle_mextlink(self, args, elem):
+        """Handle ``MExtLink`` command.
+
+        This command inserts an external link.
+        """
+        url = args[0]
+        text = destringify(args[1])
+        return pf.Link(*text, url=url)
+
     ###########################################################################
     # Graphics
 
