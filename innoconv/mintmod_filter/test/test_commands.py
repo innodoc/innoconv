@@ -11,6 +11,7 @@ class TestCommands(unittest.TestCase):
         self.commands = Commands()
 
     def test_handle_msection(self):
+        "MSection command"
         doc = pf.Doc(pf.RawBlock(r'\MSection{A Test Title}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msection(["A Test Title"], elem)
@@ -31,6 +32,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.level, 2)
 
     def test_handle_msref(self):
+        "MSRef command"
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msref(['fooid', 'linktext'], elem)
@@ -40,6 +42,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.url, '#fooid')
 
     def test_handle_mextlink(self):
+        "MExtLink command"
         block = pf.Para(
             pf.RawInline(
                 r'\MExtLink{https://www.example.com/}{Example link}',
@@ -56,6 +59,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.url, 'https://www.example.com/')
 
     def test_handle_msubject(self):
+        "MSubject command"
         doc = pf.Doc(pf.RawBlock(r'\MSubject{footitle}', format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msubject(['footitle'], elem)
@@ -65,6 +69,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(doc.get_metadata('title'), 'footitle')
 
     def test_handle_mugraphics_block(self):
+        "MUGraphics command (block)"
         content = r'\MUGraphics{foobar.png}{width=0.3\linewidth}{Footitle}'
         doc = pf.Doc(pf.RawBlock(content, format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
@@ -77,6 +82,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(img.title, 'Footitle')
 
     def test_handle_mugraphics_inline(self):
+        "MUGraphics command (inline)"
         content = r'\MUGraphics{foobar.png}{width=0.3\linewidth}{Footitle}'
         doc = pf.Doc(pf.Para(pf.RawInline(content, format='latex')))
         elem = doc.content[0].content[0]  # this sets up elem.parent
@@ -87,6 +93,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.title, 'Footitle')
 
     def test_handle_mugraphicssolo_block(self):
+        "MUGraphicsSolo command (block)"
         content = r'\MUGraphicsSolo{foobar.png}{width=0.3\linewidth}{}'
         doc = pf.Doc(pf.RawBlock(content, format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
@@ -98,6 +105,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(img.url, 'foobar.png')
 
     def test_handle_mugraphicssolo_inline(self):
+        "MUGraphicsSolo command (inline)"
         content = r'\MUGraphicsSolo{foo.jpg}{width=0.3\linewidth}{}'
         doc = pf.Doc(pf.Para(pf.RawInline(content, format='latex')))
         elem = doc.content[0].content[0]  # this sets up elem.parent
@@ -107,11 +115,13 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.url, 'foo.jpg')
 
     def test_handle_glqq(self):
+        "glqq"
         elem = pf.RawInline(r'\glqq', format='latex')
         elem_repl = self.commands.handle_glqq([], elem)
         self.assertEqual(elem_repl.text, r'„')
 
     def test_handle_grqq(self):
+        "grqq"
         elem = pf.RawInline(r'\grqq', format='latex')
         elem_repl = self.commands.handle_grqq([], elem)
         self.assertEqual(elem_repl.text, r'“')

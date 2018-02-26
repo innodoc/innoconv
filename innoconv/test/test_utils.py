@@ -97,6 +97,7 @@ class TestParsePandoc(unittest.TestCase):
 class TestDestringify(unittest.TestCase):
 
     def test_regular(self):
+        "Test destringify with a regular string"
         string = 'This is a  really\tnice    string.'
         comp = [
             pf.Str('This'),
@@ -116,24 +117,28 @@ class TestDestringify(unittest.TestCase):
         self._compare_list(ret, comp)
 
     def test_empty(self):
+        "Test destringify with an empty string"
         string = ''
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self.assertListEqual(ret, [])
 
     def test_empty_whitespace(self):
+        "Test destringify with an whitespace string"
         string = '   '
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self.assertListEqual(ret, [])
 
     def test_one_word(self):
+        "Test destringify with one word"
         string = 'foobar'
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self._compare_list(ret, [pf.Str('foobar')])
 
     def test_whitespace(self):
+        "Test destringify with leading and trailing whitespace"
         string = '  foo bar  '
         comp = [pf.Str('foo'), pf.Space(), pf.Str('bar')]
         ret = destringify(string)

@@ -13,30 +13,35 @@ class TestEnvironments(unittest.TestCase):
         self.environments = Environments()
 
     def test_handle_minfo(self):
+        "MInfo"
         self._test_content_box(
             self.environments.handle_minfo,
             ELEMENT_CLASSES['MINFO'], 'Info'
         )
 
     def test_handle_mexperiment(self):
+        "MExperiment"
         self._test_content_box(
             self.environments.handle_mexperiment,
             ELEMENT_CLASSES['MEXPERIMENT'], 'Experiment'
         )
 
     def test_handle_mexercise(self):
+        "MExercise"
         self._test_content_box(
             self.environments.handle_mexercise,
             ELEMENT_CLASSES['MEXERCISE'], 'Aufgabe'
         )
 
     def test_handle_mexercises(self):
+        "MExercises"
         self._test_content_box(
             self.environments.handle_mexercises,
             ELEMENT_CLASSES['MEXERCISES'], 'Aufgaben'
         )
 
     def test_handle_mexample(self):
+        "MExample"
         self._test_content_box(
             self.environments.handle_mexample,
             ELEMENT_CLASSES['MEXAMPLE'], 'Beispiel'
