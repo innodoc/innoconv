@@ -15,7 +15,7 @@ class TestFilterAction(unittest.TestCase):
         "filter() returns None if given Str element"
         elem_str = pf.Str('foo')
         ret = self._filter_elem([pf.Para(elem_str)], elem_str)
-        self.assertIsNone(ret)
+        self.assertIsNone(ret)  # None means element unchanged
 
     def test_math_input(self):
         "filter() returns Math if given Math element"
