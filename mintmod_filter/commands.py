@@ -1,7 +1,4 @@
 """Handle mintmod LaTeX commands."""
-
-# pylint: disable=unused-argument,no-self-use
-
 import panflute as pf
 from mintmod_filter.elements import create_header
 from mintmod_filter.utils import debug, destringify
@@ -16,6 +13,8 @@ class Commands():
 
     Example: ``handle_msection`` method will receive the ``MSection`` command.
     """
+
+    # pylint: disable=unused-argument,no-self-use
 
     def handle_msection(self, args, elem):
         """Remember ``MSection`` name for later.

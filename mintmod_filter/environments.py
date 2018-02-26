@@ -17,6 +17,8 @@ class Environments():
     ``\begin{MXContent}…\end{MXContent}`` environment.
     """
 
+    # pylint: disable=unused-argument,no-self-use
+
     def handle_msectionstart(self, elem_content, env_args, elem):
         """Handle ``MSectionStart`` environment."""
         # Use title from previously found \MSection command
