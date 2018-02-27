@@ -1,4 +1,4 @@
-r"""Pandoc filter that handles \ifttm commands."""
+r"""Pandoc filter that handles ``\ifttm`` commands."""
 
 
 from enum import Enum
