@@ -2,10 +2,12 @@
 __pycache__
 .DS_Store
 venv
+.eggs
 
 # build
 content
 build
+doc/_build/
 innoConv.egg-info
 
 # coverage
