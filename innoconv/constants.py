@@ -25,6 +25,7 @@ ELEMENT_CLASSES = {
     'MHINT_TEXT': ['hint-text'],
     'UNKNOWN_CMD': ['unknown-command'],
     'UNKNOWN_ENV': ['unknown-environment'],
+    'MYOUTUBE_VIDEO': ['video', 'video-youtube']
 }
 
 # colors

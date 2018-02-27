@@ -2,6 +2,8 @@
 
 import unittest
 import panflute as pf
+
+from innoconv import utils
 from innoconv.mintmod_filter.commands import Commands
 
 
@@ -125,3 +127,14 @@ class TestCommands(unittest.TestCase):
         elem = pf.RawInline(r'\grqq', format='latex')
         elem_repl = self.commands.handle_grqq([], elem)
         self.assertEqual(elem_repl.text, r'“')
+
+    def test_handle_myoutubevideo(self):
+        command = r'''\MYoutubeVideo{Newtons Laws (2)}{400}{300}{https://www.you
+        tube.com/embed/WzvhuQ5RWJE?rel=0&amp;wmode=transparent}'''
+        elem, args = utils.parse_cmd(command)
+        ret = self.commands.handle_myoutubevideo(args, elem)
+        self.assertIsInstance(ret, pf.Link)
+        # pylint: disable=no-member
+        self.assertEqual(ret.attributes['width'], '400')
+        self.assertEqual(ret.attributes['height'], '300')
+        self.assertEqual(ret.title, args[0])

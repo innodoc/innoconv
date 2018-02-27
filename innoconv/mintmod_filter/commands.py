@@ -89,7 +89,7 @@ class Commands():
         return pf.Link(*text, url=url)
 
     ###########################################################################
-    # Graphics
+    # Media
 
     def handle_mugraphics(self, args, elem):
         """Handle ``MUGraphics``.
@@ -121,6 +121,22 @@ class Commands():
             div.content.extend([pf.Plain(img)])
             return div
         return None
+
+    def handle_myoutubevideo(self, args, elem):
+        """Handle ``MYoutubeVideo``.
+
+        Just return a Link Element
+        """
+        title, width, height, url = args
+        debug(title, width, height)
+        attrs = {'width': width, 'height': height}
+        return pf.Link(
+            *destringify(title),
+            url=url,
+            title=title,
+            classes=ELEMENT_CLASSES['MYOUTUBE_VIDEO'],
+            attributes=attrs
+        )
 
     ###########################################################################
     # Misc elements
