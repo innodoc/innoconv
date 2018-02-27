@@ -1,4 +1,4 @@
-"""The actual Pandoc filter."""
+"""Pandoc filter that transforms mintmod commands."""
 
 import panflute as pf
 from slugify import slugify
