@@ -31,11 +31,19 @@ def pandoc_parse(parse_string):
     The panflute helper function ``convert_text`` does not print debug
     messages. So we have our own version.
     """
-    filter_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'mintmod_filter', '__main__.py')
 
-    args = ['--from=latex+raw_tex', '--to=json', '--filter=%s' % filter_path]
+    def filter_path(filter_name):
+        """Return path for filter main entry point."""
+        return os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            filter_name, '__main__.py')
+
+    args = [
+        '--from=latex+raw_tex', '--to=json',
+        # TODO: enable ifttm_filter
+        # '--filter=%s' % filter_path('ifttm_filter'),
+        '--filter=%s' % filter_path('mintmod_filter'),
+    ]
     out, err = run_pandoc(parse_string, args)
     if err is not None:
         debug_nested(fix_line_endings(err))

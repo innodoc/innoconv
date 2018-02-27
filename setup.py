@@ -99,9 +99,10 @@ class BuildTUBBaseCommand(BaseCommand):
         filename_out_path = os.path.join(BUILD_ROOT, 'tub_base', 'de')
         filename_out = os.path.join(filename_out_path, 'index.html')
         self._run(['mkdir', '-p', filename_out_path])
-        self._run(['pandoc', '--from=latex+raw_tex',
-                   '--to=html5+empty_paragraphs',
+        self._run(['pandoc', '--from=latex+raw_tex', '--to=html5',
                    '--standalone', '--mathjax',
+                   # enable ifttm_filter
+                   # '--filter=../../../innoconv/ifttm_filter/__main__.py',
                    '--filter=../../../innoconv/mintmod_filter/__main__.py',
                    '--css=%s' % BOOTSTRAP_CSS,
                    '--output=%s' % filename_out, 'tree_pandoc.tex'],
