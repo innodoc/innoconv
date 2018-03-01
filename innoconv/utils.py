@@ -22,7 +22,7 @@ def debug_nested(msg, *args, **kwargs):
     # only print message if not empty strip returns false for strings that only
     # consist of whitespace characters
     if msg and msg.strip():
-        pf.debug('↳ %s' % msg, *args, **kwargs)
+        pf.debug(u'↳ %s' % msg, *args, **kwargs)
 
 
 def pandoc_parse(parse_string):
