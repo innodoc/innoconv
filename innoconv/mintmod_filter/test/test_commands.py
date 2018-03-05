@@ -33,6 +33,26 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.identifier, "a-test-title")
         self.assertEqual(last_header_elem.level, 2)
 
+    def test_handle_msubsection(self):
+        # TODO implement test_handle_msubsection
+        pass
+
+    def test_handle_mtitle(self):
+        # TODO implement test_handle_mtitle
+        pass
+
+    def test_handle_mlabel(self):
+        # TODO implement test_handle_mlabel
+        pass
+
+    def test_handle_special(self):
+        # TODO implement test_handle_special
+        pass
+
+    def test_handle_mssectionlabelprefix(self):
+        # TODO implement handle_mssectionlabelprefix
+        pass
+
     def test_handle_msref(self):
         "MSRef command"
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
@@ -138,3 +158,24 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.attributes['width'], '400')
         self.assertEqual(ret.attributes['height'], '300')
         self.assertEqual(ret.title, args[0])
+
+    def test_noops(self):
+        "Test no-op commands."
+        noops = (
+            (
+                self.commands.handle_mdeclaresiteuxid,
+                ['FOO'], r'\MDeclareSiteUXID{FOO}',
+            ),
+            (
+                self.commands.handle_mmodstartbox,
+                [], r'\MModstartBox',
+            ),
+            (
+                self.commands.handle_mpragma,
+                ['MathSkip'], r'\MPragma{MathSkip}',
+            ),
+        )
+        for handler, elem_args, elem_code in noops:
+            with self.subTest(name=handler.__name__):
+                ret = handler(elem_args, pf.RawBlock(elem_code))
+                self.assertListEqual(ret, [])
