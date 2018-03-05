@@ -2,6 +2,7 @@
 
 import unittest
 import os
+from mock import patch
 import panflute as pf
 
 from innoconv.errors import ParseError
@@ -66,6 +67,13 @@ class TestParsePandoc(unittest.TestCase):
         "parse_pandoc() returns [] if given empty document"
         ret = pandoc_parse('')
         self.assertEqual(ret, [])
+
+    @patch('innoconv.utils.which', return_value=None)
+    def test_parse_pandoc_not_in_path(self, mock_func):
+        "parse_pandoc() should fail if pandoc not in PATH"
+        # pylint: disable=unused-argument
+        with self.assertRaises(OSError):
+            pandoc_parse('foo bar')
 
     # TODO: should be moved to integration tests
     @unittest.skip("We need to write a second filter for label / index / ..."
