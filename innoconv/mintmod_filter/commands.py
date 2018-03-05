@@ -99,13 +99,13 @@ class Commands():
         filename = args[0]
         title = args[2]
         img = pf.Image(url=filename, title=title)
+        # inline
         if isinstance(elem, pf.RawInline):
             return img
-        elif isinstance(elem, pf.RawBlock):
-            div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
-            div.content.extend([pf.Plain(img)])
-            return div
-        return None
+        # block
+        div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
+        div.content.extend([pf.Plain(img)])
+        return div
 
     def handle_mugraphicssolo(self, args, elem):
         """Handle ``MUGraphicsSolo``.
@@ -114,13 +114,13 @@ class Commands():
         """
         filename = args[0]
         img = pf.Image(url=filename)
+        # inline
         if isinstance(elem, pf.RawInline):
             return img
-        elif isinstance(elem, pf.RawBlock):
-            div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
-            div.content.extend([pf.Plain(img)])
-            return div
-        return None
+        # block
+        div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
+        div.content.extend([pf.Plain(img)])
+        return div
 
     def handle_myoutubevideo(self, args, elem):
         """Handle ``MYoutubeVideo``.
