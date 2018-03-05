@@ -14,15 +14,15 @@ from innoconv.errors import ParseError
 
 def debug(msg, *args, **kwargs):
     """Print debug message."""
-    pf.debug('[MINTMOD] %s' % msg, *args, **kwargs)
+    pf.debug('[INNOCONV] %s' % msg, *args, **kwargs)
 
 
-def debug_nested(msg, *args, **kwargs):
-    """Print debug message for a nested filter instance."""
-    # only print message if not empty strip returns false for strings that only
-    # consist of whitespace characters
-    if msg and msg.strip():
-        pf.debug(u'↳ %s' % msg, *args, **kwargs)
+def debug_nested(msg):
+    """Print debug message for a nested filter instance.
+
+    Prefix every line for better readability."""
+    for line in msg.splitlines():
+        pf.debug(u'↳ %s' % line)
 
 
 def pandoc_parse(parse_string):
