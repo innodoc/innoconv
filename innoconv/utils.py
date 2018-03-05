@@ -38,42 +38,35 @@ def pandoc_parse(parse_string):
             os.path.dirname(os.path.realpath(__file__)),
             filter_name, '__main__.py')
 
-    args = [
+    pandoc_args = [
         '--from=latex+raw_tex', '--to=json',
         # TODO: enable ifttm_filter
         # '--filter=%s' % filter_path('ifttm_filter'),
         '--filter=%s' % filter_path('mintmod_filter'),
     ]
-    out, err = run_pandoc(parse_string, args)
-    if err is not None:
-        debug_nested(fix_line_endings(err))
-    if out is not None:
-        out = fix_line_endings(out)
-        out = json.loads(out, object_pairs_hook=from_json)
-        out = out.content.list
-        return out
-    return []
-
-
-def run_pandoc(text='', args=None):
-    """Call Pandoc with input text and/or arguments."""
-    if args is None:
-        args = []
 
     pandoc_path = which('pandoc')
     if pandoc_path is None or not os.path.exists(pandoc_path):
-        raise OSError("Path to pandoc executable does not exists")
+        raise OSError('pandoc executable not in PATH!')
 
-    proc = Popen([pandoc_path] + args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    out, err = proc.communicate(input=text.encode('utf-8'))
-    exitcode = proc.returncode
-    if exitcode != 0:
+    cmd = [pandoc_path] + pandoc_args
+    proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    out, err = proc.communicate(input=parse_string.encode('utf-8'))
+
+    if proc.returncode != 0:
         debug('Pandoc process exited with non-zero return code.')
         debug('-- BEGIN of Pandoc output --')
         debug_nested(fix_line_endings(err))
         debug('-- END of Pandoc output --')
         return None, None
-    return out.decode('utf-8'), err.decode('utf-8')
+
+    if err:
+        debug_nested(fix_line_endings(err.decode('utf-8')))
+        return []
+
+    out = fix_line_endings(out.decode('utf-8'))
+    out = json.loads(out, object_pairs_hook=from_json)
+    return out.content.list
 
 
 def fix_line_endings(repl):
