@@ -9,7 +9,7 @@ import panflute as pf
 from panflute.elements import from_json
 
 from innoconv.constants import REGEX_PATTERNS
-from innoconv.errors import ParseError
+from innoconv.errors import ParseError, PandocError
 
 
 def debug(msg, *args, **kwargs):
@@ -20,7 +20,9 @@ def debug(msg, *args, **kwargs):
 def debug_nested(msg):
     """Print debug message for a nested filter instance.
 
-    Prefix every line for better readability."""
+    Prefix every line for better readability.
+    """
+    msg = fix_line_endings(msg)
     for line in msg.splitlines():
         pf.debug(u'↳ %s' % line)
 
@@ -30,6 +32,13 @@ def pandoc_parse(parse_string):
 
     The panflute helper function ``convert_text`` does not print debug
     messages. So we have our own version.
+
+    :param parse_string: Pandoc input
+    :type parse_string: str
+
+    :returns: list of :class:`panflute.Element`
+    :raises OSError: if the Pandoc executable is not found
+    :raises PandocError: if the Pandoc process fails
     """
 
     def filter_path(filter_name):
@@ -54,23 +63,20 @@ def pandoc_parse(parse_string):
     out, err = proc.communicate(input=parse_string.encode('utf-8'))
 
     if proc.returncode != 0:
-        debug('Pandoc process exited with non-zero return code.')
         debug('-- BEGIN of Pandoc output --')
-        debug_nested(fix_line_endings(err))
+        debug_nested(err)
         debug('-- END of Pandoc output --')
-        return None, None
+        raise PandocError('Pandoc process exited with non-zero return code.')
 
     if err:
-        debug_nested(fix_line_endings(err.decode('utf-8')))
-        return []
+        debug_nested(err)
 
-    out = fix_line_endings(out.decode('utf-8'))
-    out = json.loads(out, object_pairs_hook=from_json)
+    out = json.loads(fix_line_endings(out), object_pairs_hook=from_json)
     return out.content.list
 
 
 def fix_line_endings(repl):
-    r"""Replace \r\n with \n."""
+    r"""Replace ``\r\n`` with ``\n`` and convert ``bytes`` to ``str``."""
     if isinstance(repl, bytes):
         repl = str(repl, 'utf-8')
     return "\n".join(repl.splitlines())

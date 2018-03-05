@@ -5,7 +5,7 @@ import os
 from mock import patch
 import panflute as pf
 
-from innoconv.errors import ParseError
+from innoconv.errors import ParseError, PandocError
 from innoconv.utils import pandoc_parse, destringify, parse_cmd
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +62,11 @@ class TestParsePandoc(unittest.TestCase):
         for elem in content_tests:
             with self.subTest(value=elem[0]):
                 self.assertEqual(elem[0], elem[1])
+
+    def test_parse_pandoc_fail(self):
+        "parse_pandoc() raises PandocError if given broken document"
+        with self.assertRaises(PandocError):
+            pandoc_parse(r'\begin{fooenv}bla')
 
     def test_parse_pandoc_empty(self):
         "parse_pandoc() returns [] if given empty document"
