@@ -68,6 +68,12 @@ class TestParsePandoc(unittest.TestCase):
         with self.assertRaises(PandocError):
             pandoc_parse(r'\begin{fooenv}bla')
 
+    @patch('innoconv.utils.debug_nested')
+    def test_parse_pandoc_debug_output(self, debug_nested_mock):
+        "parse_pandoc() does print debug messages"
+        pandoc_parse(r'\unknowncommandfoobar')
+        self.assertTrue(debug_nested_mock.called)
+
     def test_parse_pandoc_empty(self):
         "parse_pandoc() returns [] if given empty document"
         ret = pandoc_parse('')
