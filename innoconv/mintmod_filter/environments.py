@@ -3,7 +3,7 @@
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
 from innoconv.errors import NoPrecedingHeader
-from innoconv.utils import pandoc_parse, destringify
+from innoconv.utils import pandoc_parse
 from innoconv.mintmod_filter.elements import create_content_box
 
 
@@ -77,11 +77,7 @@ class Environments():
 
     def handle_mhint(self, elem_content, env_args, elem):
         """Handle ``MHint`` command."""
-        div = pf.Div(classes=ELEMENT_CLASSES['MHINT'])
-
-        div.content.extend([
-            pf.Plain(pf.Span(*destringify(env_args[0]),
-                             classes=ELEMENT_CLASSES['MHINT_TEXT']))
-        ] + pandoc_parse(elem_content))
-
-        return div
+        return create_content_box(
+            None, ELEMENT_CLASSES['MHINT'],
+            elem_content, elem.doc
+        )

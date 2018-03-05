@@ -30,8 +30,10 @@ def create_content_box(title, div_classes, elem_content, doc, level=4,
     by having diffent titles and classes.
     """
 
-    header = create_header(title, doc, level=level, auto_id=auto_id)
     div = pf.Div(classes=div_classes)
     content = pandoc_parse(elem_content)
-    div.content.extend([header] + content)
+    if title:
+        header = create_header(title, doc, level=level, auto_id=auto_id)
+        content = [header] + content
+    div.content.extend(content)
     return div
