@@ -79,15 +79,15 @@ class MintmodFilterAction:
             pf.Strong(*destringify('Unhandled command:')),
             pf.Space(), pf.Code(elem.text),
         ]
+        # RawBlock
         if isinstance(elem, pf.Block):
             div = pf.Div(classes=classes, attributes=attrs)
             div.content.extend([pf.Para(*msg)])
             return div
-        elif isinstance(elem, pf.Inline):
-            span = pf.Span(classes=classes, attributes=attrs)
-            span.content.extend(msg)
-            return span
-        return None
+        # RawInline
+        span = pf.Span(classes=classes, attributes=attrs)
+        span.content.extend(msg)
+        return span
 
     def _handle_environment(self, elem):
         """Parse and handle mintmod environments."""

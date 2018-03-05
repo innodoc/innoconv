@@ -42,12 +42,24 @@ class TestFilterAction(unittest.TestCase):
                 self.assertIn(cls, ret.classes)
         self.assertIn('thiscommandalsodoesnotexist', ret.classes)
 
-    def test_unknown_command(self):
-        "filter() handles unknown LaTeX command"
+    def test_unknown_raw_block_command(self):
+        "filter() handles unknown RawBlock command"
         elem_unkown_cmd = pf.RawBlock(
             r'\ThisCommandDoesNotExist', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
         self.assertIsInstance(ret, pf.Div)
+        for cls in ELEMENT_CLASSES['UNKNOWN_CMD']:
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)
+        self.assertIn('thiscommanddoesnotexist', ret.classes)
+
+    def test_unknown_raw_inline_command(self):
+        "filter() handles unknown RawInline command"
+        elem_unkown_cmd = pf.RawInline(
+            r'\ThisCommandDoesNotExist', format='latex')
+        para = pf.Para(elem_unkown_cmd)
+        ret = self._filter_elem([para], elem_unkown_cmd)
+        self.assertIsInstance(ret, pf.Span)
         for cls in ELEMENT_CLASSES['UNKNOWN_CMD']:
             with self.subTest(cls=cls):
                 self.assertIn(cls, ret.classes)
@@ -93,12 +105,30 @@ class TestFilterAction(unittest.TestCase):
     def test_invalid_environment(self):
         "filter() raises ParseError on invalid environment"
         elem_invalid_env = pf.RawBlock(
-            r'/begin'
+            r'\begin{ThisEnvDoesNotExist}'
             'FOOBARCONTENT'
-            r'\end{ThisEnvDoesNotExist}',
+            r'\end{ThisEnvDoesNotExistTypo}',
             format='latex')
         with self.assertRaises(ParseError):
             self._filter_elem([elem_invalid_env], elem_invalid_env)
+
+    def test_invalid_value_elem(self):
+        "filter() raises ValueError if elem=None"
+        with self.assertRaises(ValueError):
+            self.filter_action.filter(None, pf.Doc())
+
+    def test_invalid_value_doc(self):
+        "filter() raises ValueError if doc=None"
+        with self.assertRaises(ValueError):
+            self.filter_action.filter(pf.Para(), None)
+
+    def test_rawinline(self):
+        "filter() handles RawInline element"
+        glqq = pf.RawInline(r'\glqq', format='latex')
+        elem = pf.Para(glqq)
+        ret = self._filter_elem([elem], glqq)
+        self.assertIsInstance(ret, pf.Str)
+        self.assertEqual(ret.text, r'„')
 
     def _filter_elem(self, elem_list, test_elem):
         self.doc.content.extend(elem_list)
