@@ -23,6 +23,7 @@ ELEMENT_CLASSES = {
     'MEXAMPLE': ['example'],
     'MHINT': ['hint'],
     'MHINT_TEXT': ['hint-text'],
+    'MSECTIONSTART': ['section-start'],
     'UNKNOWN_CMD': ['unknown-command'],
     'UNKNOWN_ENV': ['unknown-environment'],
     'MYOUTUBE_VIDEO': ['video', 'video-youtube']

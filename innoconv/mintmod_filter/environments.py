@@ -2,7 +2,8 @@
 
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
-from innoconv.utils import pandoc_parse, debug, destringify
+from innoconv.errors import NoPrecedingHeader
+from innoconv.utils import pandoc_parse, destringify
 from innoconv.mintmod_filter.elements import create_content_box
 
 
@@ -22,12 +23,12 @@ class Environments():
     def handle_msectionstart(self, elem_content, env_args, elem):
         """Handle ``MSectionStart`` environment."""
         # Use title from previously found \MSection command
-        header = getattr(elem.doc, "last_header_elem", None)
+        header = getattr(elem.doc, 'last_header_elem', None)
         if header is None:
-            debug("warning handle_msectionstart did not find a previously \
-            found header element.")
+            raise NoPrecedingHeader(
+                'MSectionStart must precede a header element.')
 
-        div = pf.Div(classes=['section-start'])
+        div = pf.Div(classes=ELEMENT_CLASSES['MSECTIONSTART'])
         div.content.extend([header] + pandoc_parse(elem_content))
         return div
 

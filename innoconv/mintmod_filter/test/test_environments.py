@@ -3,10 +3,45 @@
 import unittest
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
+from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.environments import Environments
+from innoconv.mintmod_filter.elements import create_header
 
 
 class TestEnvironments(unittest.TestCase):
+
+    def setUp(self):
+        self.doc = pf.Doc()
+        self.environments = Environments()
+        self.elem_content = r"""\begin{MSectionStart}
+        Lorem ipsum.
+        \end{MSectionStart}"""
+        self.doc.content.extend(
+            [pf.RawBlock(self.elem_content, format='latex')])
+        self.elem = self.doc.content[0]  # this sets up elem.parent
+
+    def test_msectionstart_no_header(self):
+        "Should raise NoPrecedingHeader if there's no header"
+        with self.assertRaises(NoPrecedingHeader):
+            self.environments.handle_msectionstart(
+                self.elem_content, [], self.elem)
+
+    def test_msectionstart(self):
+        "Should handle MSectionStart"
+
+        # mock a preceding header
+        create_header('foo', level=2, doc=self.elem.doc, auto_id=True)
+
+        ret = self.environments.handle_msectionstart(
+            self.elem_content, [], self.elem)
+
+        self.assertIsInstance(ret, pf.Div)
+        for cls in ELEMENT_CLASSES['MSECTIONSTART']:
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)  # pylint: disable=no-member
+
+
+class TestContentBoxes(unittest.TestCase):
 
     def setUp(self):
         self.doc = pf.Doc()
