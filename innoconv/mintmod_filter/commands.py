@@ -128,7 +128,6 @@ class Commands():
         Just return a Link Element
         """
         title, width, height, url = args
-        debug(title, width, height)
         attrs = {'width': width, 'height': height}
         return pf.Link(
             *destringify(title),
