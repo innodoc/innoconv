@@ -24,7 +24,7 @@ class TestEnvironments(unittest.TestCase):
         "Should raise NoPrecedingHeader if there's no header"
         with self.assertRaises(NoPrecedingHeader):
             self.environments.handle_msectionstart(
-                self.elem_content, [], self.elem)
+                'Lorem ipsum', [], self.elem)
 
     def test_msectionstart(self):
         "Should handle MSectionStart"
@@ -33,7 +33,7 @@ class TestEnvironments(unittest.TestCase):
         create_header('foo', level=2, doc=self.elem.doc, auto_id=True)
 
         ret = self.environments.handle_msectionstart(
-            self.elem_content, [], self.elem)
+            'Lorem ipsum', [], self.elem)
 
         self.assertIsInstance(ret, pf.Div)
         for cls in ELEMENT_CLASSES['MSECTIONSTART']:
