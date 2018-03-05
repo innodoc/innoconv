@@ -130,7 +130,7 @@ class TestCommand(BaseCommand):
     description = 'Run test suite'
 
     def run(self):
-        self._run(['green', '-r', 'innoconv', 'test'])
+        self._run(['green', '-r', 'innoconv'])
 
 
 class CoverageCommand(BaseCommand):
