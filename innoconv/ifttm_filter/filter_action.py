@@ -64,31 +64,19 @@ class IfttmFilterAction():
                 self._state = State.FIND_FI
                 ret = []
             elif cmd_name == 'fi':
-                ret = self._finalize(elem)
+                ret = self._finalize()
 
         # 3) Handle \fi
 
         elif self._state == State.FIND_FI:
             ret = []
             if cmd_name == 'fi':
-                ret = self._finalize(elem)
+                ret = self._finalize()
 
         return ret
 
-    def _prepare_element_memory(self, elem):
-        elements = self._element_memory
-
-        # Closing \fi is RawBlock: Pandoc expects block elements. Wrap inline
-        # elements.
-        if isinstance(elem, pf.Block):
-            for i, ret_el in enumerate(elements):
-                if not isinstance(ret_el, pf.Block):
-                    elements[i] = pf.Para(ret_el)
-
-        return elements
-
-    def _finalize(self, elem):
-        ret = self._prepare_element_memory(elem)
+    def _finalize(self):
+        ret = self._element_memory
         self._element_memory = []
         self._state = State.FIND_IFTTM
         return ret
