@@ -153,7 +153,7 @@ class Commands():
     def handle_mssectionlabelprefix(self, args, elem):
         """Handle ``MSsectionlabelprefix`` command.
 
-        This command inserts a translation.
+        This command inserts the translation for 'section'.
         """
         return pf.Str('Abschnitt')  # TODO: i18n
 
