@@ -145,9 +145,8 @@ class Commands():
 
         This command is used to embed HTML in LaTeX source.
         """
-        if "html:" in args[0]:
-            html_code = args[0].replace("html:", "")
-            return pf.RawBlock(html_code)
+        if args[0].startswith('html:'):
+            return pf.RawBlock(args[0][5:], format='html')
         return None
 
     def handle_mssectionlabelprefix(self, args, elem):

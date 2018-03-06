@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,invalid-name
+# pylint: disable=missing-docstring, invalid-name, too-many-public-methods
 
 import unittest
 import panflute as pf
@@ -34,23 +34,90 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.level, 2)
 
     def test_handle_msubsection(self):
-        # TODO implement test_handle_msubsection
-        pass
+        "MSubsection command"
+        doc = pf.Doc(pf.RawBlock(r'\MSubsection{Foo title}'), format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_msubsection(['Foo title'], elem)
+        self.assertIsInstance(ret, pf.Header)
+        self.assertIsInstance(ret.content[0], pf.Str)
+        self.assertEqual(ret.content[0].text, 'Foo')
+        self.assertIsInstance(ret.content[1], pf.Space)
+        self.assertIsInstance(ret.content[2], pf.Str)
+        self.assertEqual(ret.content[2].text, 'title')
+        self.assertEqual(ret.identifier, 'foo-title')
+        self.assertEqual(ret.level, 3)
 
     def test_handle_mtitle(self):
-        # TODO implement test_handle_mtitle
-        pass
+        "MTitle command"
+        doc = pf.Doc(
+            pf.RawBlock(r'\MTitle{Schöne Titel nach Maß?}'), format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_mtitle([u'Schöne Titel nach Maß?'], elem)
+        self.assertIsInstance(ret, pf.Header)
+        self.assertIsInstance(ret.content[0], pf.Str)
+        self.assertEqual(ret.content[0].text, u'Schöne')
+        self.assertIsInstance(ret.content[6], pf.Str)
+        self.assertEqual(ret.content[6].text, u'Maß?')
+        self.assertEqual(ret.identifier, 'schone-titel-nach-mass')
+        self.assertEqual(ret.level, 4)
 
     def test_handle_mlabel(self):
-        # TODO implement test_handle_mlabel
+        # TODO implement test_handle_mlabel, not specified yet, see #10
         pass
 
-    def test_handle_special(self):
-        # TODO implement test_handle_special
-        pass
+    def test_handle_special_html(self):
+        "special command embedded html"
+        doc = pf.Doc(
+            pf.RawBlock(
+                r'\special{html:<a href="http://www.example.com">Bar</a>}'),
+            format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_special(
+            [r'html:<a href="http://www.example.com">Bar</a>'], elem)
+        self.assertIsInstance(ret, pf.RawBlock)
+        self.assertEqual(ret.format, 'html')
+        self.assertEqual(
+            ret.text, '<a href="http://www.example.com">Bar</a>')
+
+    def test_handle_special_html_replacing(self):
+        "special command should not remove 'html:' in the middle of string."
+        doc = pf.Doc(
+            pf.RawBlock(
+                r'\special{html:<a href="#bar">html:</a>}'),
+            format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_special(
+            [r'html:<a href="#bar">html:</a>'], elem)
+        self.assertIsInstance(ret, pf.RawBlock)
+        self.assertEqual(ret.format, 'html')
+        self.assertEqual(
+            ret.text, '<a href="#bar">html:</a>')
+
+    def test_handle_special_detect_html(self):
+        "special command should not be confused by a 'html:'."
+        doc = pf.Doc(
+            pf.RawBlock(
+                r'\special{bar:<a href="#foo">html:</a>}'),
+            format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_special(
+            [r'bar:<a href="#foo">html:</a>'], elem)
+        self.assertIsNone(ret)
+
+    def test_handle_special_other(self):
+        "special command with non-html code should be ignored"
+        # Note: 'html:' occuring in the middle of the string.
+        doc = pf.Doc(
+            pf.RawBlock(
+                r'\special{python:print("html:")}'),
+            format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_special(
+            [r'python:print("html:")'], elem)
+        self.assertIsNone(ret)
 
     def test_handle_mssectionlabelprefix(self):
-        # TODO implement handle_mssectionlabelprefix
+        # TODO implement handle_mssectionlabelprefix, not specified, see #4
         pass
 
     def test_handle_msref(self):
