@@ -21,7 +21,8 @@ class TestEnvironments(unittest.TestCase):
         self.elem = self.doc.content[0]  # this sets up elem.parent
 
     def test_msectionstart_no_header(self):
-        "Should raise NoPrecedingHeader if there's no header"
+        """handle_msectionstart should raise NoPrecedingHeader if there's no
+        header"""
         with self.assertRaises(NoPrecedingHeader):
             self.environments.handle_msectionstart(
                 'Lorem ipsum', [], self.elem)
@@ -134,4 +135,4 @@ class TestContentBoxes(unittest.TestCase):
         self.assertEqual(div.content[content_idx].content[0].content[0]
                          .content[0].content[0].text, "item1")
 
-        # TODO set and test a unique identifier to info boxes (and others)
+        # TODO set and test a unique identifier to info boxes and others (#10)
