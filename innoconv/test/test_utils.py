@@ -5,8 +5,9 @@ import os
 from mock import patch
 import panflute as pf
 
-from innoconv.errors import ParseError, PandocError
-from innoconv.utils import pandoc_parse, destringify, parse_cmd
+from innoconv.errors import ParseError
+from innoconv.utils import parse_fragment, destringify, parse_cmd
+from innoconv.test.utils import captured_output
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,13 +24,13 @@ Here is a text with another \MLabel{paralabel}
 \end{MXContent}"""
 
 
-class TestParsePandoc(unittest.TestCase):
+class TestParseFragment(unittest.TestCase):
 
-    def test_parse_pandoc(self):
-        "parse_pandoc() returns valid output if given test document"
+    def test_parse_fragment(self):
+        "parse_fragment() returns valid output if given test document"
         with open(os.path.join(SCRIPT_DIR, 'files', 'test.tex'), 'r') as file:
             content = file.read()
-        doc = pandoc_parse(content)
+        doc = parse_fragment(content)
         h_1 = doc[0]
         para_1 = doc[1]
         h_2 = doc[2]
@@ -63,38 +64,51 @@ class TestParsePandoc(unittest.TestCase):
             with self.subTest(value=elem[0]):
                 self.assertEqual(elem[0], elem[1])
 
-    def test_parse_pandoc_fail(self):
-        "parse_pandoc() raises PandocError if given broken document"
-        with self.assertRaises(PandocError):
-            pandoc_parse(r'\begin{fooenv}bla')
+    def test_parse_fragment_fail(self):
+        """if given broken document parse_fragment() should return [] and print
+        errors"""
+        with captured_output() as out:
+            ret = parse_fragment(r'\begin{fooenv}bla')
+            err_out = out[1].getvalue()
+        self.assertTrue('ERROR' in err_out)
+        self.assertListEqual(ret, [])
 
-    @patch('innoconv.utils.debug_nested')
-    def test_parse_pandoc_debug_output(self, debug_nested_mock):
-        "parse_pandoc() does print debug messages"
-        pandoc_parse(r'\unknowncommandfoobar')
-        self.assertTrue(debug_nested_mock.called)
+    def test_parse_fragment_quiet(self):
+        "parse_fragment() respects quiet argument"
+        with captured_output() as out:
+            ret = parse_fragment(r'\section{foo} \unknownfoobar', quiet=False)
+            err_out = out[1].getvalue()
+        self.assertTrue('pandoc read' in err_out)
+        self.assertTrue('Could not handle command unknownfoobar' in err_out)
+        self.assertIsInstance(ret[0], pf.Header)
 
-    def test_parse_pandoc_empty(self):
-        "parse_pandoc() returns [] if given empty document"
-        ret = pandoc_parse('')
+    @patch('innoconv.utils.log')
+    def test_parse_fragment_debug_output(self, log_mock):
+        "parse_fragment() does print debug messages"
+        parse_fragment(r'\unknowncommandfoobar')
+        self.assertTrue(log_mock.called)
+
+    def test_parse_fragment_empty(self):
+        "parse_fragment() returns [] if given empty document"
+        ret = parse_fragment('')
         self.assertEqual(ret, [])
 
     @patch('innoconv.utils.which', return_value=None)
-    def test_parse_pandoc_not_in_path(self, mock_func):
-        "parse_pandoc() should fail if pandoc not in PATH"
+    def test_parse_fragment_not_in_path(self, mock_func):
         # pylint: disable=unused-argument
+        "parse_fragment() raises OSError if panzer not in PATH"
         with self.assertRaises(OSError):
-            pandoc_parse('foo bar')
+            parse_fragment('foo bar')
 
     # TODO: should be moved to integration tests
     @unittest.skip("We need to write a second filter for label / index / ..."
                    "before this test will succeed, as subprocess cannot easily"
                    "the other processe's data")
-    def test_parse_pandoc_mlabel(self):
+    def test_parse_fragment_mlabel(self):
         """Test if a latex string containing several `MLabel` commands in
         different environments and positions are parsed correctly.
         """
-        ast_native = pandoc_parse(TEX_MLABEL)
+        ast_native = parse_fragment(TEX_MLABEL)
 
         self.assertIsInstance(ast_native, list)
 

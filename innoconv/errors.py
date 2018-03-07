@@ -9,8 +9,3 @@ class ParseError(ValueError):
 class NoPrecedingHeader(ParseError):
     """Raised when a there's no preceding header for a MSectionStart."""
     pass
-
-
-class PandocError(ParseError):
-    """Raised when a Pandoc process fails."""
-    pass

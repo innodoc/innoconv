@@ -2,7 +2,7 @@
 
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
-from innoconv.utils import debug, destringify
+from innoconv.utils import log, destringify
 from innoconv.mintmod_filter.elements import create_header
 
 
@@ -63,8 +63,11 @@ class Commands():
         last_header_elem = getattr(elem.doc, "last_header_elem", None)
 
         if last_header_elem is None:
-            debug("WARNING: last_header_elem undefined in handle_mlabel with"
-                  "args: %s" % args)
+            log(
+                'last_header_elem undefined in handle_mlabel with args: %s' %
+                args,
+                level='WARNING'
+            )
             return None
 
         last_header_elem.identifier = args[0]

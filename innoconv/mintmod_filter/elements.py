@@ -2,7 +2,7 @@
 
 from slugify import slugify
 import panflute as pf
-from innoconv.utils import destringify, pandoc_parse
+from innoconv.utils import destringify, parse_fragment
 
 
 def create_header(title_str, doc, level=0, auto_id=False):
@@ -31,7 +31,7 @@ def create_content_box(title, div_classes, elem_content, doc, level=4,
     """
 
     div = pf.Div(classes=div_classes)
-    content = pandoc_parse(elem_content)
+    content = parse_fragment(elem_content)
     if title:
         header = create_header(title, doc, level=level, auto_id=auto_id)
         content = [header] + content

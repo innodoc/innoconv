@@ -5,7 +5,7 @@ from slugify import slugify
 
 from innoconv.errors import ParseError
 from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES, COLORS
-from innoconv.utils import debug, destringify, parse_cmd
+from innoconv.utils import log, destringify, parse_cmd
 from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.commands import Commands
 from innoconv.mintmod_filter.substitutions import handle_math_substitutions
@@ -71,7 +71,7 @@ class MintmodFilterAction:
 
         Output visual feedback about the unknown command.
         """
-        debug("Could not handle command %s." % cmd_name)
+        log("Could not handle command %s." % cmd_name, level='WARNING')
         classes = ELEMENT_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
         attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_CMD']}
 
@@ -121,7 +121,7 @@ class MintmodFilterAction:
 
         Output visual feedback about the unknown environment.
         """
-        debug("Could not handle environment %s." % env_name)
+        log("Could not handle environment %s." % env_name, level='WARNING')
         classes = ELEMENT_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
         attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_ENV']}
         div = pf.Div(classes=classes, attributes=attrs)

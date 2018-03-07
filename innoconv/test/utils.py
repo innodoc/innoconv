@@ -2,6 +2,9 @@
 
 import subprocess
 import os
+from contextlib import contextmanager
+from io import StringIO
+import sys
 from bs4 import BeautifulSoup
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -9,7 +12,7 @@ ROOT_DIR = os.path.join(SCRIPT_DIR, '..', '..')
 
 
 def get_pandoc_soup(filename, filters=None):
-    """Run Pandoc with filters and parse output using BeautifulSoup."""
+    """Run panzer with filters and parse output using BeautifulSoup."""
     tex_source = os.path.join(SCRIPT_DIR, 'files', filename)
     env = os.environ.copy()
     env['PYTHONPATH'] = ROOT_DIR
@@ -19,7 +22,7 @@ def get_pandoc_soup(filename, filters=None):
     for _filter in filters:
         command.append(
             '--filter=%s' %
-            os.path.join(ROOT_DIR, 'innoconv', _filter, '__main__.py'))
+            os.path.join(ROOT_DIR, '.panzer', 'filter', _filter))
 
     command.append(tex_source)
 
@@ -29,3 +32,15 @@ def get_pandoc_soup(filename, filters=None):
     proc.communicate()
 
     return BeautifulSoup(html_output, 'html.parser')
+
+
+@contextmanager
+def captured_output():
+    # TODO: write docstring
+    new_out, new_err = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = new_out, new_err
+        yield sys.stdout, sys.stderr
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err

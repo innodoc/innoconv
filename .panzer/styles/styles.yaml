@@ -1,0 +1,12 @@
+innoconv:
+  all:
+    filter:
+      - run: mintmod_filter.py
+  json:
+    commandline:
+      standalone: false
+  html5:
+    commandline:
+      css: "`https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css`"
+      mathjax: "`https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML`"
+      standalone: true

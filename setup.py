@@ -8,15 +8,21 @@ import distutils.cmd
 from distutils.command.clean import clean
 import os
 import logging
-import subprocess
+from subprocess import Popen, PIPE
 import sys
 from setuptools import setup
 from colorama import init as colorama_init, Style
 
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-CONTENT_ROOT = os.path.join(ROOT_DIR, 'content')
-BUILD_ROOT = os.path.join(ROOT_DIR, 'build')
+CONTENT_DIR = os.path.join(ROOT_DIR, 'content')
+BUILD_DIR = os.path.join(ROOT_DIR, 'build')
+PANZER_SUPPORT_DIR = os.path.join(ROOT_DIR, '.panzer')
+LINT_DIRS = [
+    os.path.join(ROOT_DIR, 'innoconv'),
+    os.path.join(ROOT_DIR, 'setup.py'),
+    os.path.join(PANZER_SUPPORT_DIR, 'filter')
+]
 
 TUB_BASE_REPO = 'git@gitlab.tubit.tu-berlin.de:innodoc/tub_base.git'
 TUB_BASE_BRANCH = 'pandoc'
@@ -24,8 +30,6 @@ TUB_BASE_BRANCH = 'pandoc'
 MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' \
                    'VEUNDMINT_TUB_Brueckenkurs/raw/multilang/src/tex/%s'
 
-BOOTSTRAP_CSS = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/' \
-                'bootstrap.min.css'
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 colorama_init()
@@ -55,12 +59,12 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
         env = os.environ.copy()
         env['PYTHONPATH'] = ROOT_DIR
 
-        proc = subprocess.Popen(command, cwd=cwd, env=env)
+        proc = Popen(command, cwd=cwd, env=env, stdout=PIPE, stderr=PIPE)
         out, err_out = proc.communicate()
         if out:
-            self.log.info(out)
+            self.log.info(out.decode('utf-8'))
         if err_out:
-            self.log.error(err_out)
+            self.log.error(err_out.decode('utf-8'))
         if proc.returncode != 0:
             raise RuntimeError(err_msg)
 
@@ -71,19 +75,19 @@ class BuildTUBBaseCommand(BaseCommand):
     description = 'Build tub_base content'
 
     def run(self):
-        project_root = os.path.join(CONTENT_ROOT, 'tub_base')
+        project_root = os.path.join(CONTENT_DIR, 'tub_base')
         # TODO: this should work for arbitrary language codes
         project_root_lang = os.path.join(project_root, 'de')
 
         # clone source
-        self._run(['mkdir', '-p', CONTENT_ROOT])
+        self._run(['mkdir', '-p', CONTENT_DIR])
         if os.path.isdir(project_root):
             self.log.info('Content source directory already exists.')
         else:
             self.log.info('Cloning source repository.')
             self._run(
                 ['git', 'clone', '-q', '-b', TUB_BASE_BRANCH, TUB_BASE_REPO],
-                cwd=CONTENT_ROOT)
+                cwd=CONTENT_DIR)
 
         # fetch de.tex
         filename_base = 'de.tex'
@@ -95,18 +99,24 @@ class BuildTUBBaseCommand(BaseCommand):
             self._run(['wget', '--quiet', MINTMOD_BASE_URL % filename_base],
                       cwd=project_root_lang)
 
-        # build html
-        filename_out_path = os.path.join(BUILD_ROOT, 'tub_base', 'de')
+        # prepare panzer
+        filename_out_path = os.path.join(BUILD_DIR, 'tub_base', 'de')
         filename_out = os.path.join(filename_out_path, 'index.html')
         self._run(['mkdir', '-p', filename_out_path])
-        self._run(['pandoc', '--from=latex+raw_tex', '--to=html5',
-                   '--standalone', '--mathjax',
-                   # enable ifttm_filter
-                   # '--filter=../../../innoconv/ifttm_filter/__main__.py',
-                   '--filter=../../../innoconv/mintmod_filter/__main__.py',
-                   '--css=%s' % BOOTSTRAP_CSS,
-                   '--output=%s' % filename_out, 'tree_pandoc.tex'],
-                  cwd=project_root_lang)
+        cmd = [
+            'panzer',
+            '---panzer-support', PANZER_SUPPORT_DIR,
+            '--metadata=style:innoconv',
+            '--from=latex+raw_tex',
+            '--to=html5',
+            '--standalone',
+            '--normalize',
+            '--output=%s' % filename_out,
+            'tree_pandoc.tex'
+        ]
+
+        # run panzer
+        self._run(cmd, cwd=project_root_lang)
 
         self.log.info(
             '%sBuild finished:%s %s', Style.BRIGHT, Style.NORMAL, filename_out)
@@ -116,7 +126,7 @@ class Flake8Command(BaseCommand):
     description = 'Run flake8 on Python source files'
 
     def run(self):
-        self._run(['flake8', 'innoconv', 'setup.py'])
+        self._run(['flake8'] + LINT_DIRS)
 
 
 class PylintCommand(BaseCommand):
@@ -124,7 +134,7 @@ class PylintCommand(BaseCommand):
 
     def run(self):
         self._run(
-            ['pylint', '--output-format=colorized', 'setup.py', 'innoconv'])
+            ['pylint', '--output-format=colorized'] + LINT_DIRS)
 
 
 class TestCommand(BaseCommand):
@@ -147,8 +157,8 @@ class CoverageCommand(BaseCommand):
 class CleanCommand(clean, BaseCommand):
     def run(self):
         super().run()
-        self._run(['rm', '-rf', BUILD_ROOT])
-        self._run(['rm', '-rf', CONTENT_ROOT])
+        self._run(['rm', '-rf', BUILD_DIR])
+        self._run(['rm', '-rf', CONTENT_DIR])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
 

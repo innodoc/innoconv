@@ -3,7 +3,7 @@
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
 from innoconv.errors import NoPrecedingHeader
-from innoconv.utils import pandoc_parse
+from innoconv.utils import parse_fragment
 from innoconv.mintmod_filter.elements import create_content_box
 
 
@@ -29,7 +29,7 @@ class Environments():
                 'MSectionStart must precede a header element.')
 
         div = pf.Div(classes=ELEMENT_CLASSES['MSECTIONSTART'])
-        div.content.extend([header] + pandoc_parse(elem_content))
+        div.content.extend([header] + parse_fragment(elem_content))
         return div
 
     def handle_mxcontent(self, elem_content, env_args, elem):
