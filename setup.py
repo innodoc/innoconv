@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,no-name-in-module,import-error
 
 """Define project commands."""
 
@@ -35,7 +35,7 @@ def get_logger():
     return logging.getLogger('setup.py')
 
 
-class BaseCommand(distutils.cmd.Command):
+class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
     user_options = []
 
     def __init__(self, *args, **kwargs):
@@ -123,7 +123,8 @@ class PylintCommand(BaseCommand):
     description = 'Run pylint on Python source files'
 
     def run(self):
-        self._run(['pylint', '--output-format=colorized', 'innoconv'])
+        self._run(
+            ['pylint', '--output-format=colorized', 'setup.py', 'innoconv'])
 
 
 class TestCommand(BaseCommand):
