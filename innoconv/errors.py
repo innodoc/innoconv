@@ -7,5 +7,5 @@ class ParseError(ValueError):
 
 
 class NoPrecedingHeader(ParseError):
-    """Raised when a there's no preceding header for a MSectionStart."""
+    """Raised when a there's no preceding header for a ``MSectionStart``."""
     pass

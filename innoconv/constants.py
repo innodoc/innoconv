@@ -1,4 +1,4 @@
-"""All project constants are defined here."""
+"""Project constants are defined here."""
 
 import re
 
