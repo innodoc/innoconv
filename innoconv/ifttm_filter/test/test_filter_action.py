@@ -8,7 +8,7 @@ from innoconv.ifttm_filter.filter_action import IfttmFilterAction
 
 class TestFilterAction(unittest.TestCase):
     def test_ifttm_block_fi_else_fi(self):
-        "filter() should handle block if/else/fi"
+        """filter() should handle block if/else/fi"""
         filter_action = IfttmFilterAction()
         doc = pf.Doc()
         blocks = [
@@ -48,7 +48,7 @@ class TestFilterAction(unittest.TestCase):
             self.assertEqual(ret.content[0].text, 'foo')
 
     def test_ifttm_block_if_fi(self):
-        "filter() should handle block if/fi"
+        """filter() should handle block if/fi"""
         filter_action = IfttmFilterAction()
         doc = pf.Doc()
         blocks = [
@@ -76,7 +76,7 @@ class TestFilterAction(unittest.TestCase):
             self.assertEqual(ret.content[0].text, 'foo')
 
     def test_ifttm_inline_if_else_fi(self):
-        "filter() should handle inline if/else/fi"
+        """filter() should handle inline if/else/fi"""
         filter_action = IfttmFilterAction()
         doc = pf.Doc()
         blocks = [
@@ -118,19 +118,19 @@ class TestFilterAction(unittest.TestCase):
             self.assertEqual(ret.text, 'foo')
 
     def test_invalid_value_elem(self):
-        "filter() raises ValueError if elem=None"
+        """filter() raises ValueError if elem=None"""
         filter_action = IfttmFilterAction()
         with self.assertRaises(ValueError):
             filter_action.filter(None, pf.Doc())
 
     def test_invalid_value_doc(self):
-        "filter() raises ValueError if doc=None"
+        """filter() raises ValueError if doc=None"""
         filter_action = IfttmFilterAction()
         with self.assertRaises(ValueError):
             filter_action.filter(pf.Para(), None)
 
     def test_str_untouched(self):
-        "filter() should not change pf.Str"
+        """filter() should not change pf.Str"""
         filter_action = IfttmFilterAction()
         doc = pf.Doc()
         elem = pf.Str('foo')

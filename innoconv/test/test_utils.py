@@ -27,7 +27,7 @@ Here is a text with another \MLabel{paralabel}
 class TestParseFragment(unittest.TestCase):
 
     def test_parse_fragment(self):
-        "parse_fragment() returns valid output if given test document"
+        """parse_fragment() returns valid output if given test document"""
         with open(os.path.join(SCRIPT_DIR, 'files', 'test.tex'), 'r') as file:
             content = file.read()
         doc = parse_fragment(content)
@@ -74,7 +74,7 @@ class TestParseFragment(unittest.TestCase):
         self.assertListEqual(ret, [])
 
     def test_parse_fragment_quiet(self):
-        "parse_fragment() respects quiet argument"
+        """parse_fragment() respects quiet argument"""
         with captured_output() as out:
             ret = parse_fragment(r'\section{foo} \unknownfoobar', quiet=False)
             err_out = out[1].getvalue()
@@ -84,19 +84,19 @@ class TestParseFragment(unittest.TestCase):
 
     @patch('innoconv.utils.log')
     def test_parse_fragment_debug_output(self, log_mock):
-        "parse_fragment() does print debug messages"
+        """parse_fragment() does print debug messages"""
         parse_fragment(r'\unknowncommandfoobar')
         self.assertTrue(log_mock.called)
 
     def test_parse_fragment_empty(self):
-        "parse_fragment() returns [] if given empty document"
+        """parse_fragment() returns [] if given empty document"""
         ret = parse_fragment('')
         self.assertEqual(ret, [])
 
     @patch('innoconv.utils.which', return_value=None)
     def test_parse_fragment_not_in_path(self, mock_func):
         # pylint: disable=unused-argument
-        "parse_fragment() raises OSError if panzer not in PATH"
+        """parse_fragment() raises OSError if panzer not in PATH"""
         with self.assertRaises(OSError):
             parse_fragment('foo bar')
 
@@ -106,8 +106,7 @@ class TestParseFragment(unittest.TestCase):
                    "the other processe's data")
     def test_parse_fragment_mlabel(self):
         """Test if a latex string containing several `MLabel` commands in
-        different environments and positions are parsed correctly.
-        """
+        different environments and positions are parsed correctly."""
         ast_native = parse_fragment(TEX_MLABEL)
 
         self.assertIsInstance(ast_native, list)
@@ -132,7 +131,7 @@ class TestParseFragment(unittest.TestCase):
 class TestDestringify(unittest.TestCase):
 
     def test_regular(self):
-        "Test destringify with a regular string"
+        """Test destringify with a regular string"""
         string = 'This is a  really\tnice    string.'
         comp = [
             pf.Str('This'),
@@ -152,28 +151,28 @@ class TestDestringify(unittest.TestCase):
         self._compare_list(ret, comp)
 
     def test_empty(self):
-        "Test destringify with an empty string"
+        """Test destringify with an empty string"""
         string = ''
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self.assertListEqual(ret, [])
 
     def test_empty_whitespace(self):
-        "Test destringify with an whitespace string"
+        """Test destringify with an whitespace string"""
         string = '   '
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self.assertListEqual(ret, [])
 
     def test_one_word(self):
-        "Test destringify with one word"
+        """Test destringify with one word"""
         string = 'foobar'
         ret = destringify(string)
         self.assertIsInstance(ret, list)
         self._compare_list(ret, [pf.Str('foobar')])
 
     def test_whitespace(self):
-        "Test destringify with leading and trailing whitespace"
+        """Test destringify with leading and trailing whitespace"""
         string = '  foo bar  '
         comp = [pf.Str('foo'), pf.Space(), pf.Str('bar')]
         ret = destringify(string)

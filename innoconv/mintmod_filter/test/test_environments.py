@@ -28,7 +28,7 @@ class TestEnvironments(unittest.TestCase):
                 'Lorem ipsum', [], self.elem)
 
     def test_msectionstart(self):
-        "Should handle MSectionStart"
+        """Should handle MSectionStart"""
 
         # mock a preceding header
         create_header('foo', level=2, doc=self.elem.doc, auto_id=True)
@@ -49,7 +49,7 @@ class TestContentBoxes(unittest.TestCase):
         self.environments = Environments()
 
     def test_mxcontent(self):
-        "MXContent"
+        """MXContent"""
         title = 'Foo content'
         self._test_content_box(
             self.environments.handle_mxcontent,
@@ -57,42 +57,42 @@ class TestContentBoxes(unittest.TestCase):
         )
 
     def test_handle_mexercises(self):
-        "MExercises"
+        """MExercises"""
         self._test_content_box(
             self.environments.handle_mexercises,
             ELEMENT_CLASSES['MEXERCISES'], 'Aufgaben'
         )
 
     def test_handle_mexercise(self):
-        "MExercise"
+        """MExercise"""
         self._test_content_box(
             self.environments.handle_mexercise,
             ELEMENT_CLASSES['MEXERCISE'], 'Aufgabe'
         )
 
     def test_handle_minfo(self):
-        "MInfo"
+        """MInfo"""
         self._test_content_box(
             self.environments.handle_minfo,
             ELEMENT_CLASSES['MINFO'], 'Info'
         )
 
     def test_handle_mexperiment(self):
-        "MExperiment"
+        """MExperiment"""
         self._test_content_box(
             self.environments.handle_mexperiment,
             ELEMENT_CLASSES['MEXPERIMENT'], 'Experiment'
         )
 
     def test_handle_mexample(self):
-        "MExample"
+        """MExample"""
         self._test_content_box(
             self.environments.handle_mexample,
             ELEMENT_CLASSES['MEXAMPLE'], 'Beispiel'
         )
 
     def test_handle_mhint(self):
-        "MHint"
+        """MHint"""
         self._test_content_box(
             self.environments.handle_mhint,
             ELEMENT_CLASSES['MHINT'], None
@@ -101,8 +101,7 @@ class TestContentBoxes(unittest.TestCase):
     def _test_content_box(self, handler, element_classes, title,
                           env_args=None, _id=''):
         """Test if content boxes (e.g. Exercises, Examples, Experiment, Info)
-        are handled correctly
-        """
+        are handled correctly"""
         env_args = env_args or []
 
         # some latex content in the environment
@@ -133,6 +132,6 @@ class TestContentBoxes(unittest.TestCase):
         # and the content of the environment should be parsed correctly
         self.assertIsInstance(div.content[content_idx], pf.BulletList)
         self.assertEqual(div.content[content_idx].content[0].content[0]
-                         .content[0].content[0].text, "item1")
+                         .content[0].content[0].text, 'item1')
 
         # TODO set and test a unique identifier to info boxes and others (#10)

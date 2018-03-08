@@ -13,26 +13,26 @@ class TestFilterAction(unittest.TestCase):
         self.filter_action = MintmodFilterAction()
 
     def test_str_input(self):
-        "filter() returns None if given Str element"
+        """filter() returns None if given Str element"""
         elem_str = pf.Str('foo')
         ret = self._filter_elem([pf.Para(elem_str)], elem_str)
         self.assertIsNone(ret)  # None means element unchanged
 
     def test_math_input(self):
-        "filter() returns Math if given Math element"
+        """filter() returns Math if given Math element"""
         elem_math = pf.Math(r'1+2')
         ret = self._filter_elem([pf.Para(elem_math)], elem_math)
         self.assertIsInstance(ret, pf.Math)
 
     def test_known_command(self):
-        "filter() handles known LaTeX command"
+        """filter() handles known LaTeX command"""
         self.doc.content.extend([pf.RawBlock(r'\MTitle{Foo}', format='latex')])
         elem = self.doc.content[0]  # this sets up elem.parent
         ret = self._filter_elem([elem], elem)
         self.assertIsInstance(ret, pf.Header)
 
     def test_unknown_command_param(self):
-        "filter() handles unknown LaTeX command"
+        """filter() handles unknown LaTeX command"""
         elem_unkown_cmd = pf.RawBlock(
             r'\ThisCommandAlsoDoesNotExist{foo}{bar}', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
@@ -43,7 +43,7 @@ class TestFilterAction(unittest.TestCase):
         self.assertIn('thiscommandalsodoesnotexist', ret.classes)
 
     def test_unknown_raw_block_command(self):
-        "filter() handles unknown RawBlock command"
+        """filter() handles unknown RawBlock command"""
         elem_unkown_cmd = pf.RawBlock(
             r'\ThisCommandDoesNotExist', format='latex')
         ret = self._filter_elem([elem_unkown_cmd], elem_unkown_cmd)
@@ -54,7 +54,7 @@ class TestFilterAction(unittest.TestCase):
         self.assertIn('thiscommanddoesnotexist', ret.classes)
 
     def test_unknown_raw_inline_command(self):
-        "filter() handles unknown RawInline command"
+        """filter() handles unknown RawInline command"""
         elem_unkown_cmd = pf.RawInline(
             r'\ThisCommandDoesNotExist', format='latex')
         para = pf.Para(elem_unkown_cmd)
@@ -66,14 +66,14 @@ class TestFilterAction(unittest.TestCase):
         self.assertIn('thiscommanddoesnotexist', ret.classes)
 
     def test_invalid_command(self):
-        "filter() raises ParseError on invalid command"
+        """filter() raises ParseError on invalid command"""
         elem_invalid_cmd = pf.RawBlock(
             'This is not a valid LaTeX command', format='latex')
         with self.assertRaises(ParseError):
             self._filter_elem([elem_invalid_cmd], elem_invalid_cmd)
 
     def test_known_environment(self):
-        "filter() handles known LaTeX environment"
+        """filter() handles known LaTeX environment"""
         self.doc.content.extend([pf.RawBlock(
             r'\begin{MXContent}{FooShort}{Foo}{STD}'
             'FOOBARCONTENT'
@@ -89,7 +89,7 @@ class TestFilterAction(unittest.TestCase):
                 self.assertIn(cls, ret.classes)
 
     def test_unknown_environment(self):
-        "filter() handles unknown LaTeX environment"
+        """filter() handles unknown LaTeX environment"""
         elem_env = pf.RawBlock(
             r'\begin{ThisEnvDoesNotExist}'
             'FOOBARCONTENT'
@@ -103,7 +103,7 @@ class TestFilterAction(unittest.TestCase):
         self.assertIn('thisenvdoesnotexist', ret.classes)
 
     def test_invalid_environment(self):
-        "filter() raises ParseError on invalid environment"
+        """filter() raises ParseError on invalid environment"""
         elem_invalid_env = pf.RawBlock(
             r'\begin{ThisEnvDoesNotExist}'
             'FOOBARCONTENT'
@@ -113,17 +113,17 @@ class TestFilterAction(unittest.TestCase):
             self._filter_elem([elem_invalid_env], elem_invalid_env)
 
     def test_invalid_value_elem(self):
-        "filter() raises ValueError if elem=None"
+        """filter() raises ValueError if elem=None"""
         with self.assertRaises(ValueError):
             self.filter_action.filter(None, pf.Doc())
 
     def test_invalid_value_doc(self):
-        "filter() raises ValueError if doc=None"
+        """filter() raises ValueError if doc=None"""
         with self.assertRaises(ValueError):
             self.filter_action.filter(pf.Para(), None)
 
     def test_rawinline(self):
-        "filter() handles RawInline element"
+        """filter() handles RawInline element"""
         glqq = pf.RawInline(r'\glqq', format='latex')
         elem = pf.Para(glqq)
         ret = self._filter_elem([elem], glqq)

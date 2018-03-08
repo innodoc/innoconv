@@ -13,14 +13,14 @@ class TestCommands(unittest.TestCase):
         self.commands = Commands()
 
     def test_handle_msection(self):
-        "MSection command"
+        """MSection command"""
         doc = pf.Doc(pf.RawBlock(r'\MSection{A Test Title}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
-        ret = self.commands.handle_msection(["A Test Title"], elem)
+        ret = self.commands.handle_msection(['A Test Title'], elem)
 
         self.assertEqual(ret, [])
 
-        last_header_elem = getattr(doc, "last_header_elem")
+        last_header_elem = getattr(doc, 'last_header_elem')
 
         self.assertIsInstance(last_header_elem, pf.Header)
         self.assertIsInstance(last_header_elem.content[0], pf.Str)
@@ -34,7 +34,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.level, 2)
 
     def test_handle_msubsection(self):
-        "MSubsection command"
+        """MSubsection command"""
         doc = pf.Doc(pf.RawBlock(r'\MSubsection{Foo title}'), format='latex')
         elem = doc.content[0]
         ret = self.commands.handle_msubsection(['Foo title'], elem)
@@ -48,7 +48,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.level, 3)
 
     def test_handle_mtitle(self):
-        "MTitle command"
+        """MTitle command"""
         doc = pf.Doc(
             pf.RawBlock(r'\MTitle{Schöne Titel nach Maß?}'), format='latex')
         elem = doc.content[0]
@@ -66,7 +66,7 @@ class TestCommands(unittest.TestCase):
         pass
 
     def test_handle_special_html(self):
-        "special command embedded html"
+        """special command embedded html"""
         doc = pf.Doc(
             pf.RawBlock(
                 r'\special{html:<a href="http://www.example.com">Bar</a>}'),
@@ -80,7 +80,8 @@ class TestCommands(unittest.TestCase):
             ret.text, '<a href="http://www.example.com">Bar</a>')
 
     def test_handle_special_html_replacing(self):
-        "special command should not remove 'html:' in the middle of string."
+        """special command should not remove 'html:' in the middle of a
+        string."""
         doc = pf.Doc(
             pf.RawBlock(
                 r'\special{html:<a href="#bar">html:</a>}'),
@@ -94,7 +95,7 @@ class TestCommands(unittest.TestCase):
             ret.text, '<a href="#bar">html:</a>')
 
     def test_handle_special_detect_html(self):
-        "special command should not be confused by a 'html:'."
+        """special command should not be confused by a 'html:'."""
         doc = pf.Doc(
             pf.RawBlock(
                 r'\special{bar:<a href="#foo">html:</a>}'),
@@ -105,7 +106,7 @@ class TestCommands(unittest.TestCase):
         self.assertIsNone(ret)
 
     def test_handle_special_other(self):
-        "special command with non-html code should be ignored"
+        """special command with non-html code should be ignored"""
         # Note: 'html:' occuring in the middle of the string.
         doc = pf.Doc(
             pf.RawBlock(
@@ -121,7 +122,7 @@ class TestCommands(unittest.TestCase):
         pass
 
     def test_handle_msref(self):
-        "MSRef command"
+        """MSRef command"""
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msref(['fooid', 'linktext'], elem)
@@ -131,7 +132,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.url, '#fooid')
 
     def test_handle_mextlink(self):
-        "MExtLink command"
+        """MExtLink command"""
         block = pf.Para(
             pf.RawInline(
                 r'\MExtLink{https://www.example.com/}{Example link}',
@@ -148,7 +149,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.url, 'https://www.example.com/')
 
     def test_handle_msubject(self):
-        "MSubject command"
+        """MSubject command"""
         doc = pf.Doc(pf.RawBlock(r'\MSubject{footitle}', format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msubject(['footitle'], elem)
@@ -158,7 +159,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(doc.get_metadata('title'), 'footitle')
 
     def test_handle_mugraphics_block(self):
-        "MUGraphics command (block)"
+        """MUGraphics command (block)"""
         content = r'\MUGraphics{foobar.png}{width=0.3\linewidth}{Footitle}'
         doc = pf.Doc(pf.RawBlock(content, format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
@@ -171,7 +172,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(img.title, 'Footitle')
 
     def test_handle_mugraphics_inline(self):
-        "MUGraphics command (inline)"
+        """MUGraphics command (inline)"""
         content = r'\MUGraphics{foobar.png}{width=0.3\linewidth}{Footitle}'
         doc = pf.Doc(pf.Para(pf.RawInline(content, format='latex')))
         elem = doc.content[0].content[0]  # this sets up elem.parent
@@ -182,7 +183,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.title, 'Footitle')
 
     def test_handle_mugraphicssolo_block(self):
-        "MUGraphicsSolo command (block)"
+        """MUGraphicsSolo command (block)"""
         content = r'\MUGraphicsSolo{foobar.png}{width=0.3\linewidth}{}'
         doc = pf.Doc(pf.RawBlock(content, format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
@@ -194,7 +195,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(img.url, 'foobar.png')
 
     def test_handle_mugraphicssolo_inline(self):
-        "MUGraphicsSolo command (inline)"
+        """MUGraphicsSolo command (inline)"""
         content = r'\MUGraphicsSolo{foo.jpg}{width=0.3\linewidth}{}'
         doc = pf.Doc(pf.Para(pf.RawInline(content, format='latex')))
         elem = doc.content[0].content[0]  # this sets up elem.parent
@@ -204,13 +205,13 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.url, 'foo.jpg')
 
     def test_handle_glqq(self):
-        "glqq"
+        """glqq"""
         elem = pf.RawInline(r'\glqq', format='latex')
         elem_repl = self.commands.handle_glqq([], elem)
         self.assertEqual(elem_repl.text, r'„')
 
     def test_handle_grqq(self):
-        "grqq"
+        """grqq"""
         elem = pf.RawInline(r'\grqq', format='latex')
         elem_repl = self.commands.handle_grqq([], elem)
         self.assertEqual(elem_repl.text, r'“')
@@ -227,7 +228,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.title, args[0])
 
     def test_noops(self):
-        "Test no-op commands."
+        """Test no-op commands."""
         noops = (
             (
                 self.commands.handle_mdeclaresiteuxid,
