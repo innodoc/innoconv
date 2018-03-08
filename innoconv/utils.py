@@ -14,7 +14,13 @@ from innoconv.errors import ParseError
 
 
 def log(msg_string, level='INFO'):
-    """Log messages for panzer."""
+    """Log messages for panzer.
+
+    :param msg_string: Message that is logged
+    :type msg_string: str
+    :param level: Log level (``INFO``, ``WARNING``, ``ERROR`` OR ``CRITICAL``)
+    :type level: str
+    """
     msg = {
         'level': level,
         'message': msg_string,
@@ -28,15 +34,18 @@ def parse_fragment(parse_string, quiet=True):
     :param parse_string: Source fragment
     :type parse_string: str
     :param quiet: Pass ``---quiet``` arg to panzer
-    :type quiet: boolean
+    :type quiet: bool
 
-    :returns: list of :class:`panflute.Element`
+    :rtype: list
+    :returns: list of :class:`panflute.base.Element`
+    :raises OSError: if panzer executable is not found
     """
 
     panzer_bin = which('panzer')
     if panzer_bin is None or not os.path.exists(panzer_bin):
-        log('panzer executable not found!', level='CRITICAL')
-        return []
+        err_msg = 'panzer executable not found!'
+        log(err_msg, level='CRITICAL')
+        raise OSError(err_msg)
 
     root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
     panzer_support_dir = os.path.join(root_dir, '.panzer')
@@ -82,6 +91,7 @@ def destringify(string):
     :param string: String to transform
     :type string: str
 
+    :rtype: list
     :returns: list of :class:`panflute.Str` and :class:`panflute.Space`
     """
     ret = []
@@ -99,10 +109,11 @@ def parse_cmd(text):
 
     Parses a command like: ``\foo{bar}{baz}``
 
-    :param string: String to parse
-    :type string: str
+    :param text: String to parse
+    :type text: str
 
-    :returns: `str` cmd_name, list of `str` cmd_args
+    :rtype: (str, list)
+    :returns: command name and list of command arguments
     """
     match = REGEX_PATTERNS['CMD'].match(text)
     if not match:

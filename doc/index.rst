@@ -1,11 +1,16 @@
 innoConv API documentation
 ==========================
 
+What is innoConv?
+-----------------
+
 .. automodule:: innoconv
 
+Module overview
+---------------
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 4
 
    innoconv.constants
    innoconv.errors

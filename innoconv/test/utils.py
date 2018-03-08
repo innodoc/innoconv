@@ -36,7 +36,7 @@ def get_pandoc_soup(filename, filters=None):
 
 @contextmanager
 def captured_output():
-    # TODO: write docstring
+    """Used in tests to easily capture stdout/stderr."""
     new_out, new_err = StringIO(), StringIO()
     old_out, old_err = sys.stdout, sys.stderr
     try:

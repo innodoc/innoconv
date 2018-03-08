@@ -15,7 +15,7 @@ class State(Enum):
 
 
 class IfttmFilterAction():
-    r"""Handle ``\ifttm … \else \fi`` blocks."""
+    r"""Handle conditional code blocks (``\ifttm``)."""
 
     def __init__(self):
         self._state = State.FIND_IFTTM

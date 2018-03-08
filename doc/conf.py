@@ -23,6 +23,7 @@
 import os
 import sys
 print(os.path.abspath('..'))
+import sphinx_readable_theme
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
@@ -87,14 +88,13 @@ todo_include_todos = True
 # Make panflute docs linkable
 intersphinx_mapping = {
     'panflute': ('http://scorreia.com/software/panflute/', None),
+    'python': ('https://docs.python.org/3.6', None),
 }
 
 # -- Options for HTML output ----------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'alabaster'
+html_theme_path = [sphinx_readable_theme.get_html_theme_path()]
+html_theme = 'readable'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
