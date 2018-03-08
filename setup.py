@@ -8,7 +8,7 @@ import distutils.cmd
 from distutils.command.clean import clean
 import os
 import logging
-from subprocess import Popen, PIPE
+import subprocess
 import sys
 from setuptools import setup
 from colorama import init as colorama_init, Style
@@ -55,17 +55,16 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
     def _run(self, command, err_msg='Command failed!', cwd=ROOT_DIR):
         self.log.info(
             '%sCommand%s %s', Style.BRIGHT, Style.NORMAL, ' '.join(command))
+
         # make mintmod_filter module available
         env = os.environ.copy()
         env['PYTHONPATH'] = ROOT_DIR
 
-        proc = Popen(command, cwd=cwd, env=env, stdout=PIPE, stderr=PIPE)
-        out, err_out = proc.communicate()
-        if out:
-            self.log.info(out.decode('utf-8'))
-        if err_out:
-            self.log.error(err_out.decode('utf-8'))
-        if proc.returncode != 0:
+        proc = subprocess.Popen(
+            command, cwd=cwd, env=env, stderr=subprocess.STDOUT)
+
+        return_code = proc.wait(timeout=120)
+        if return_code != 0:
             raise RuntimeError(err_msg)
 
 
