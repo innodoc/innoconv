@@ -26,12 +26,13 @@ def get_pandoc_soup(filename, filters=None):
 
     command.append(tex_source)
 
-    proc = subprocess.Popen(
-        command, stdout=subprocess.PIPE, cwd=SCRIPT_DIR, env=env)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, cwd=SCRIPT_DIR, env=env)
     html_output = proc.stdout.read()
+    err_out = proc.stderr.read()
     proc.communicate()
 
-    return BeautifulSoup(html_output, 'html.parser')
+    return BeautifulSoup(html_output, 'html.parser'), err_out
 
 
 @contextmanager

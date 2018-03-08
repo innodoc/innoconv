@@ -90,6 +90,10 @@ class IfttmFilterAction():
         if isinstance(current_elem, pf.RawBlock):
             if isinstance(elem_list[0], pf.Inline):
                 ret = pf.Para(*ret)
+        # if inline is expected unwrap Para
+        else:
+            if isinstance(elem_list[0], pf.Para) and len(elem_list) == 1:
+                ret = [el for el in elem_list[0].content]
 
         return ret
 
