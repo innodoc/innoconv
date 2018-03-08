@@ -109,7 +109,6 @@ class BuildTUBBaseCommand(BaseCommand):
             '--from=latex+raw_tex',
             '--to=html5',
             '--standalone',
-            '--normalize',
             '--output=%s' % filename_out,
             'tree_pandoc.tex'
         ]
