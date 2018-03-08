@@ -75,8 +75,7 @@ def parse_fragment(parse_string):
     match = REGEX_PATTERNS['PANZER_OUTPUT'].search(err.decode('utf-8'))
     if match:
         for line in match.group('messages').strip().splitlines():
-            msg = u'↳ ' * recursion_depth + line.strip()
-            log(msg, level='INFO')
+            log(u'↳ %s' % line.strip(), level='INFO')
     else:
         raise RuntimeError("Unable to parse panzer output!")
 
