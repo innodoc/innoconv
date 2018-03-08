@@ -74,17 +74,15 @@ class TestParseFragment(unittest.TestCase):
         self.assertListEqual(ret, [])
 
     def test_parse_fragment_quiet(self):
-        """parse_fragment() respects quiet argument"""
+        """parse_fragment() prints debug messages"""
         with captured_output() as out:
-            ret = parse_fragment(r'\section{foo} \unknownfoobar', quiet=False)
+            parse_fragment(r'\section{foo} \unknownfoobar')
             err_out = out[1].getvalue()
-        self.assertTrue('pandoc read' in err_out)
         self.assertTrue('Could not handle command unknownfoobar' in err_out)
-        self.assertIsInstance(ret[0], pf.Header)
 
     @patch('innoconv.utils.log')
-    def test_parse_fragment_debug_output(self, log_mock):
-        """parse_fragment() does print debug messages"""
+    def test_parse_fragment_log_is_called(self, log_mock):
+        """parse_fragment() calls log function on warning"""
         parse_fragment(r'\unknowncommandfoobar')
         self.assertTrue(log_mock.called)
 

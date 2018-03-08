@@ -4,12 +4,18 @@ import re
 
 # regex patterns
 REGEX_PATTERNS = {
+    # latex parsing
     'CMD': re.compile(r'\\([^\\\s{]+)', re.DOTALL),
     'CMD_ARGS': re.compile(r'{([^}]+)}'),
     'ENV': re.compile(r'\A\\begin{(?P<env_name>[^}]+)}(.+)'
                       r'\\end{(?P=env_name)}\Z', re.DOTALL),
     'ENV_ARGS': re.compile(
         r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL),
+
+    # panzer output parsing
+    'PANZER_OUTPUT':
+        re.compile(r"----- run list -----.+ json(?:\n|\r\n?)(?P<messages>.+)"
+                   "----- pandoc write -----", re.MULTILINE | re.DOTALL)
 }
 
 # element classes

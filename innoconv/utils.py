@@ -28,17 +28,17 @@ def log(msg_string, level='INFO'):
     pf.debug(json.dumps(msg))
 
 
-def parse_fragment(parse_string, quiet=True):
+def parse_fragment(parse_string):
     """Parse a source fragment using panzer.
 
     :param parse_string: Source fragment
     :type parse_string: str
-    :param quiet: Pass ``---quiet``` arg to panzer
-    :type quiet: bool
 
     :rtype: list
     :returns: list of :class:`panflute.base.Element`
     :raises OSError: if panzer executable is not found
+    :raises RuntimeError: if panzer recursion depth is exceeded
+    :raises RuntimeError: if panzer output could not be parsed
     """
 
     panzer_bin = which('panzer')
@@ -48,30 +48,37 @@ def parse_fragment(parse_string, quiet=True):
         raise OSError(err_msg)
 
     root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
-    panzer_support_dir = os.path.join(root_dir, '.panzer')
     panzer_cmd = [
         panzer_bin,
-        '---panzer-support', panzer_support_dir,
+        '---panzer-support', os.path.join(root_dir, '.panzer'),
         '--from=latex+raw_tex',
         '--to=json',
         '--metadata=style:innoconv',
     ]
 
-    if quiet:
-        panzer_cmd.append('---quiet')
+    # pass nesting depth as ENV var
+    recursion_depth = int(os.getenv('INNOCONV_RECURSION_DEPTH', '0'))
+    env = os.environ.copy()
+    env['INNOCONV_RECURSION_DEPTH'] = str(recursion_depth + 1)
 
-    proc = Popen(panzer_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    if recursion_depth > 10:
+        raise RuntimeError("Panzer recursion depth exceeded!")
+
+    proc = Popen(panzer_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=env)
     out, err = proc.communicate(input=parse_string.encode('utf-8'))
-
-    # TODO: pass nesting level to subprocesses and indent output
-
-    if err:
-        for line in err.decode('utf-8').splitlines():
-            log(line.strip(), level='INFO')
 
     if proc.returncode != 0:
         log('panzer process exited with non-zero return code.', level='ERROR')
         return []
+
+    # only print filter messages for better output log
+    match = REGEX_PATTERNS['PANZER_OUTPUT'].search(err.decode('utf-8'))
+    if match:
+        for line in match.group('messages').strip().splitlines():
+            msg = u'↳ ' * recursion_depth + line.strip()
+            log(msg, level='INFO')
+    else:
+        raise RuntimeError("Unable to parse panzer output!")
 
     doc = json.loads(out.decode('utf-8'), object_pairs_hook=from_json)
     return doc.content.list
