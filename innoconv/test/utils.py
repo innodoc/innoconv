@@ -12,7 +12,7 @@ ROOT_DIR = os.path.join(SCRIPT_DIR, '..', '..')
 
 
 def get_pandoc_soup(filename, filters=None):
-    """Run panzer with filters and parse output using BeautifulSoup."""
+    """Run Pandoc with filters and parse output using BeautifulSoup."""
     tex_source = os.path.join(SCRIPT_DIR, 'files', filename)
     env = os.environ.copy()
     env['PYTHONPATH'] = ROOT_DIR

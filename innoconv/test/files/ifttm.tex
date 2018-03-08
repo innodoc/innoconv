@@ -2,6 +2,29 @@
 \title{ifttm test file}
 \begin{document}
 
+% inline \ifttm
+
 You can eat \ifttm Apples \else Bananas \fi if you want.
+
+% block variant
+
+\ifttm
+
+  Option 1
+
+\else
+
+  Option 2
+
+\fi
+
+% this is also inline \ifttm, but will produce
+% [Str(Option), Space, Str(A), SoftBreak]
+
+\ifttm
+  Option A
+\else
+  Option B
+\fi
 
 \end{document}

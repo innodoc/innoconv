@@ -64,19 +64,38 @@ class IfttmFilterAction():
                 self._state = State.FIND_FI
                 ret = []
             elif cmd_name == 'fi':
-                ret = self._finalize()
+                ret = self._finalize(elem)
 
         # 3) Handle \fi
 
         elif self._state == State.FIND_FI:
             ret = []
             if cmd_name == 'fi':
-                ret = self._finalize()
+                ret = self._finalize(elem)
 
         return ret
 
-    def _finalize(self):
+    @staticmethod
+    def _clean(elem_list, current_elem):
+        if not elem_list:
+            return elem_list
+        ret = []
+
+        # remove empty paragraphs
+        for elem in elem_list:
+            if not (isinstance(elem, pf.Para) and not elem.content):
+                ret.append(elem)
+
+        # if block is expected wrap inlines in para
+        if isinstance(current_elem, pf.RawBlock):
+            if isinstance(elem_list[0], pf.Inline):
+                ret = pf.Para(*ret)
+
+        return ret
+
+    def _finalize(self, elem):
+        self._state = State.FIND_IFTTM
         ret = self._element_memory
         self._element_memory = []
-        self._state = State.FIND_IFTTM
+        ret = self._clean(ret, elem)
         return ret
