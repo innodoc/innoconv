@@ -1,4 +1,13 @@
-"""Handle mintmod LaTeX commands."""
+r"""
+Handle mintmod LaTeX commands.
+
+.. note::
+    Provide a ``handle_CMDNAME`` function for handling ``CMDNAME`` command.
+    You need to `slugify <https://github.com/un33k/python-slugify>`_ the
+    command name.
+
+    Example: ``handle_msection`` method will receive the command ``\MSection``.
+"""
 
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
@@ -8,12 +17,22 @@ from innoconv.mintmod_filter.elements import create_header
 
 class Commands():
 
-    """Handlers for commands are defined here.
+    r"""
+    Handlers for commands are defined here.
 
-    Convention: Provide a ``handle_CMDNAME`` function for handling ``CMDNAME``
-    command. You need to slugify the command name.
+    Given the command:
 
-    Example: ``handle_msection`` method will receive the ``MSection`` command.
+    .. code-block:: latex
+
+        \MSection{Foo}
+
+    The handler method ``handle_msection`` receives the following arguments:
+
+    .. hlist::
+        :columns: 1
+
+        * ``cmd_args``: ``['Foo']``
+        * ``elem``: :class:`panflute.base.Element`
     """
 
     # pylint: disable=unused-argument,no-self-use
@@ -21,86 +40,86 @@ class Commands():
     ###########################################################################
     # Sections
 
-    def handle_msection(self, args, elem):
-        """Remember ``MSection`` name for later.
+    def handle_msection(self, cmd_args, elem):
+        r"""Remember ``\MSection`` name for later.
 
-        ``MSectionStart`` environment will use this information later.
+        ``\MSectionStart`` environment will use this information later.
         """
-        create_header(args[0], level=2, doc=elem.doc, auto_id=True)
+        create_header(cmd_args[0], level=2, doc=elem.doc, auto_id=True)
         return []
 
-    def handle_msubsection(self, args, elem):
-        """Handle ``MSubsection``"""
-        return create_header(args[0], level=3, doc=elem.doc, auto_id=True)
+    def handle_msubsection(self, cmd_args, elem):
+        r"""Handle ``\MSubsection``"""
+        return create_header(cmd_args[0], level=3, doc=elem.doc, auto_id=True)
 
-    def handle_mtitle(self, args, elem):
-        """Handle ``MTitle`` command.
+    def handle_mtitle(self, cmd_args, elem):
+        r"""Handle ``\MTitle`` command.
 
-        These is an equivalent to ``subsubsection``
+        These is an equivalent to ``\subsubsection``
         """
-        return create_header(args[0], level=4, doc=elem.doc, auto_id=True)
+        return create_header(cmd_args[0], level=4, doc=elem.doc, auto_id=True)
 
     ###########################################################################
     # Metadata
 
-    def handle_msubject(self, args, elem):
-        """Handle ``MSubject{title}`` command.
+    def handle_msubject(self, cmd_args, elem):
+        r"""Handle ``\MSubject{title}`` command.
 
         Command defines the document title.
         """
-        # self.doc.metadata['title'] = pf.MetaString(args[0])
-        elem.doc.metadata['title'] = pf.MetaString(args[0])
+        # self.doc.metadata['title'] = pf.MetaString(cmd_args[0])
+        elem.doc.metadata['title'] = pf.MetaString(cmd_args[0])
         return []
 
     ###########################################################################
     # Links/labels
 
-    def handle_mlabel(self, args, elem):
-        """Handle ``MLabel`` command.
+    def handle_mlabel(self, cmd_args, elem):
+        r"""Handle ``\MLabel`` command.
 
         Will search for the previous header element and update its ID to the
-        ID defined in the ``MLabel`` command."""
+        ID defined in the ``\MLabel`` command."""
         last_header_elem = getattr(elem.doc, "last_header_elem", None)
 
         if last_header_elem is None:
             log(
-                'last_header_elem undefined in handle_mlabel with args: %s' %
-                args,
+                'last_header_elem undefined in '
+                'handle_mlabel with cmd_args: %s' % cmd_args,
                 level='WARNING'
             )
             return None
 
-        last_header_elem.identifier = args[0]
+        last_header_elem.identifier = cmd_args[0]
         return []
 
-    def handle_msref(self, args, elem):
-        """Handle ``MSRef`` command.
+    def handle_msref(self, cmd_args, elem):
+        r"""Handle ``\MSRef`` command.
 
         This command inserts an fragment-style link.
         """
-        url = '#%s' % args[0]
-        description = destringify(args[1])
+        url = '#%s' % cmd_args[0]
+        description = destringify(cmd_args[1])
         return pf.Link(*description, url=url)
 
-    def handle_mextlink(self, args, elem):
-        """Handle ``MExtLink`` command.
+    def handle_mextlink(self, cmd_args, elem):
+        r"""Handle ``\MExtLink`` command.
 
         This command inserts an external link.
         """
-        url = args[0]
-        text = destringify(args[1])
+        url = cmd_args[0]
+        text = destringify(cmd_args[1])
         return pf.Link(*text, url=url)
 
     ###########################################################################
     # Media
 
-    def handle_mugraphics(self, args, elem):
-        """Handle ``MUGraphics``.
+    def handle_mugraphics(self, cmd_args, elem):
+        r"""Handle ``\MUGraphics``.
 
         Embed an image with title.
         """
-        filename = args[0]
-        title = args[2]
+        filename = cmd_args[0]
+        title = cmd_args[2]
         img = pf.Image(url=filename, title=title)
         # inline
         if isinstance(elem, pf.RawInline):
@@ -110,12 +129,12 @@ class Commands():
         div.content.extend([pf.Plain(img)])
         return div
 
-    def handle_mugraphicssolo(self, args, elem):
-        """Handle ``MUGraphicsSolo``.
+    def handle_mugraphicssolo(self, cmd_args, elem):
+        r"""Handle ``\MUGraphicsSolo``.
 
         Embed an image without title.
         """
-        filename = args[0]
+        filename = cmd_args[0]
         img = pf.Image(url=filename)
         # inline
         if isinstance(elem, pf.RawInline):
@@ -125,12 +144,12 @@ class Commands():
         div.content.extend([pf.Plain(img)])
         return div
 
-    def handle_myoutubevideo(self, args, elem):
-        """Handle ``MYoutubeVideo``.
+    def handle_myoutubevideo(self, cmd_args, elem):
+        r"""Handle ``\MYoutubeVideo``.
 
         Just return a Link Element
         """
-        title, width, height, url = args
+        title, width, height, url = cmd_args
         attrs = {'width': width, 'height': height}
         return pf.Link(
             *destringify(title),
@@ -143,17 +162,17 @@ class Commands():
     ###########################################################################
     # Misc elements
 
-    def handle_special(self, args, elem):
-        """Handle ``special`` command.
+    def handle_special(self, cmd_args, elem):
+        r"""Handle ``\special`` command.
 
         This command is used to embed HTML in LaTeX source.
         """
-        if args[0].startswith('html:'):
-            return pf.RawBlock(args[0][5:], format='html')
+        if cmd_args[0].startswith('html:'):
+            return pf.RawBlock(cmd_args[0][5:], format='html')
         return None
 
-    def handle_mssectionlabelprefix(self, args, elem):
-        """Handle ``MSsectionlabelprefix`` command.
+    def handle_mssectionlabelprefix(self, cmd_args, elem):
+        r"""Handle ``\MSsectionlabelprefix`` command.
 
         This command inserts the translation for 'section'.
         """
@@ -162,35 +181,35 @@ class Commands():
     ###########################################################################
     # Simple substitutions
 
-    def handle_glqq(self, args, elem):
-        """Handle ``glqq`` command."""
+    def handle_glqq(self, cmd_args, elem):
+        r"""Handle ``\glqq`` command."""
         return pf.Str('„')
 
-    def handle_grqq(self, args, elem):
-        """Handle ``grqq`` command."""
+    def handle_grqq(self, cmd_args, elem):
+        r"""Handle ``\grqq`` command."""
         return pf.Str('“')
 
     ###########################################################################
     # No-ops
 
-    def handle_mdeclaresiteuxid(self, args, elem):
-        """Handle ``MDeclareSiteUXID`` command.
+    def handle_mdeclaresiteuxid(self, cmd_args, elem):
+        r"""Handle ``\MDeclareSiteUXID`` command.
 
         This command is used to embed IDs. This is not relevant anymore and
         becomes a no-op.
         """
         return self._noop()
 
-    def handle_mmodstartbox(self, args, elem):
-        """Handle ``MModStartBox`` command.
+    def handle_mmodstartbox(self, cmd_args, elem):
+        r"""Handle ``\MModStartBox`` command.
 
         This command displays a table of content for the current chapter. This
         is handled elswhere and becomes a no-op.
         """
         return self._noop()
 
-    def handle_mpragma(self, args, elem):
-        """Handle ``MPragma`` command.
+    def handle_mpragma(self, cmd_args, elem):
+        r"""Handle ``\MPragma`` command.
 
         This command was used to embed build time flags for mintmod. It becomes
         a no-op.

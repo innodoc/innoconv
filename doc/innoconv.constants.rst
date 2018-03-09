@@ -2,4 +2,12 @@ innoconv.constants
 ==================
 
 .. automodule:: innoconv.constants
-   :members:
+
+.. autodata:: REGEX_PATTERNS
+  :annotation:
+
+.. autodata:: ELEMENT_CLASSES
+  :annotation:
+
+.. autodata:: COLORS
+  :annotation:

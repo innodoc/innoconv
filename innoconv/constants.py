@@ -2,7 +2,7 @@
 
 import re
 
-# regex patterns
+#: Regular expressions
 REGEX_PATTERNS = {
     # latex parsing
     'CMD': re.compile(r'\\([^\\\s{]+)', re.DOTALL),
@@ -18,7 +18,7 @@ REGEX_PATTERNS = {
                    "----- pandoc write -----", re.MULTILINE | re.DOTALL)
 }
 
-# element classes
+#: Element classes
 ELEMENT_CLASSES = {
     'IMAGE': ['img'],
     'MXCONTENT': ['content'],
@@ -35,7 +35,7 @@ ELEMENT_CLASSES = {
     'MYOUTUBE_VIDEO': ['video', 'video-youtube']
 }
 
-# colors
+#: Color codes
 COLORS = {
     'UNKNOWN_CMD': '#ffa500',
     'UNKNOWN_ENV': '#ff4d00',

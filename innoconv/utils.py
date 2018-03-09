@@ -1,4 +1,4 @@
-"""Utility Module."""
+"""Utility module"""
 
 import os
 import json

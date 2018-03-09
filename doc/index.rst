@@ -6,17 +6,22 @@ What is innoConv?
 
 .. automodule:: innoconv
 
+Usage
+-----
+
+TODO: write instructions on how to use innoconv
+
 Module overview
 ---------------
 
 .. toctree::
-   :maxdepth: 4
+  :maxdepth: 4
 
-   innoconv.constants
-   innoconv.errors
-   innoconv.utils
-   innoconv.ifttm_filter
-   innoconv.mintmod_filter
+  innoconv.constants
+  innoconv.errors
+  innoconv.utils
+  innoconv.ifttm_filter
+  innoconv.mintmod_filter
 
 Indices and tables
 ------------------
