@@ -68,14 +68,13 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
             raise RuntimeError(err_msg)
 
 
-# TODO: this should be named BuildProjectCommand and work for arbitrary
-#       local/remote projects
+# TODO: this should become a seperate command (innoconv) that handles
+#       local folders/remote repos and arbitrary languages (see #13)
 class BuildTUBBaseCommand(BaseCommand):
     description = 'Build tub_base content'
 
     def run(self):
         project_root = os.path.join(CONTENT_DIR, 'tub_base')
-        # TODO: this should work for arbitrary language codes
         project_root_lang = os.path.join(project_root, 'de')
 
         # clone source
@@ -176,6 +175,7 @@ def setup_package():
             'test': TestCommand,
         },
         entry_points={
+            # TODO: update when #13 is done
             'console_scripts': [
                 'mintmod_filter = innoconv.mintmod_filter.__main__:main',
             ],
