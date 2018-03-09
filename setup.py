@@ -137,8 +137,15 @@ class PylintCommand(BaseCommand):
 class TestCommand(BaseCommand):
     description = 'Run test suite'
 
+    user_options = [
+        ('test-target=', 't', 'Test target (module or path)'),
+    ]
+
+    def initialize_options(self):
+        self.test_target = os.path.join(ROOT_DIR, 'innoconv')
+
     def run(self):
-        self._run(['green', '-r', 'innoconv'])
+        self._run(['green', '-r', self.test_target])
 
 
 class CoverageCommand(BaseCommand):
