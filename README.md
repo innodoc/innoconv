@@ -7,7 +7,7 @@ Converter for interactive educational content.
 ### Setup environment
 
 ```
-$ virtualenv --no-site-packages venv
+$ python3 -m venv venv
 $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
