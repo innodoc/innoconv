@@ -138,3 +138,43 @@ class TestFilterAction(unittest.TestCase):
         doc.content.extend(blocks)
         ret = filter_action.filter(str, pf.Doc())
         self.assertIsNone(ret)
+
+
+class TestFilterActionClean(unittest.TestCase):
+
+    # pylint: disable=protected-access
+
+    def test_clean_empty(self):
+        """_clean() should return [] if given []"""
+        filter_action = IfttmFilterAction()
+        ret = filter_action._clean([], pf.Str('foo'))
+        self.assertListEqual(ret, [])
+
+    def test_clean_remove_empty_paras(self):
+        r"""_clean() should remove empty paras in list"""
+        filter_action = IfttmFilterAction()
+        elems = [pf.Str('foo'), pf.Para()]
+        ret = filter_action._clean(elems, pf.RawInline(r'\fi'))
+        self.assertEqual(len(ret), 1)
+        self.assertEqual(ret[0].text, 'foo')
+
+    def test_clean_wrap_inlines(self):
+        r"""_clean() should wrap inlines if closing \fi is RawBlock"""
+        filter_action = IfttmFilterAction()
+        elems = [pf.Str('foo'), pf.Space(), pf.Str('bar')]
+        ret = filter_action._clean(elems, pf.RawBlock(r'\fi'))
+        self.assertEqual(len(ret), 1)
+        self.assertEqual(len(ret[0].content), 3)
+        self.assertEqual(ret[0].content[0].text, 'foo')
+        self.assertIsInstance(ret[0].content[1], pf.Space)
+        self.assertEqual(ret[0].content[2].text, 'bar')
+
+    def test_clean_unwrap_para(self):
+        r"""_clean() should unwrap a para if closing \fi is RawInline"""
+        filter_action = IfttmFilterAction()
+        elems = [pf.Para(pf.Str('foo'), pf.Space(), pf.Str('bar'))]
+        ret = filter_action._clean(elems, pf.RawInline(r'\fi'))
+        self.assertEqual(len(ret), 3)
+        self.assertEqual(getattr(ret[0], 'text'), 'foo')
+        self.assertIsInstance(ret[1], pf.Space)
+        self.assertEqual(ret[2].text, 'bar')
