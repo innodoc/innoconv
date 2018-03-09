@@ -15,5 +15,7 @@ The command is used to insert different content depending on the output format
 .. warning::
 
     At the moment only HTML output is considered!
+    (See `#15
+    <https://gitlab.tu-berlin.de/innodoc/innoconv/issues/15#note_336060>`_)
 
 """
