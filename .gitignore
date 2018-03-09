@@ -7,8 +7,10 @@ venv
 # build
 content
 build
-innoConv.egg-info
+innoconv.egg-info
+__panzer*
 
 # coverage
 .coverage
+.coverage.*
 htmlcov

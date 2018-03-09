@@ -8,6 +8,7 @@ import distutils.cmd
 from distutils.command.clean import clean
 import os
 import logging
+import re
 import subprocess
 import sys
 from setuptools import setup
@@ -33,6 +34,12 @@ MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' \
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 colorama_init()
+
+METADATA_PATH = os.path.join(ROOT_DIR, 'innoconv', 'metadata.py')
+with open(METADATA_PATH, 'r') as metadata_file:
+    METADATA = dict(
+        re.findall(r"__([a-z_]+)__\s*=\s*['\"]([^'\"]+)['\"]",
+                   metadata_file.read()))
 
 
 def get_logger():
@@ -168,11 +175,11 @@ class CleanCommand(clean, BaseCommand):
 
 
 def setup_package():
-    metadata = dict(
-        name='innoConv',
-        version='0.1',
-        author='innoCampus',
-        author_email='dietrich@math.tu-berlin.de',
+    setup(
+        name='innoconv',
+        version=METADATA['version'],
+        author=METADATA['author'],
+        author_email=METADATA['author_email'],
         cmdclass={
             'build_tub_base': BuildTUBBaseCommand,
             'clean': CleanCommand,
@@ -184,16 +191,19 @@ def setup_package():
         entry_points={
             # TODO: update when #13 is done
             'console_scripts': [
-                'mintmod_filter = innoconv.mintmod_filter.__main__:main',
+                'innoconv = innoconv.__main__:main',
             ],
         },
+        include_package_data=True,
         packages=[
             'innoconv',
         ],
-        license='GPLv3',
+        keywords=['pandoc'],
+        license=METADATA['license'],
         long_description=open('README.md').read(),
+        url=METADATA['url'],
+        zip_safe=False,
     )
-    setup(**metadata)
 
 
 if __name__ == '__main__':
