@@ -82,14 +82,12 @@ class Commands():
         last_header_elem = getattr(elem.doc, "last_header_elem", None)
 
         if last_header_elem is None:
-            log(
-                'last_header_elem undefined in '
+            log('last_header_elem undefined in '
                 'handle_mlabel with cmd_args: %s' % cmd_args,
-                level='WARNING'
-            )
-            return None
+                level='WARNING')
+        else:
+            last_header_elem.identifier = cmd_args[0]
 
-        last_header_elem.identifier = cmd_args[0]
         return []
 
     def handle_msref(self, cmd_args, elem):

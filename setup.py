@@ -75,57 +75,6 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
             raise RuntimeError(err_msg)
 
 
-# TODO: this should become a seperate command (innoconv) that handles
-#       local folders/remote repos and arbitrary languages (see #13)
-class BuildTUBBaseCommand(BaseCommand):
-    description = 'Build tub_base content'
-
-    def run(self):
-        project_root = os.path.join(CONTENT_DIR, 'tub_base')
-        project_root_lang = os.path.join(project_root, 'de')
-
-        # clone source
-        self._run(['mkdir', '-p', CONTENT_DIR])
-        if os.path.isdir(project_root):
-            self.log.info('Content source directory already exists.')
-        else:
-            self.log.info('Cloning source repository.')
-            self._run(
-                ['git', 'clone', '-q', '-b', TUB_BASE_BRANCH, TUB_BASE_REPO],
-                cwd=CONTENT_DIR)
-
-        # fetch de.tex
-        filename_base = 'de.tex'
-        filename_path = os.path.join(project_root_lang, filename_base)
-        if os.path.isfile(filename_path):
-            self.log.info('File already exists: %s', filename_base)
-        else:
-            self.log.info('Fetching file: %s', filename_base)
-            self._run(['wget', '--quiet', MINTMOD_BASE_URL % filename_base],
-                      cwd=project_root_lang)
-
-        # prepare panzer
-        filename_out_path = os.path.join(BUILD_DIR, 'tub_base', 'de')
-        filename_out = os.path.join(filename_out_path, 'index.html')
-        self._run(['mkdir', '-p', filename_out_path])
-        cmd = [
-            'panzer',
-            '---panzer-support', PANZER_SUPPORT_DIR,
-            '--metadata=style:innoconv',
-            '--from=latex+raw_tex',
-            '--to=html5',
-            '--standalone',
-            '--output=%s' % filename_out,
-            'tree_pandoc.tex'
-        ]
-
-        # run panzer
-        self._run(cmd, cwd=project_root_lang)
-
-        self.log.info(
-            '%sBuild finished:%s %s', Style.BRIGHT, Style.NORMAL, filename_out)
-
-
 class Flake8Command(BaseCommand):
     description = 'Run flake8 on Python source files'
 
@@ -137,8 +86,7 @@ class PylintCommand(BaseCommand):
     description = 'Run pylint on Python source files'
 
     def run(self):
-        self._run(
-            ['pylint', '--output-format=colorized'] + LINT_DIRS)
+        self._run(['pylint', '--output-format=colorized'] + LINT_DIRS)
 
 
 class TestCommand(BaseCommand):
@@ -181,7 +129,6 @@ def setup_package():
         author=METADATA['author'],
         author_email=METADATA['author_email'],
         cmdclass={
-            'build_tub_base': BuildTUBBaseCommand,
             'clean': CleanCommand,
             'coverage': CoverageCommand,
             'flake8': Flake8Command,
@@ -189,7 +136,6 @@ def setup_package():
             'test': TestCommand,
         },
         entry_points={
-            # TODO: update when #13 is done
             'console_scripts': [
                 'innoconv = innoconv.__main__:main',
             ],

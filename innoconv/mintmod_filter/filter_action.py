@@ -15,7 +15,8 @@ class MintmodFilterAction:
 
     """The Pandoc filter is defined in this class."""
 
-    def __init__(self):
+    def __init__(self, debug=False):
+        self._debug = debug
         self._commands = Commands()
         self._environments = Environments()
 
@@ -63,15 +64,17 @@ class MintmodFilterAction:
         func = getattr(self._commands, function_name, None)
         if callable(func):
             return func(cmd_args, elem)
-        return self._handle_unknown_command(cmd_name, elem)
+        log("Could not handle command %s." % cmd_name, level='WARNING')
+        if self._debug:
+            return self._unknown_command_debug(cmd_name, elem)
+        return None
 
     @staticmethod
-    def _handle_unknown_command(cmd_name, elem):
+    def _unknown_command_debug(cmd_name, elem):
         """Handle unknown latex commands.
 
         Output visual feedback about the unknown command.
         """
-        log("Could not handle command %s." % cmd_name, level='WARNING')
         classes = ELEMENT_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
         attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_CMD']}
 
@@ -113,15 +116,17 @@ class MintmodFilterAction:
         func = getattr(self._environments, function_name, None)
         if callable(func):
             return func(rest, env_args, elem)
-        return self._handle_unknown_environment(env_name, elem)
+        log("Could not handle environment %s." % env_name, level='WARNING')
+        if self._debug:
+            return self._unknown_environment_debug(env_name, elem)
+        return None
 
     @staticmethod
-    def _handle_unknown_environment(env_name, elem):
+    def _unknown_environment_debug(env_name, elem):
         """Handle unknown latex environment.
 
         Output visual feedback about the unknown environment.
         """
-        log("Could not handle environment %s." % env_name, level='WARNING')
         classes = ELEMENT_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
         attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_ENV']}
         div = pf.Div(classes=classes, attributes=attrs)

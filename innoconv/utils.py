@@ -3,8 +3,8 @@
 import os
 import json
 import re
-from subprocess import Popen, PIPE
 from shutil import which
+from subprocess import Popen, PIPE
 
 import panflute as pf
 from panflute.elements import from_json
@@ -14,7 +14,7 @@ from innoconv.errors import ParseError
 
 
 def log(msg_string, level='INFO'):
-    """Log messages for panzer.
+    """Log messages when running as a panzer filter.
 
     :param msg_string: Message that is logged
     :type msg_string: str
@@ -26,6 +26,16 @@ def log(msg_string, level='INFO'):
         'message': msg_string,
     }
     pf.debug(json.dumps(msg))
+
+
+def get_panzer_bin():
+    """Get path of panzer binary."""
+    panzer_bin = which('panzer')
+    if panzer_bin is None or not os.path.exists(panzer_bin):
+        err_msg = 'panzer executable not found!'
+        log(err_msg, level='CRITICAL')
+        raise OSError(err_msg)
+    return panzer_bin
 
 
 def parse_fragment(parse_string):
@@ -41,15 +51,9 @@ def parse_fragment(parse_string):
     :raises RuntimeError: if panzer output could not be parsed
     """
 
-    panzer_bin = which('panzer')
-    if panzer_bin is None or not os.path.exists(panzer_bin):
-        err_msg = 'panzer executable not found!'
-        log(err_msg, level='CRITICAL')
-        raise OSError(err_msg)
-
     root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
     panzer_cmd = [
-        panzer_bin,
+        get_panzer_bin(),
         '---panzer-support', os.path.join(root_dir, '.panzer'),
         '--from=latex+raw_tex',
         '--to=json',
@@ -65,6 +69,7 @@ def parse_fragment(parse_string):
         raise RuntimeError("Panzer recursion depth exceeded!")
 
     proc = Popen(panzer_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=env)
+    # TODO: continuous log output
     out, err = proc.communicate(input=parse_string.encode('utf-8'))
 
     if proc.returncode != 0:

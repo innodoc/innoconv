@@ -1,6 +1,8 @@
 """Project constants are defined here."""
 
 import re
+import os
+
 
 #: Regular expressions
 REGEX_PATTERNS = {
@@ -40,3 +42,21 @@ COLORS = {
     'UNKNOWN_CMD': '#ffa500',
     'UNKNOWN_ENV': '#ff4d00',
 }
+
+#: Supported language codes
+LANGUAGE_CODES = (
+    'de',
+    'en',
+)
+
+#: Default language code
+DEFAULT_LANGUAGE_CODE = LANGUAGE_CODES[0]
+
+#: Default innoconv output directory
+DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), 'build')
+
+#: project root dir
+ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+
+#: panzer support directory
+PANZER_SUPPORT_DIR = os.path.join(ROOT_DIR, '.panzer')
