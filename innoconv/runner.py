@@ -28,10 +28,7 @@ class InnoconvRunner():
 
         # output directory
         filename_out_path = os.path.join(self.output_dir, 'tub_base', 'de')
-        try:
-            os.mkdir(filename_out_path)
-        except FileExistsError:
-            pass
+        os.makedirs(filename_out_path, exist_ok=True)
 
         # output filename
         if self.output_format.startswith('html'):
