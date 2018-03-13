@@ -176,7 +176,7 @@ class Commands():
 
         This command inserts the translation for 'section'.
         """
-        return pf.Str('Abschnitt')  # TODO: i18n
+        return pf.Str('Abschnitt')  # TODO: i18n (#4)
 
     ###########################################################################
     # Simple substitutions
