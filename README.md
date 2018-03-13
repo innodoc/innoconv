@@ -10,14 +10,26 @@ Converter for interactive educational content.
 $ python3 -m venv venv
 $ . venv/bin/activate
 $ pip install -r requirements.txt
+$ ./setup.py develop
 ```
 
 ### Commands
 
 #### Build tub_base
 
+##### JSON
+
+Get the content source code and convert it to JSON.
+
 ```
-$ ./setup.py build_tub_base
+$ git clone -b pandoc git@gitlab.tubit.tu-berlin.de:innodoc/tub_base
+$ innoconv tub_base
+```
+
+##### HTML (for debugging/development)
+
+```
+$ innoconv -d tub_base
 ```
 
 #### Linting
