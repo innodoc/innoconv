@@ -53,7 +53,7 @@ LANGUAGE_CODES = (
 DEFAULT_LANGUAGE_CODE = LANGUAGE_CODES[0]
 
 #: Default innoconv output directory
-DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), 'build')
+DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), 'innoconv_output')
 
 #: project root dir
 ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')

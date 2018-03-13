@@ -27,15 +27,14 @@ class InnoconvRunner():
         source_lang_dir = os.path.join(self.source_dir, self.language_code)
 
         # output directory
-        filename_out_path = os.path.join(self.output_dir, 'tub_base', 'de')
-        os.makedirs(filename_out_path, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
 
         # output filename
         if self.output_format.startswith('html'):
             filename = 'index.html'
         else:
             filename = 'index.json'
-        filename_out = os.path.join(filename_out_path, filename)
+        filename_out = os.path.join(self.output_dir, filename)
 
         # set debug mode
         env = os.environ.copy()
