@@ -3,12 +3,11 @@
 import os
 import subprocess
 
-from innoconv.constants import PANZER_SUPPORT_DIR
+from innoconv.constants import PANZER_SUPPORT_DIR, OUTPUT_FORMAT_EXT_MAP
 
 
 class InnoconvRunner():
-    """innoConv runner that spawns a panzer instance.
-    """
+    """innoConv runner that spawns a panzer instance."""
 
     def __init__(self, source_dir, output_dir, language_code,
                  output_format='json', debug=False):
@@ -30,11 +29,8 @@ class InnoconvRunner():
         os.makedirs(self.output_dir, exist_ok=True)
 
         # output filename
-        if self.output_format.startswith('html'):
-            filename = 'index.html'
-        else:
-            filename = 'index.json'
-        filename_out = os.path.join(self.output_dir, filename)
+        filename = 'index.{}'.format(OUTPUT_FORMAT_EXT_MAP[self.output_format])
+        filename_path = os.path.join(self.output_dir, filename)
 
         # set debug mode
         env = os.environ.copy()
@@ -48,8 +44,8 @@ class InnoconvRunner():
             '--from=latex+raw_tex',
             '--to={}'.format(self.output_format),
             '--standalone',
-            '--output={}'.format(filename_out),
-            'tree_pandoc.tex'
+            '--output={}'.format(filename_path),
+            'tree.tex'
         ]
 
         proc = subprocess.Popen(
@@ -59,4 +55,4 @@ class InnoconvRunner():
         if return_code != 0:
             raise RuntimeError("Failed to run panzer!")
 
-        return filename_out
+        return filename_path

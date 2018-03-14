@@ -6,7 +6,8 @@ import argparse
 from panflute import debug
 
 from innoconv.utils import get_panzer_bin
-from innoconv.constants import (DEFAULT_OUTPUT_DIR, DEFAULT_LANGUAGE_CODE,
+from innoconv.constants import (DEFAULT_OUTPUT_DIR, DEFAULT_OUTPUT_FORMAT,
+                                OUTPUT_FORMAT_CHOICES, DEFAULT_LANGUAGE_CODE,
                                 LANGUAGE_CODES)
 import innoconv.metadata as metadata
 from innoconv.runner import InnoconvRunner
@@ -42,10 +43,17 @@ def parse_cli_args():
     innoconv_argparser.add_argument('source_dir',
                                     help="content directory")
 
-    output_help = 'output directory (default: "%s")' % DEFAULT_OUTPUT_DIR
+    output_help = 'output directory (default: "{}")'.format(DEFAULT_OUTPUT_DIR)
     innoconv_argparser.add_argument('-o', '--output-dir',
                                     default=DEFAULT_OUTPUT_DIR,
                                     help=output_help)
+
+    output_format_help = 'output format'
+    innoconv_argparser.add_argument('-t', '--to',
+                                    dest='output_format',
+                                    choices=OUTPUT_FORMAT_CHOICES,
+                                    default=DEFAULT_OUTPUT_FORMAT,
+                                    help=output_format_help)
 
     language_help = 'two-letter language code (default: {})'.format(
         DEFAULT_LANGUAGE_CODE)
@@ -65,11 +73,14 @@ def parse_cli_args():
 def main():
     """innoConv main entry point."""
     args = parse_cli_args()
-    output_format = 'html5' if args['debug'] else 'json'
+
+    if args['debug'] and args['output_format'] != 'html5':
+        debug("Warning: Setting output format to 'html5' in debug mode.")
+        args['output_format'] = 'html5'
 
     runner = InnoconvRunner(
         args['source_dir'], args['output_dir'], args['language_code'],
-        output_format=output_format, debug=args['debug'])
+        output_format=args['output_format'], debug=args['debug'])
     filename_out = runner.run()
     debug('Build finished: {}'.format(filename_out))
 

@@ -55,6 +55,20 @@ DEFAULT_LANGUAGE_CODE = LANGUAGE_CODES[0]
 #: Default innoconv output directory
 DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), 'innoconv_output')
 
+#: Default innoconv output format
+DEFAULT_OUTPUT_FORMAT = 'json'
+
+#: mapping between output formats and file extensions
+OUTPUT_FORMAT_EXT_MAP = {
+    'html5': 'html',
+    'json': 'json',
+    'latex': 'tex',
+    'markdown': 'md',
+}
+
+#: Output format choices
+OUTPUT_FORMAT_CHOICES = list(OUTPUT_FORMAT_EXT_MAP.keys())
+
 #: project root dir
 ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
