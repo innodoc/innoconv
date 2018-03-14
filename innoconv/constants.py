@@ -60,3 +60,6 @@ ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
 #: panzer support directory
 PANZER_SUPPORT_DIR = os.path.join(ROOT_DIR, '.panzer')
+
+#: encoding
+ENCODING = 'utf-8'

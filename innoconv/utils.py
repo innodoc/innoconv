@@ -5,11 +5,12 @@ import json
 import re
 from shutil import which
 from subprocess import Popen, PIPE
+import sys
 
 import panflute as pf
 from panflute.elements import from_json
 
-from innoconv.constants import REGEX_PATTERNS
+from innoconv.constants import REGEX_PATTERNS, ENCODING
 from innoconv.errors import ParseError
 
 
@@ -21,20 +22,21 @@ def log(msg_string, level='INFO'):
     :param level: Log level (``INFO``, ``WARNING``, ``ERROR`` OR ``CRITICAL``)
     :type level: str
     """
-    msg = {
-        'level': level,
-        'message': msg_string,
-    }
-    pf.debug(json.dumps(msg))
+    outgoing = {'level': level, 'message': msg_string}
+    outgoing_json = json.dumps(outgoing) + '\n'
+    if hasattr(sys.stderr, 'buffer'):
+        outgoing_bytes = outgoing_json.encode(ENCODING)
+        sys.stderr.buffer.write(outgoing_bytes)
+    else:
+        sys.stderr.write(outgoing_json)
+    sys.stderr.flush()
 
 
 def get_panzer_bin():
     """Get path of panzer binary."""
     panzer_bin = which('panzer')
     if panzer_bin is None or not os.path.exists(panzer_bin):
-        err_msg = 'panzer executable not found!'
-        log(err_msg, level='CRITICAL')
-        raise OSError(err_msg)
+        raise OSError('panzer executable not found!')
     return panzer_bin
 
 
@@ -70,21 +72,21 @@ def parse_fragment(parse_string):
 
     proc = Popen(panzer_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=env)
     # TODO: continuous log output
-    out, err = proc.communicate(input=parse_string.encode('utf-8'))
+    out, err = proc.communicate(input=parse_string.encode(ENCODING))
 
     if proc.returncode != 0:
         log('panzer process exited with non-zero return code.', level='ERROR')
         return []
 
     # only print filter messages for better output log
-    match = REGEX_PATTERNS['PANZER_OUTPUT'].search(err.decode('utf-8'))
+    match = REGEX_PATTERNS['PANZER_OUTPUT'].search(err.decode(ENCODING))
     if match:
         for line in match.group('messages').strip().splitlines():
             log(u'↳ %s' % line.strip(), level='INFO')
     else:
         raise RuntimeError("Unable to parse panzer output!")
 
-    doc = json.loads(out.decode('utf-8'), object_pairs_hook=from_json)
+    doc = json.loads(out.decode(ENCODING), object_pairs_hook=from_json)
     return doc.content.list
 
 
