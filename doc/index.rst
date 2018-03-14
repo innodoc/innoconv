@@ -20,7 +20,6 @@ Module overview
   innoconv.constants
   innoconv.errors
   innoconv.utils
-  innoconv.ifttm_filter
   innoconv.mintmod_filter
 
 Indices and tables

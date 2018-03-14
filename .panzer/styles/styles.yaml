@@ -1,7 +1,6 @@
 innoconv:
   all:
     filter:
-      - run: ifttm_filter.py
       - run: mintmod_filter.py
   json:
     commandline:
