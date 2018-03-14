@@ -45,7 +45,7 @@ class InnoconvRunner():
             '--to={}'.format(self.output_format),
             '--standalone',
             '--output={}'.format(filename_path),
-            'tree.tex'
+            'index.tex'
         ]
 
         proc = subprocess.Popen(
