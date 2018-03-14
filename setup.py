@@ -138,6 +138,7 @@ def setup_package():
         entry_points={
             'console_scripts': [
                 'innoconv = innoconv.__main__:main',
+                'mintmod_ifttm = innoconv.mintmod_ifttm:main',
             ],
         },
         include_package_data=True,
