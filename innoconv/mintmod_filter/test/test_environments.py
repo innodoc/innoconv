@@ -8,13 +8,14 @@ from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.elements import create_header
 
 
-class TestEnvironments(unittest.TestCase):
+class TestMsectionStart(unittest.TestCase):
 
     def setUp(self):
         self.doc = pf.Doc()
         self.environments = Environments()
-        self.elem_content = r"""\begin{MSectionStart}
-        Lorem ipsum.
+        self.elem_content = r"""
+        \begin{MSectionStart}
+            Lorem ipsum
         \end{MSectionStart}"""
         self.doc.content.extend(
             [pf.RawBlock(self.elem_content, format='latex')])
@@ -37,78 +38,103 @@ class TestEnvironments(unittest.TestCase):
             'Lorem ipsum', [], self.elem)
 
         self.assertIsInstance(ret, pf.Div)
+
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertEqual(pf.stringify(header), 'foo')
+
+        para = ret.content[1]
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[0].text, 'Lorem')
+        self.assertEqual(para.content[2].text, 'ipsum')
+
         for cls in ELEMENT_CLASSES['MSECTIONSTART']:
             with self.subTest(cls=cls):
                 self.assertIn(cls, ret.classes)  # pylint: disable=no-member
 
 
-class TestContentBoxes(unittest.TestCase):
+class TestMxContent(unittest.TestCase):
+
+    def setUp(self):
+        self.doc = pf.Doc()
+        self.environments = Environments()
+        self.elem_content = r"""
+        \begin{MXContent}{Nice title}{Short title}{STD}
+            Lorem ipsum
+        \end{MXContent}"""
+        self.doc.content.extend(
+            [pf.RawBlock(self.elem_content, format='latex')])
+        self.elem = self.doc.content[0]  # this sets up elem.parent
+
+    def test_mxcontent(self):
+        """Should handle MXContent"""
+        ret = self.environments.handle_mxcontent(
+            'Foo bar', ['Nice title', 'Short title', 'STD'], self.elem)
+
+        self.assertIsInstance(ret, pf.Div)
+
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertEqual(pf.stringify(header), 'Nice title')
+
+        para = ret.content[1]
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[0].text, 'Foo')
+        self.assertEqual(para.content[2].text, 'bar')
+
+        for cls in ELEMENT_CLASSES['MXCONTENT']:
+            with self.subTest(cls=cls):
+                self.assertIn(cls, ret.classes)  # pylint: disable=no-member
+
+
+class TestBoxesWithoutTitle(unittest.TestCase):
 
     def setUp(self):
         self.doc = pf.Doc()
         self.environments = Environments()
 
-    def test_mxcontent(self):
-        """MXContent"""
-        title = 'Foo content'
-        self._test_content_box(
-            self.environments.handle_mxcontent,
-            ELEMENT_CLASSES['MXCONTENT'], title, [title], 'foo-content'
-        )
-
     def test_handle_mexercises(self):
         """MExercises"""
         self._test_content_box(
-            self.environments.handle_mexercises,
-            ELEMENT_CLASSES['MEXERCISES'], 'Aufgaben'
-        )
+            self.environments.handle_mexercises, ELEMENT_CLASSES['MEXERCISES'])
 
     def test_handle_mexercise(self):
         """MExercise"""
         self._test_content_box(
-            self.environments.handle_mexercise,
-            ELEMENT_CLASSES['MEXERCISE'], 'Aufgabe'
-        )
+            self.environments.handle_mexercise, ELEMENT_CLASSES['MEXERCISE'])
 
     def test_handle_minfo(self):
         """MInfo"""
         self._test_content_box(
-            self.environments.handle_minfo,
-            ELEMENT_CLASSES['MINFO'], 'Info'
-        )
+            self.environments.handle_minfo, ELEMENT_CLASSES['MINFO'])
 
     def test_handle_mexperiment(self):
         """MExperiment"""
-        self._test_content_box(
-            self.environments.handle_mexperiment,
-            ELEMENT_CLASSES['MEXPERIMENT'], 'Experiment'
-        )
+        self._test_content_box(self.environments.handle_mexperiment,
+                               ELEMENT_CLASSES['MEXPERIMENT'])
 
     def test_handle_mexample(self):
         """MExample"""
         self._test_content_box(
-            self.environments.handle_mexample,
-            ELEMENT_CLASSES['MEXAMPLE'], 'Beispiel'
-        )
+            self.environments.handle_mexample, ELEMENT_CLASSES['MEXAMPLE'])
 
     def test_handle_mhint(self):
         """MHint"""
         self._test_content_box(
-            self.environments.handle_mhint,
-            ELEMENT_CLASSES['MHINT'], None
-        )
+            self.environments.handle_mhint, ELEMENT_CLASSES['MHINT'])
 
-    def _test_content_box(self, handler, element_classes, title,
-                          env_args=None, _id=''):
-        """Test if content boxes (e.g. Exercises, Examples, Experiment, Info)
-        are handled correctly"""
-        env_args = env_args or []
-
+    def _test_content_box(self, handler, element_classes, env_args=None):
         # some latex content in the environment
-        elem_content = r"""\begin{itemize}
-        \item{item1}
-        \item{item2}
-        \end{itemize}"""
+        elem_content = r"""
+            \begin{itemize}
+                \item{item1}
+                \item{item2}
+            \end{itemize}
+        """
 
         # should return a div with the given classes
         self.doc.content.extend([pf.RawBlock(elem_content, format='latex')])
@@ -120,18 +146,8 @@ class TestContentBoxes(unittest.TestCase):
             with self.subTest(cls=cls):
                 self.assertIn(cls, div.classes)
 
-        # should return a header with the correct title and id
-        if title:
-            self.assertIsInstance(div.content[0], pf.Header)
-            self.assertEqual(div.content[0].identifier, _id)
-            self.assertEqual(pf.stringify(div.content[0]), title)
-            content_idx = 1
-        else:
-            content_idx = 0
-
         # and the content of the environment should be parsed correctly
-        self.assertIsInstance(div.content[content_idx], pf.BulletList)
-        self.assertEqual(div.content[content_idx].content[0].content[0]
-                         .content[0].content[0].text, 'item1')
-
-        # TODO set and test a unique identifier to info boxes and others (#10)
+        bullet_list = div.content[0]
+        self.assertIsInstance(bullet_list, pf.BulletList)
+        self.assertEqual(bullet_list.content[0].content[0].content[0]
+                         .content[0].text, 'item1')

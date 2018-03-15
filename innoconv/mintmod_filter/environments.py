@@ -10,11 +10,9 @@ Handle mintmod LaTeX environments.
     ``\begin{MXContent}…\end{MXContent}`` environment.
 """
 
-import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
 from innoconv.errors import NoPrecedingHeader
-from innoconv.utils import parse_fragment
-from innoconv.mintmod_filter.elements import create_content_box
+from innoconv.mintmod_filter.elements import create_content_box, create_header
 
 
 class Environments():
@@ -43,62 +41,47 @@ class Environments():
 
     def handle_msectionstart(self, elem_content, env_args, elem):
         r"""Handle ``\MSectionStart`` environment."""
-        # Use title from previously found \MSection command
+
+        div = create_content_box(
+            elem_content, ELEMENT_CLASSES['MSECTIONSTART'])
+
+        # Insert header created by previous \MSection command
         header = getattr(elem.doc, 'last_header_elem', None)
-        if header is None:
+        if header:
+            div.content.insert(0, header)
+        else:
             raise NoPrecedingHeader(
                 'MSectionStart must precede a header element.')
 
-        div = pf.Div(classes=ELEMENT_CLASSES['MSECTIONSTART'])
-        div.content.extend([header] + parse_fragment(elem_content))
         return div
 
     def handle_mxcontent(self, elem_content, env_args, elem):
         r"""Handle ``\MXContent`` environment."""
-        title = env_args[0]
-        return create_content_box(
-            title, ELEMENT_CLASSES['MXCONTENT'],
-            elem_content, elem.doc, level=3, auto_id=True
-        )
+        div = create_content_box(elem_content, ELEMENT_CLASSES['MXCONTENT'])
+        header = create_header(env_args[0], elem.doc, level=3, auto_id=True)
+        div.content.insert(0, header)
+        return div
 
     def handle_mexercises(self, elem_content, env_args, elem):
         r"""Handle ``\MExercises`` environment."""
-        return create_content_box(
-            'Aufgaben', ELEMENT_CLASSES['MEXERCISES'],
-            elem_content, elem.doc, level=3
-        )
+        return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISES'])
 
     def handle_mexercise(self, elem_content, env_args, elem):
         r"""Handle ``\MExercise`` environment."""
-        return create_content_box(
-            'Aufgabe', ELEMENT_CLASSES['MEXERCISE'],
-            elem_content, elem.doc
-        )
+        return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISE'])
 
     def handle_minfo(self, elem_content, env_args, elem):
         r"""Handle ``\MInfo`` environment."""
-        return create_content_box(
-            'Info', ELEMENT_CLASSES['MINFO'],
-            elem_content, elem.doc
-        )
+        return create_content_box(elem_content, ELEMENT_CLASSES['MINFO'])
 
     def handle_mexperiment(self, elem_content, env_args, elem):
         r"""Handle ``\MExperiment`` environment."""
-        return create_content_box(
-            'Experiment', ELEMENT_CLASSES['MEXPERIMENT'],
-            elem_content, elem.doc
-        )
+        return create_content_box(elem_content, ELEMENT_CLASSES['MEXPERIMENT'])
 
     def handle_mexample(self, elem_content, env_args, elem):
         r"""Handle ``\MExample`` command."""
-        return create_content_box(
-            'Beispiel', ELEMENT_CLASSES['MEXAMPLE'],
-            elem_content, elem.doc
-        )
+        return create_content_box(elem_content, ELEMENT_CLASSES['MEXAMPLE'])
 
     def handle_mhint(self, elem_content, env_args, elem):
         r"""Handle ``\MHint`` command."""
-        return create_content_box(
-            None, ELEMENT_CLASSES['MHINT'],
-            elem_content, elem.doc
-        )
+        return create_content_box(elem_content, ELEMENT_CLASSES['MHINT'])
