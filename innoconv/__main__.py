@@ -3,10 +3,11 @@
 """Main entry for the innoconv document converter."""
 
 import argparse
+import os
 from panflute import debug
 
 from innoconv.utils import get_panzer_bin
-from innoconv.constants import (DEFAULT_OUTPUT_DIR, DEFAULT_OUTPUT_FORMAT,
+from innoconv.constants import (DEFAULT_OUTPUT_DIR_BASE, DEFAULT_OUTPUT_FORMAT,
                                 OUTPUT_FORMAT_CHOICES, DEFAULT_LANGUAGE_CODE,
                                 LANGUAGE_CODES)
 import innoconv.metadata as metadata
@@ -43,9 +44,10 @@ def parse_cli_args():
     innoconv_argparser.add_argument('source_dir',
                                     help="content directory")
 
-    output_help = 'output directory (default: "{}")'.format(DEFAULT_OUTPUT_DIR)
-    innoconv_argparser.add_argument('-o', '--output-dir',
-                                    default=DEFAULT_OUTPUT_DIR,
+    output_help = 'output base directory (default: "{}")'.format(
+        DEFAULT_OUTPUT_DIR_BASE)
+    innoconv_argparser.add_argument('-o', '--output-dir-base',
+                                    default=DEFAULT_OUTPUT_DIR_BASE,
                                     help=output_help)
 
     output_format_help = 'output format'
@@ -78,8 +80,10 @@ def main():
         debug("Warning: Setting output format to 'html5' in debug mode.")
         args['output_format'] = 'html5'
 
+    output_dir = os.path.join(args['output_dir_base'], args['language_code'])
+
     runner = InnoconvRunner(
-        args['source_dir'], args['output_dir'], args['language_code'],
+        args['source_dir'], output_dir, args['language_code'],
         output_format=args['output_format'], debug=args['debug'])
     filename_out = runner.run()
     debug('Build finished: {}'.format(filename_out))
