@@ -24,6 +24,7 @@ REGEX_PATTERNS = {
 ELEMENT_CLASSES = {
     'IMAGE': ['img'],
     'MXCONTENT': ['content'],
+    'MINTRO': ['content', 'intro'],
     'MEXERCISES': ['content', 'exercises'],
     'MEXERCISE': ['exercise'],
     'MINFO': ['info'],
@@ -53,7 +54,7 @@ LANGUAGE_CODES = (
 DEFAULT_LANGUAGE_CODE = LANGUAGE_CODES[0]
 
 #: Default innoconv output directory
-DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), 'innoconv_output')
+DEFAULT_OUTPUT_DIR_BASE = os.path.join(os.getcwd(), 'innoconv_output')
 
 #: Default innoconv output format
 DEFAULT_OUTPUT_FORMAT = 'json'
