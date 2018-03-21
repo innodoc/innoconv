@@ -247,6 +247,13 @@ class Commands():
         """
         return self._noop()
 
+    def handle_vspace(self, cmd_args, elem):
+        r"""Handle ``\vspace`` command.
+
+        A display related command. It becomes a no-op.
+        """
+        return self._noop()
+
     @staticmethod
     def _noop():
         """Return no elements."""
