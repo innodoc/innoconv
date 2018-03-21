@@ -10,6 +10,7 @@ Handle mintmod LaTeX commands.
 """
 
 import panflute as pf
+from slugify import slugify
 from innoconv.constants import ELEMENT_CLASSES
 from innoconv.utils import log, destringify
 from innoconv.mintmod_filter.elements import create_header
@@ -107,6 +108,38 @@ class Commands():
         url = cmd_args[0]
         text = destringify(cmd_args[1])
         return pf.Link(*text, url=url)
+
+    ###########################################################################
+    # Glossary/index
+
+    def handle_mentry(self, cmd_args, elem):
+        r"""Handle ``\MEntry`` command.
+
+        This command creates an entry for the glossary/index.
+        """
+        text = cmd_args[0]
+        concept = cmd_args[1]
+        strong = pf.Strong()
+        strong.content.extend(destringify(text))
+        span = pf.Span()
+        span.identifier = 'index-{}'.format(slugify(concept))
+        span.attributes = {'data-index-concept': concept}
+        span.content = [strong]
+        return span
+
+    def handle_mindex(self, cmd_args, elem):
+        r"""Handle ``\MIndex`` command.
+
+        This command creates an invisible entry for the glossary/index.
+        """
+        concept = cmd_args[0]
+        span = pf.Span()
+        span.identifier = 'index-{}'.format(slugify(concept))
+        span.attributes = {
+            'data-index-concept': concept,
+            'hidden': 'hidden',
+        }
+        return span
 
     ###########################################################################
     # Media
