@@ -23,25 +23,19 @@ REGEX_PATTERNS = {
 #: Element classes
 ELEMENT_CLASSES = {
     'IMAGE': ['img'],
+    'DEBUG_UNKNOWN_CMD': ['innoconv-debug-unknown-command'],
+    'DEBUG_UNKNOWN_ENV': ['innoconv-debug-unknown-environment'],
     'MXCONTENT': ['content'],
     'MINTRO': ['content', 'intro'],
     'MEXERCISES': ['content', 'exercises'],
-    'MEXERCISE': ['exercise'],
-    'MINFO': ['info'],
-    'MEXPERIMENT': ['experiment'],
-    'MEXAMPLE': ['example'],
-    'MHINT': ['hint'],
-    'MHINT_TEXT': ['hint-text'],
+    'MEXERCISE': ['panel', 'panel-default', 'exercise'],
+    'MINFO': ['panel', 'panel-info', 'info'],
+    'MEXPERIMENT': ['panel', 'panel-default', 'experiment'],
+    'MEXAMPLE': ['panel', 'panel-default', 'example'],
+    'MHINT': ['panel', 'panel-default', 'hint'],
+    'MINPUTHINT': ['hint-text'],
     'MSECTIONSTART': ['section-start'],
-    'UNKNOWN_CMD': ['unknown-command'],
-    'UNKNOWN_ENV': ['unknown-environment'],
-    'MYOUTUBE_VIDEO': ['video', 'video-youtube']
-}
-
-#: Color codes
-COLORS = {
-    'UNKNOWN_CMD': '#ffa500',
-    'UNKNOWN_ENV': '#ff4d00',
+    'MYOUTUBE_VIDEO': ['video', 'video-youtube'],
 }
 
 #: Supported language codes

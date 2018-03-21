@@ -36,11 +36,14 @@ class InnoconvRunner():
         env = os.environ.copy()
         if self.debug:
             env['INNOCONV_DEBUG'] = '1'
+            style = 'innoconv-debug'
+        else:
+            style = 'innoconv'
 
         cmd = [
             'panzer',
             '---panzer-support', PANZER_SUPPORT_DIR,
-            '--metadata=style:innoconv',
+            '--metadata=style:{}'.format(style),
             '--from=latex+raw_tex',
             '--to={}'.format(self.output_format),
             '--standalone',

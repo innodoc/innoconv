@@ -4,7 +4,7 @@ import panflute as pf
 from slugify import slugify
 
 from innoconv.errors import ParseError
-from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES, COLORS
+from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES
 from innoconv.utils import log, destringify, parse_cmd
 from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.commands import Commands
@@ -75,21 +75,15 @@ class MintmodFilterAction:
 
         Output visual feedback about the unknown command.
         """
-        classes = ELEMENT_CLASSES['UNKNOWN_CMD'] + [slugify(cmd_name)]
-        attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_CMD']}
-
-        msg = [
-            pf.Strong(*destringify('Unhandled command:')),
-            pf.Space(), pf.Code(elem.text),
-        ]
-        # RawBlock
+        classes = ELEMENT_CLASSES['DEBUG_UNKNOWN_CMD'] + [slugify(cmd_name)]
+        msg_prefix = pf.Strong(*destringify('Unhandled command:'))
         if isinstance(elem, pf.Block):
-            div = pf.Div(classes=classes, attributes=attrs)
-            div.content.extend([pf.Para(*msg)])
+            div = pf.Div(classes=classes)
+            div.content.extend([pf.Para(msg_prefix), pf.CodeBlock(elem.text)])
             return div
         # RawInline
-        span = pf.Span(classes=classes, attributes=attrs)
-        span.content.extend(msg)
+        span = pf.Span(classes=classes)
+        span.content.extend([msg_prefix, pf.Space(), pf.Code(elem.text)])
         return span
 
     def _handle_environment(self, elem):
@@ -127,10 +121,10 @@ class MintmodFilterAction:
 
         Output visual feedback about the unknown environment.
         """
-        classes = ELEMENT_CLASSES['UNKNOWN_ENV'] + [slugify(env_name)]
-        attrs = {'style': 'background: %s;' % COLORS['UNKNOWN_ENV']}
-        div = pf.Div(classes=classes, attributes=attrs)
-        msg = pf.Para(pf.Strong(*destringify('Unhandled environment:')),
-                      pf.LineBreak(), pf.Code(elem.text))
-        div.content.extend([msg])
+        classes = ELEMENT_CLASSES['DEBUG_UNKNOWN_ENV'] + [slugify(env_name)]
+        div = pf.Div(classes=classes)
+        div.content.extend([
+            pf.Para(pf.Strong(*destringify('Unhandled environment:'))),
+            pf.CodeBlock(elem.text),
+        ])
         return div
