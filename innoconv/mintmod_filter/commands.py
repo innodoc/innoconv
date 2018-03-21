@@ -231,6 +231,10 @@ class Commands():
         r"""Handle ``\grqq`` command."""
         return pf.Str('“')
 
+    def handle_quad(self, cmd_args, elem):
+        r"""Handle ``\quad`` command."""
+        return pf.Space()
+
     ###########################################################################
     # No-ops
 
