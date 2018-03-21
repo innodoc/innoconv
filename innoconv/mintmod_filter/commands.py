@@ -12,7 +12,7 @@ Handle mintmod LaTeX commands.
 import panflute as pf
 from slugify import slugify
 from innoconv.constants import ELEMENT_CLASSES
-from innoconv.utils import log, destringify
+from innoconv.utils import log, destringify, parse_fragment
 from innoconv.mintmod_filter.elements import create_header
 
 
@@ -36,7 +36,7 @@ class Commands():
         * ``elem``: :class:`panflute.base.Element`
     """
 
-    # pylint: disable=unused-argument,no-self-use
+    # pylint: disable=unused-argument,no-self-use,too-many-public-methods
 
     ###########################################################################
     # Sections
@@ -208,6 +208,17 @@ class Commands():
         This command inserts the translation for 'section'.
         """
         return pf.Str('Abschnitt')  # TODO: i18n (#4)
+
+    def handle_minputhint(self, cmd_args, elem):
+        r"""Handle ``\MInputHint`` command."""
+        content = parse_fragment(cmd_args[0])
+        if isinstance(elem, pf.Block):
+            div = pf.Div(classes=ELEMENT_CLASSES['MINPUTHINT'])
+            div.content.extend(content)
+            return div
+        span = pf.Span(classes=ELEMENT_CLASSES['MINPUTHINT'])
+        span.content.extend(content)
+        return span
 
     ###########################################################################
     # Simple substitutions
