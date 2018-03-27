@@ -17,10 +17,14 @@ MATH_SUBSTITUTIONS = (
     (r'\\MSetminus', r'\setminus'),
     (r'\\MElSetSep', ';'),
     (r'\\MIntvlSep', ';'),
-    (r'\\MoIl', ']'),  # (#17)
-    (r'\\MoIr', '['),  # (#17)
     (r'\\MEU', 'e'),
-    (r'\\MZahl{([0-9]*?)}{([0-9]*?)}', r'\1{,}\2')  # maybe obsolete (see #16)
+    (r'\\MZahl{([0-9]*?)}{([0-9]*?)}', r'\1{,}\2'),  # maybe obsolete (see #16)
+
+    # intervals (#17)
+    (r'\\MoIl\[\\left\]', r'\left]'),
+    (r'\\MoIr\[\\right\]', r'\\right['),
+    (r'\\MoIl', ']'),
+    (r'\\MoIr', '['),
 )
 
 
