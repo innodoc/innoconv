@@ -47,17 +47,12 @@ class MintmodFilterAction:
             # block commands and environments
             if isinstance(elem, pf.RawBlock):
                 cmd_name, cmd_args = parse_cmd(elem.text)
-                if cmd_name == 'begin':
-                    try:
-                        return self._handle_environment(elem)
-                    except TypeError as err:
-                        return self._handle_typeerror(
-                            err, cmd_name, cmd_args, elem)
                 try:
+                    if cmd_name == 'begin':
+                        return self._handle_environment(elem)
                     return self._handle_command(cmd_name, cmd_args, elem)
                 except TypeError as err:
-                    return self._handle_typeerror(
-                        err, cmd_name, cmd_args, elem)
+                    self._handle_typeerror(err, cmd_name, cmd_args, elem)
 
             # inline commands (no inline environments!)
             elif isinstance(elem, pf.RawInline):
@@ -65,8 +60,7 @@ class MintmodFilterAction:
                 try:
                     return self._handle_command(cmd_name, cmd_args, elem)
                 except TypeError as err:
-                    return self._handle_typeerror(
-                        err, cmd_name, cmd_args, elem)
+                    self._handle_typeerror(err, cmd_name, cmd_args, elem)
 
         return None  # element unchanged
 
@@ -147,4 +141,3 @@ class MintmodFilterAction:
             name, args, elem.__class__.__name__, err))
         import traceback
         traceback.print_tb(err.__traceback__)
-        return None
