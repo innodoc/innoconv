@@ -100,6 +100,17 @@ class Commands():
         description = destringify(cmd_args[1])
         return pf.Link(*description, url=url)
 
+    def handle_mnref(self, cmd_args, elem):
+        r"""Handle ``\MNRef`` command.
+
+        This command inserts a section link.
+        """
+        identifier = cmd_args[0]
+        span = pf.Span()
+        span.attributes = {'data-link-section': identifier}
+        span.content = [pf.Str(identifier)]
+        return span
+
     def handle_mextlink(self, cmd_args, elem):
         r"""Handle ``\MExtLink`` command.
 
