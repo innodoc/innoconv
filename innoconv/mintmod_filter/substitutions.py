@@ -5,11 +5,7 @@ import re
 
 MATH_SUBSTITUTIONS = (
     # leave \Rightarrow, ... intact
-    (r'\\N($|[$^_,.\s])', r'\mathbb{N}\1'),
-    (r'\\Z($|[$^_,.\s])', r'\mathbb{Z}\1'),
-    (r'\\Q($|[$^_,.\s])', r'\mathbb{Q}\1'),
-    (r'\\R($|[$^_,.\s])', r'\mathbb{R}\1'),
-    (r'\\C($|[$^_,.\s])', r'\mathbb{C}\1'),
+    (r'\\([NZQRC])($|[_\\$:=\s^,.])', r'\mathbb{\1}\2'),
 
     (r'\\Mtfrac{(.*?)}{(.*?)}', r'{\\textstyle \\frac{\1}{\2}}'),
     (r'\\Mdfrac{(.*?)}{(.*?)}', r'{\\displaystyle \\frac{\1}{\2}}'),
