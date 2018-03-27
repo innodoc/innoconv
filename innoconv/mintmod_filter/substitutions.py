@@ -7,8 +7,8 @@ MATH_SUBSTITUTIONS = (
     # leave \Rightarrow, ... intact
     (r'\\([NZQRC])($|[_\\$:=\s^,.])', r'\mathbb{\1}\2'),
 
-    (r'\\Mtfrac{(.*?)}{(.*?)}', r'{\\textstyle \\frac{\1}{\2}}'),
-    (r'\\Mdfrac{(.*?)}{(.*?)}', r'{\\displaystyle \\frac{\1}{\2}}'),
+    (r'\\Mtfrac', r'\\tfrac'),
+    (r'\\Mdfrac', r'\\dfrac'),
     (r'\\MBlank', r'\ '),
     (r'\\MCondSetSep', r'{\,}:{\,}'),
     (r'\\MDFPSpace', r'\,'),
