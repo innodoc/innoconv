@@ -233,6 +233,21 @@ class Commands():
         return span
 
     ###########################################################################
+    # Command pass-thru
+
+    def handle_mzxyzhltrennzeichen(self, cmd_args, elem):
+        r"""Handle ``\MZXYZhltrennzeichen`` command.
+
+        It is transformed to a ``\decmarker`` command and later substituted
+        by MathJax. This is already in math substitions but as it occurs
+        outside of math environments it's defined here too.
+        """
+        if isinstance(elem, pf.Block):
+            raise ValueError(
+                r'Encountered \MZXYZhltrennzeichen as block element!')
+        return pf.Math(r'\decmarker', format='InlineMath')
+
+    ###########################################################################
     # Simple substitutions
 
     def handle_glqq(self, cmd_args, elem):

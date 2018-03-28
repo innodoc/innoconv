@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html$if(lang)$ lang="$lang$"$endif$>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta charset="utf-8">
   <meta name="generator" content="innoconv" />
   <title>$if(title-prefix)$$title-prefix$ - $endif$$pagetitle$</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
@@ -36,6 +35,10 @@
       padding: 1rem;
     }
   </style>
+  <script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path["innoconv"] = window.location.href;
+    MathJax.Hub.config.extensions.push("[innoconv]innoconv.mathjax.js");
+  </script>
 $if(math)$
   $math$
 $endif$

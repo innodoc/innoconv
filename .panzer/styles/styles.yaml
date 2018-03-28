@@ -13,3 +13,5 @@ innoconv-debug:
   parent: innoconv
   html5:
     template: debug.html
+    preflight:
+      - run: copy_innoconv.mathjax.py

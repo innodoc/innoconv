@@ -18,7 +18,10 @@ MATH_SUBSTITUTIONS = (
     (r'\\MElSetSep', ';'),
     (r'\\MIntvlSep', ';'),
     (r'\\MEU', 'e'),
-    (r'\\MZahl{([0-9]*?)}{([0-9]*?)}', r'\1{,}\2'),  # maybe obsolete (see #16)
+
+    # handled by innoconv.mathjax.js
+    (r'\\MZahl{([0-9]+?)}{([0-9]*?)}', r'\\num{\1.\2}'),
+    (r'\\MZXYZhltrennzeichen}', r'\decmarker'),
 
     # intervals (#17)
     (r'\\MoIl\[\\left\]', r'\left]'),
