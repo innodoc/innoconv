@@ -71,22 +71,23 @@ def parse_fragment(parse_string):
         raise RuntimeError("Panzer recursion depth exceeded!")
 
     proc = Popen(panzer_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=env)
-    # TODO: continuous log output
     out, err = proc.communicate(input=parse_string.encode(ENCODING))
+    out = out.decode(ENCODING)
+    err = err.decode(ENCODING)
 
     if proc.returncode != 0:
-        log('panzer process exited with non-zero return code.', level='ERROR')
-        return []
+        log(err, level='ERROR')
+        raise RuntimeError("panzer process exited with non-zero return code.")
 
     # only print filter messages for better output log
-    match = REGEX_PATTERNS['PANZER_OUTPUT'].search(err.decode(ENCODING))
+    match = REGEX_PATTERNS['PANZER_OUTPUT'].search(err)
     if match:
         for line in match.group('messages').strip().splitlines():
             log(u'↳ %s' % line.strip(), level='INFO')
     else:
         raise RuntimeError("Unable to parse panzer output!")
 
-    doc = json.loads(out.decode(ENCODING), object_pairs_hook=from_json)
+    doc = json.loads(out, object_pairs_hook=from_json)
     return doc.content.list
 
 
