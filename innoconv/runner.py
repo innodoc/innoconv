@@ -44,6 +44,7 @@ class InnoconvRunner():
             'panzer',
             '---panzer-support', PANZER_SUPPORT_DIR,
             '--metadata=style:{}'.format(style),
+            '--metadata=lang:{}'.format(self.language_code),
             '--from=latex+raw_tex',
             '--to={}'.format(self.output_format),
             '--standalone',
