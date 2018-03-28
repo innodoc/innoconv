@@ -281,6 +281,20 @@ class Commands():
         """
         return self._noop()
 
+    def handle_newpage(self, cmd_args, elem):
+        r"""Handle ``\newpage`` command.
+
+        A display related command. It becomes a no-op.
+        """
+        return self._noop()
+
+    def handle_mprintindex(self, cmd_args, elem):
+        r"""Handle ``\MPrintIndex`` command.
+
+        Index will be printed automatically. It becomes a no-op.
+        """
+        return self._noop()
+
     @staticmethod
     def _noop():
         """Return no elements."""
