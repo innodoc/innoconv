@@ -8,7 +8,8 @@ from mock import patch
 import panflute as pf
 
 from innoconv.errors import ParseError
-from innoconv.utils import parse_fragment, destringify, parse_cmd
+from innoconv.utils import (parse_fragment, destringify, parse_cmd,
+                            parse_nested_args)
 from innoconv.test.utils import captured_output
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -67,13 +68,13 @@ class TestParseFragment(unittest.TestCase):
                 self.assertEqual(elem[0], elem[1])
 
     def test_parse_fragment_fail(self):
-        """if given broken document parse_fragment() should return [] and print
-        errors"""
+        """if given broken document parse_fragment() raises RuntimeError and
+        prints errors"""
         with captured_output() as out:
-            ret = parse_fragment(r'\begin{fooenv}bla')
+            with self.assertRaises(RuntimeError):
+                parse_fragment(r'\begin{fooenv}bla')
             err_out = out[1].getvalue()
         self.assertTrue('ERROR' in err_out)
-        self.assertListEqual(ret, [])
 
     def test_parse_fragment_quiet(self):
         """parse_fragment() prints debug messages"""
@@ -214,3 +215,34 @@ class TestParseCmd(unittest.TestCase):
         """It should fail on invalid command"""
         with self.assertRaises(ParseError):
             parse_cmd('not-a-valid-command')
+
+    def test_parse_cmd_nested(self):
+        """It should parse nested commands"""
+        cmd_name, cmd_args = parse_cmd(r'\foobar{word\bar{two}bbb}{baz}')
+        self.assertEqual(cmd_name, 'foobar')
+        self.assertEqual(cmd_args, [r'word\bar{two}bbb', 'baz'])
+
+
+class TestParseNestedArgs(unittest.TestCase):
+
+    def test_parse_nested_args_empty(self):
+        """It should parse nested arguments: empty"""
+        cmd_args = list(parse_nested_args(''))
+        self.assertEqual(cmd_args, [])
+
+    def test_parse_nested_args_simple(self):
+        """It should parse nested arguments: simple"""
+        cmd_args = list(parse_nested_args('{bbb}{baz}{foo}'))
+        self.assertEqual(cmd_args, ['bbb', 'baz', 'foo'])
+
+    def test_parse_nested_args_1(self):
+        """It should parse nested arguments: nested 1"""
+        cmd_args = list(parse_nested_args(r'{word\bar{two}bbb}{baz}'))
+        self.assertEqual(cmd_args, [r'word\bar{two}bbb', 'baz'])
+
+    def test_parse_nested_args_2(self):
+        """It should parse nested arguments: nested 2"""
+        cmd_args = list(parse_nested_args(
+            r'{cont}{}{\foo{\bla{\stop}}}{\baz{}{}{}}'))
+        self.assertEqual(cmd_args,
+                         ['cont', '', r'\foo{\bla{\stop}}', r'\baz{}{}{}'])

@@ -228,7 +228,8 @@ class Commands():
             div.content.extend(content)
             return div
         span = pf.Span(classes=ELEMENT_CLASSES['MINPUTHINT'])
-        span.content.extend(content)
+        if content and isinstance(content[0], pf.Para):
+            span.content.extend(content[0].content)
         return span
 
     ###########################################################################

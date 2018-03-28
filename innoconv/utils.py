@@ -2,7 +2,6 @@
 
 import os
 import json
-import re
 from shutil import which
 from subprocess import Popen, PIPE
 import sys
@@ -132,6 +131,27 @@ def parse_cmd(text):
     match = REGEX_PATTERNS['CMD'].match(text)
     if not match:
         raise ParseError("Could not parse LaTeX command: '%s'" % text)
-    cmd_name = match.groups()[0]
-    cmd_args = re.findall(REGEX_PATTERNS['CMD_ARGS'], text)
+    groups = match.groups()
+    cmd_name = groups[0]
+    cmd_args = list(parse_nested_args(groups[1]))
     return cmd_name, cmd_args
+
+
+def parse_nested_args(string):
+    r"""
+    Generator that parses LaTeX command arguments that can have nested
+    commands.
+
+    Parses a string like: ``{bar}{baz{}}``
+
+    :param string: String to parse
+    :type string: str
+    """
+    stack = []
+    for i, cha in enumerate(string):
+        if cha == '{':
+            stack.append(i)
+        elif cha == '}' and stack:
+            start = stack.pop()
+            if not stack:
+                yield string[start + 1: i]
