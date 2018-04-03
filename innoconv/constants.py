@@ -37,6 +37,15 @@ ELEMENT_CLASSES = {
     'MYOUTUBE_VIDEO': ['video', 'video-youtube'],
 }
 
+#: Subjects as used in mintmod command ``\MSetSubject``
+MINTMOD_SUBJECTS = {
+    r'\MINTMathematics': 'mathematics',
+    r'\MINTInformatics': 'informatics',
+    r'\MINTChemistry': 'chemistry',
+    r'\MINTPhysics': 'physics',
+    r'\MINTEngineering': 'engineering',
+}
+
 #: Supported language codes
 LANGUAGE_CODES = (
     'de',
@@ -70,5 +79,5 @@ ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 #: panzer support directory
 PANZER_SUPPORT_DIR = os.path.join(ROOT_DIR, '.panzer')
 
-#: encoding
+#: encoding used in this project
 ENCODING = 'utf-8'
