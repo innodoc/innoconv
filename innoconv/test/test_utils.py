@@ -14,24 +14,13 @@ from innoconv.test.utils import captured_output
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-TEX_MLABEL = r"""\MSubSection{foo}
-\MLabel{label1}
-
-\MTitle{header level 4}
-\MLabel{label2}
-
-\begin{MXContent}{Die erste Seite}{Seite 1}{STD}
-\MLabel{LABEL_BASE_SITE_ONE}
-
-Here is a text with another \MLabel{paralabel}
-\end{MXContent}"""
-
 
 class TestParseFragment(unittest.TestCase):
 
     def test_parse_fragment(self):
         """parse_fragment() returns valid output if given test document"""
-        with open(os.path.join(SCRIPT_DIR, 'files', 'test.tex'), 'r') as file:
+        with open(os.path.join(SCRIPT_DIR,
+                               'files', 'parse_fragment.tex'), 'r') as file:
             content = file.read()
         doc = parse_fragment(content)
         h_1 = doc[0]
@@ -100,33 +89,6 @@ class TestParseFragment(unittest.TestCase):
         """parse_fragment() raises OSError if panzer not in PATH"""
         with self.assertRaises(OSError):
             parse_fragment('foo bar')
-
-    # TODO: should be moved to integration tests
-    @unittest.skip("We need to write a second filter for label / index / ..."
-                   "before this test will succeed, as subprocess cannot easily"
-                   "the other processe's data")
-    def test_parse_fragment_mlabel(self):
-        """Test if a latex string containing several `MLabel` commands in
-        different environments and positions are parsed correctly."""
-        ast_native = parse_fragment(TEX_MLABEL)
-
-        self.assertIsInstance(ast_native, list)
-
-        header1 = ast_native[0]
-        self.assertIsInstance(header1, pf.Header)
-        self.assertEqual(header1.identifier, "label1")
-
-        header2 = ast_native[1]
-        self.assertIsInstance(header2, pf.Header)
-        self.assertEqual(header2.identifier, "label2")
-
-        header3 = ast_native[2].content[0]
-        self.assertIsInstance(header3, pf.Header)
-        self.assertEqual(header3.identifier, "LABEL_BASE_SITE_ONE")
-
-        # para_1 = ast_native[2]
-        # self.assertIsInstance(para_1, pf.Para)
-        # self.assertEqual(para_1.identifier, "paralabel")
 
 
 class TestDestringify(unittest.TestCase):
