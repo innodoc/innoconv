@@ -61,9 +61,25 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.identifier, 'schone-titel-nach-mass')
         self.assertEqual(ret.level, 4)
 
-    def test_handle_mlabel(self):
-        # TODO implement test_handle_mlabel, not specified yet, see #10
-        pass
+    def test_handle_mlabel_no_last_header(self):
+        """MTitle command without a last header element"""
+        doc = pf.Doc(pf.RawBlock(r'\MLabel{TEST_LABEL}'), format='latex')
+        elem = doc.content[0]
+        ret = self.commands.handle_mlabel(['TEST_LABEL'], elem)
+        self.assertIsInstance(ret, pf.Div)
+        self.assertIn('label', ret.classes)
+        self.assertEqual(ret.identifier, 'label-TEST_LABEL')
+
+    def test_handle_mlabel_last_header(self):
+        """MTitle command with a last header element"""
+        mlabel = pf.RawBlock(r'\MLabel{TEST_LABEL}')
+        header = pf.Header(pf.Str('headertext'))
+        doc = pf.Doc(header, mlabel, format='latex')
+        doc.last_header_elem = header
+        elem = doc.content[0]
+        ret = self.commands.handle_mlabel(['HEADER'], elem)
+        self.assertFalse(ret)
+        self.assertEqual(header.identifier, 'HEADER')
 
     def test_handle_special_html(self):
         """special command embedded html"""
