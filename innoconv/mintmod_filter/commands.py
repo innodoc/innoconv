@@ -11,7 +11,7 @@ Handle mintmod LaTeX commands.
 
 import panflute as pf
 from slugify import slugify
-from innoconv.constants import ELEMENT_CLASSES
+from innoconv.constants import ELEMENT_CLASSES, MINTMOD_SUBJECTS
 from innoconv.utils import log, destringify, parse_fragment
 from innoconv.mintmod_filter.elements import create_header
 
@@ -68,8 +68,16 @@ class Commands():
 
         Command defines the document title.
         """
-        # self.doc.metadata['title'] = pf.MetaString(cmd_args[0])
         elem.doc.metadata['title'] = pf.MetaString(cmd_args[0])
+        return []
+
+    def handle_msetsubject(self, cmd_args, elem):
+        r"""Handle ``\MSetSubject{}`` command.
+
+        Command defines the category.
+        """
+        elem.doc.metadata['subject'] = pf.MetaString(
+            MINTMOD_SUBJECTS[cmd_args[0]])
         return []
 
     ###########################################################################
@@ -91,10 +99,19 @@ class Commands():
 
         return []
 
+    def handle_mref(self, cmd_args, elem):
+        r"""Handle ``\MRef`` command.
+
+        This command translates to ``\vref``.
+        """
+        url = '#%s' % cmd_args[0]
+        # TODO: insert referenced number (e.g. '1.2')
+        return pf.Link(pf.Str('PLACEHOLDER'), url=url)
+
     def handle_msref(self, cmd_args, elem):
         r"""Handle ``\MSRef`` command.
 
-        This command inserts an fragment-style link.
+        This command inserts a fragment-style link.
         """
         url = '#%s' % cmd_args[0]
         description = destringify(cmd_args[1])
@@ -307,6 +324,13 @@ class Commands():
         r"""Handle ``\MPrintIndex`` command.
 
         Index will be printed automatically. It becomes a no-op.
+        """
+        return self._noop()
+
+    def handle_msetsectionid(self, cmd_args, elem):
+        r"""Handle ``\MSetSectionID`` command.
+
+        This command is used solely for tikz images. It becomes a no-op.
         """
         return self._noop()
 
