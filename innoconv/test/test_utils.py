@@ -3,7 +3,6 @@
 # pylint: disable=missing-docstring,invalid-name
 
 import unittest
-import os
 from mock import patch
 import panflute as pf
 
@@ -12,17 +11,40 @@ from innoconv.utils import (parse_fragment, destringify, parse_cmd,
                             parse_nested_args)
 from innoconv.test.utils import captured_output
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONTENT = r"""
+\documentclass[12pt]{article}
+\begin{document}
+
+\section{Test heading}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. In luctus
+eget lorem ut tincidunt. Duis nunc quam, vehicula et molestie
+consectetur, maximus nec sapien. In posuere venenatis fringilla. Sed
+ac mi vehicula, blandit elit id, rutrum tellus. Praesent consectetur
+lacinia quam, nec molestie neque ultricies eget. Donec eget facilisis
+nisi. Suspendisse condimentum facilisis molestie. Donec vehicula dui
+vel ligula laoreet porta.
+
+\subsection{Another heading}
+
+Aliquam sit amet lorem nec mauris venenatis volutpat quis et
+mauris. Aenean nec ullamcorper orci, at euismod ipsum. Sed ac risus
+tortor. Class aptent taciti sociosqu ad litora torquent per conubia
+nostra, per inceptos himenaeos. Nullam tincidunt euismod felis, in
+varius quam. Mauris lobortis elit mollis nisi imperdiet, at sagittis
+libero elementum. Donec hendrerit ex libero, ut condimentum ligula
+porttitor at. Pellentesque libero urna, egestas a semper in, auctor
+vitae tellus. In quis viverra nibh.
+
+\end{document}
+"""
 
 
 class TestParseFragment(unittest.TestCase):
 
     def test_parse_fragment(self):
         """parse_fragment() returns valid output if given test document"""
-        with open(os.path.join(SCRIPT_DIR,
-                               'files', 'parse_fragment.tex'), 'r') as file:
-            content = file.read()
-        doc = parse_fragment(content)
+        doc = parse_fragment(CONTENT)
         h_1 = doc[0]
         para_1 = doc[1]
         h_2 = doc[2]
