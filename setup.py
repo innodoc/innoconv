@@ -132,6 +132,9 @@ def setup_package():
             'pylint': PylintCommand,
             'test': TestCommand,
         },
+        dependency_links=[
+            'git+https://github.com/msprev/panzer#egg=panzer-1.4.1',
+        ],
         entry_points={
             'console_scripts': [
                 'innoconv = innoconv.__main__:main',
@@ -139,6 +142,11 @@ def setup_package():
             ],
         },
         include_package_data=True,
+        install_requires={
+            'panflute',
+            'panzer',
+            'python-slugify',
+        },
         packages=[
             'innoconv',
         ],
