@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=missing-docstring,no-name-in-module,import-error
+# pylint: disable=missing-docstring
 
 """Define project commands."""
 
@@ -13,23 +13,13 @@ import subprocess
 import sys
 from setuptools import setup
 
-
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-CONTENT_DIR = os.path.join(ROOT_DIR, 'content')
-BUILD_DIR = os.path.join(ROOT_DIR, 'build')
 PANZER_SUPPORT_DIR = os.path.join(ROOT_DIR, '.panzer')
 LINT_DIRS = [
     os.path.join(ROOT_DIR, 'innoconv'),
     os.path.join(ROOT_DIR, 'setup.py'),
     os.path.join(PANZER_SUPPORT_DIR, 'filter')
 ]
-
-TUB_BASE_REPO = 'git@gitlab.tubit.tu-berlin.de:innodoc/tub_base.git'
-TUB_BASE_BRANCH = 'pandoc'
-
-MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' \
-                   'VEUNDMINT_TUB_Brueckenkurs/raw/multilang/src/tex/%s'
-
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
@@ -113,8 +103,6 @@ class CoverageCommand(BaseCommand):
 class CleanCommand(clean, BaseCommand):
     def run(self):
         super().run()
-        self._run(['rm', '-rf', BUILD_DIR])
-        self._run(['rm', '-rf', CONTENT_DIR])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
 
@@ -138,7 +126,6 @@ def setup_package():
         entry_points={
             'console_scripts': [
                 'innoconv = innoconv.__main__:main',
-                'mintmod_ifttm = innoconv.mintmod_ifttm:main',
             ],
         },
         include_package_data=True,
