@@ -12,7 +12,7 @@ $ python3 -m venv /path/to/virtual/environment
 # Activate venv
 $ source /path/to/virtual/environment/bin/activate
 # Install using pip
-$ pip install -e git+https://gitlab.tubit.tu-berlin.de/innodoc/innoconv.git#egg=master
+$ pip install --process-dependency-links -e git+https://gitlab.tubit.tu-berlin.de/innodoc/innoconv.git#egg=innoconv
 ```
 
 The ``innoconv`` command is now available.
