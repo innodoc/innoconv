@@ -143,7 +143,7 @@ def parse_nested_args(string):
     Generator that parses LaTeX command arguments that can have nested
     commands.
 
-    Parses a string like: ``{bar}{baz{}}``
+    Parses strings like: ``{bar}{baz{}}``
 
     :param string: String to parse
     :type string: str
