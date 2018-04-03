@@ -12,7 +12,6 @@ import re
 import subprocess
 import sys
 from setuptools import setup
-from colorama import init as colorama_init, Style
 
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -33,7 +32,6 @@ MINTMOD_BASE_URL = 'https://gitlab.tu-berlin.de/stefan.born/' \
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
-colorama_init()
 
 METADATA_PATH = os.path.join(ROOT_DIR, 'innoconv', 'metadata.py')
 with open(METADATA_PATH, 'r') as metadata_file:
@@ -60,8 +58,7 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
         pass
 
     def _run(self, command, err_msg='Command failed!', cwd=ROOT_DIR):
-        self.log.info(
-            '%sCommand%s %s', Style.BRIGHT, Style.NORMAL, ' '.join(command))
+        self.log.info('Command %s', ' '.join(command))
 
         # make mintmod_filter module available
         env = os.environ.copy()
