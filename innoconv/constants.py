@@ -58,6 +58,7 @@ OUTPUT_FORMAT_EXT_MAP = {
     'json': 'json',
     'latex': 'tex',
     'markdown': 'md',
+    'asciidoc': 'adoc',
 }
 
 #: Output format choices
