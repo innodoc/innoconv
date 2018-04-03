@@ -12,7 +12,7 @@ Handle mintmod LaTeX commands.
 import panflute as pf
 from slugify import slugify
 from innoconv.constants import ELEMENT_CLASSES, MINTMOD_SUBJECTS
-from innoconv.utils import log, destringify, parse_fragment
+from innoconv.utils import destringify, parse_fragment
 from innoconv.mintmod_filter.elements import create_header
 
 
@@ -87,17 +87,28 @@ class Commands():
         r"""Handle ``\MLabel`` command.
 
         Will search for the previous header element and update its ID to the
-        ID defined in the ``\MLabel`` command."""
-        last_header_elem = getattr(elem.doc, "last_header_elem", None)
+        ID defined in the ``\MLabel`` command.
 
-        if last_header_elem is None:
-            log('last_header_elem undefined in '
-                'handle_mlabel with cmd_args: %s' % cmd_args,
-                level='WARNING')
-        else:
+        The command can occur in an environment that is parsed by a
+        sub-process. In this case there's no last header element and a Div/Span
+        is returned that carries the label as identifier. The parent process
+        will then extract the information and set it on the last header.
+        """
+
+        # check for previous header
+        last_header_elem = getattr(elem.doc, 'last_header_elem', None)
+        if last_header_elem:
             last_header_elem.identifier = cmd_args[0]
-
-        return []
+            return []
+        # otherwise return a div with ID can be parsed in the parent process
+        if isinstance(elem, pf.Block):
+            ret = pf.Div()
+        else:
+            ret = pf.Span()
+        ret.identifier = 'label-{}'.format(cmd_args[0])
+        ret.classes = ['label']
+        ret.attributes = {'hidden': 'hidden'}
+        return ret
 
     def handle_mref(self, cmd_args, elem):
         r"""Handle ``\MRef`` command.

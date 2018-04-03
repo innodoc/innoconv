@@ -5,34 +5,49 @@ import os
 from contextlib import contextmanager
 from io import StringIO
 import sys
-from bs4 import BeautifulSoup
+import panflute as pf
+
+from innoconv.constants import PANZER_SUPPORT_DIR, ENCODING
+from innoconv.utils import log
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.join(SCRIPT_DIR, '..', '..')
 
 
-def get_pandoc_soup(filename, filters=None):
-    """Run Pandoc with filters and parse output using BeautifulSoup."""
-    tex_source = os.path.join(SCRIPT_DIR, 'files', filename)
+def get_doc_from_markup(markup):
+    """Run panzer on markup and return Doc."""
+
+    cmd = [
+        'panzer',
+        '---panzer-support', PANZER_SUPPORT_DIR,
+        '--metadata=style:innoconv-debug',
+        '--metadata=lang:de',
+        '--from=latex+raw_tex',
+        '--to=json',
+        '--standalone',
+    ]
+
     env = os.environ.copy()
-    env['PYTHONPATH'] = ROOT_DIR
+    proc = subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env
+    )
 
-    command = ['pandoc', '--from=latex+raw_tex', '--to=html5']
+    proc.stdin.write(markup.encode(ENCODING))
+    try:
+        outs, errs = proc.communicate(timeout=30)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        outs, errs = proc.communicate()
+    err_out = errs.decode(ENCODING)
+    log('errout: {}'.format(err_out))
 
-    for _filter in filters:
-        command.append(
-            '--filter=%s' %
-            os.path.join(ROOT_DIR, '.panzer', 'filter', _filter))
-
-    command.append(tex_source)
-
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE, cwd=SCRIPT_DIR, env=env)
-    html_output = proc.stdout.read()
-    err_out = proc.stderr.read()
-    proc.communicate()
-
-    return BeautifulSoup(html_output, 'html.parser'), err_out
+    if proc.returncode != 0:
+        raise RuntimeError("Failed to run panzer!")
+    return pf.load(StringIO(outs.decode(ENCODING)))
 
 
 @contextmanager

@@ -10,7 +10,7 @@ Handle mintmod LaTeX environments.
     ``\begin{MXContent}…\end{MXContent}`` environment.
 """
 
-from innoconv.constants import ELEMENT_CLASSES
+from innoconv.constants import ELEMENT_CLASSES, REGEX_PATTERNS
 from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.elements import create_content_box, create_header
 
@@ -58,7 +58,22 @@ class Environments():
     def handle_mxcontent(self, elem_content, env_args, elem):
         r"""Handle ``\MXContent`` environment."""
         div = create_content_box(elem_content, ELEMENT_CLASSES['MXCONTENT'])
-        header = create_header(env_args[0], elem.doc, level=3, auto_id=True)
+        header = create_header(env_args[0], elem.doc, level=3)
+
+        # set identifier on header (extracted from \MLabel)
+        if div.content:
+            first_child = div.content[0]
+            try:
+                if 'label' in first_child.classes:
+                    match = REGEX_PATTERNS['LABEL'].match(
+                        first_child.identifier)
+                    if match:
+                        # set id and remove MLabel
+                        header.identifier = match.groups()[0]
+                        del div.content[0]
+            except AttributeError:
+                pass
+
         div.content.insert(0, header)
         return div
 

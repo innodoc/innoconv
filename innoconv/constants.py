@@ -13,6 +13,8 @@ REGEX_PATTERNS = {
     'ENV_ARGS': re.compile(
         r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL),
 
+    'LABEL': re.compile(r'^label-(.+)$'),
+
     # panzer output parsing
     'PANZER_OUTPUT':
         re.compile(r"----- run list -----.+? json(?:\n|\r\n?)(?P<messages>.+)"
