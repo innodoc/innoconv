@@ -9,7 +9,7 @@ import sys
 import panflute as pf
 from panflute.elements import from_json
 
-from innoconv.constants import REGEX_PATTERNS, ENCODING
+from innoconv.constants import REGEX_PATTERNS, ENCODING, INDEX_LABEL_PREFIX
 from innoconv.errors import ParseError
 
 
@@ -155,3 +155,19 @@ def parse_nested_args(string):
             start = stack.pop()
             if not stack:
                 yield string[start + 1: i]
+
+
+def swallow_mlabel(content):
+    r"""Extract identifier from \MLabel and remove it."""
+    first_child = content[0]
+    label = None
+    try:
+        if INDEX_LABEL_PREFIX in first_child.classes:
+            match = REGEX_PATTERNS['LABEL'].match(
+                first_child.identifier)
+            if match:
+                label = match.groups()[0]
+                del content[0]  # remove label
+    except AttributeError:
+        pass
+    return content, label

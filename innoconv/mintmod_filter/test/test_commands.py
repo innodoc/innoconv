@@ -4,6 +4,7 @@ import unittest
 import panflute as pf
 
 from innoconv import utils
+from innoconv.constants import INDEX_LABEL_PREFIX
 from innoconv.mintmod_filter.commands import Commands
 
 
@@ -67,8 +68,9 @@ class TestCommands(unittest.TestCase):
         elem = doc.content[0]
         ret = self.commands.handle_mlabel(['TEST_LABEL'], elem)
         self.assertIsInstance(ret, pf.Div)
-        self.assertIn('label', ret.classes)
-        self.assertEqual(ret.identifier, 'label-TEST_LABEL')
+        self.assertIn(INDEX_LABEL_PREFIX, ret.classes)
+        self.assertEqual(
+            ret.identifier, '{}-TEST_LABEL'.format(INDEX_LABEL_PREFIX))
 
     def test_handle_mlabel_last_header(self):
         """MTitle command with a last header element"""

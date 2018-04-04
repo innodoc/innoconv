@@ -4,6 +4,7 @@ import subprocess
 import os
 from contextlib import contextmanager
 from io import StringIO
+from json.decoder import JSONDecodeError
 import sys
 import panflute as pf
 
@@ -42,12 +43,16 @@ def get_doc_from_markup(markup):
     except subprocess.TimeoutExpired:
         proc.kill()
         outs, errs = proc.communicate()
-    err_out = errs.decode(ENCODING)
-    log('errout: {}'.format(err_out))
+    log('errout: {}'.format(errs.decode(ENCODING)))
 
     if proc.returncode != 0:
         raise RuntimeError("Failed to run panzer!")
-    return pf.load(StringIO(outs.decode(ENCODING)))
+
+    json_raw = outs.decode(ENCODING)
+    try:
+        return pf.load(StringIO(json_raw))
+    except JSONDecodeError:
+        log("Couldn't decode JSON: {}".format(json_raw))
 
 
 @contextmanager

@@ -101,7 +101,9 @@ class Commands():
         if last_header_elem:
             last_header_elem.identifier = cmd_args[0]
             return []
-        # otherwise return a div with ID can be parsed in the parent process
+
+        # otherwise return a div/span with ID that is parsed in the parent
+        # process
         if isinstance(elem, pf.Block):
             ret = pf.Div()
         else:

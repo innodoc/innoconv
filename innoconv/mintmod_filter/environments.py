@@ -10,10 +10,10 @@ Handle mintmod LaTeX environments.
     ``\begin{MXContent}…\end{MXContent}`` environment.
 """
 
-from innoconv.constants import ELEMENT_CLASSES, REGEX_PATTERNS
+from innoconv.constants import ELEMENT_CLASSES
 from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.elements import create_content_box, create_header
-from innoconv.utils import parse_fragment
+from innoconv.utils import parse_fragment, swallow_mlabel
 
 
 class Environments():
@@ -60,20 +60,9 @@ class Environments():
         r"""Handle ``\MXContent`` environment."""
         content = parse_fragment(elem_content)
         header = create_header(env_args[0], elem.doc, level=3)
-
-        # set identifier on header (extracted from \MLabel)
-        first_child = content[0]
-        try:
-            if 'label' in first_child.classes:
-                match = REGEX_PATTERNS['LABEL'].match(
-                    first_child.identifier)
-                if match:
-                    # set id and remove MLabel
-                    header.identifier = match.groups()[0]
-                    del content[0]
-        except AttributeError:
-            pass
-
+        content, label = swallow_mlabel(content)
+        if label:
+            header.identifier = label
         content.insert(0, header)
         return content
 

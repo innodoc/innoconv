@@ -3,6 +3,7 @@
 import unittest
 import panflute as pf
 from innoconv.test.utils import get_doc_from_markup
+from innoconv.constants import INDEX_LABEL_PREFIX
 
 TEX_MLABEL = r"""\MSubSection{foo}
 \MLabel{label1}
@@ -48,5 +49,6 @@ class TestInnoconvIntegration(unittest.TestCase):
         # Other label inside MXContent should be parsed
         another_label = para.content[2]
         self.assertIsInstance(another_label, pf.Span)
-        self.assertIn('label', another_label.classes)
-        self.assertEqual(another_label.identifier, 'label-paralabel')
+        self.assertIn(INDEX_LABEL_PREFIX, another_label.classes)
+        self.assertEqual(another_label.identifier,
+                         '{}-paralabel'.format(INDEX_LABEL_PREFIX))
