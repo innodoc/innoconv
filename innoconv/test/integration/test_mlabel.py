@@ -5,26 +5,24 @@ import panflute as pf
 from innoconv.test.utils import get_doc_from_markup
 from innoconv.constants import INDEX_LABEL_PREFIX
 
-TEX_MLABEL = r"""\MSubSection{foo}
-\MLabel{label1}
 
-\MTitle{header level 4}
-\MLabel{label2}
+class TestInnoconvIntegrationMlabel(unittest.TestCase):
 
-\begin{MXContent}{Die erste Seite}{Seite 1}{STD}
-\MLabel{LABEL_BASE_SITE_ONE}
-
-Label: \MLabel{paralabel}
-\end{MXContent}"""
-
-
-class TestInnoconvIntegration(unittest.TestCase):
-
-    def test_labels(self):
+    def test_various(self):
         """Test if a latex string containing several `MLabel` commands in
         different environments and positions are parsed correctly."""
 
-        doc = get_doc_from_markup(TEX_MLABEL)
+        doc = get_doc_from_markup(r"""\MSubSection{foo}
+            \MLabel{label1}
+
+            \MTitle{header level 4}
+            \MLabel{label2}
+
+            \begin{MXContent}{Die erste Seite}{Seite 1}{STD}
+            \MLabel{LABEL_BASE_SITE_ONE}
+
+            Label: \MLabel{paralabel}
+            \end{MXContent}""")
 
         self.assertIsInstance(doc, pf.Doc)
 
