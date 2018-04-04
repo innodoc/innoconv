@@ -69,8 +69,12 @@ $endif$
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
 jQuery(function() {
-  // bootstrap tables
+  // add some BS classes for nicer layout
   jQuery('table').addClass('table');
+  jQuery('img').addClass('img-responsive');
+  jQuery('.intro, .exercises, .exercise, .info, .experiment, .example, .hint').addClass('panel');
+  jQuery('.intro, .exercises, .exercise, .experiment, .example, .hint').addClass('panel-default');
+  jQuery('.info').addClass('panel-info');
 });
 </script>
 $for(include-after)$
