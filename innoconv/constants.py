@@ -17,7 +17,7 @@ REGEX_PATTERNS = {
 
     # panzer output parsing
     'PANZER_OUTPUT':
-        re.compile(r"----- run list -----.+? json(?:\n|\r\n?)(?P<messages>.+)"
+        re.compile(r"----- filter -----.+?json(?:\n|\r\n?)(?P<messages>.+)"
                    "----- pandoc write -----", re.MULTILINE | re.DOTALL)
 }
 

@@ -84,8 +84,7 @@ def parse_fragment(parse_string):
         for line in match.group('messages').strip().splitlines():
             log(u'↳ %s' % line.strip(), level='INFO')
     else:
-        log(u'↳ Unable to parse output: %s' % err.strip(), level='INFO')
-        raise RuntimeError("Unable to parse panzer output!")
+        raise RuntimeError("Unable to parse panzer output: {}".format(err))
 
     doc = json.loads(out, object_pairs_hook=from_json)
     return doc.content.list
