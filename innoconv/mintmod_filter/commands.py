@@ -91,9 +91,10 @@ class Commands():
         ID defined in the ``\MLabel`` command.
 
         The command can occur in an environment that is parsed by a
-        sub-process. In this case there's no last header element and a Div/Span
-        is returned that carries the label as identifier. The parent process
-        will then extract the information and set it on the last header.
+        subprocess. In this case there's no last header element. The process
+        can't set the ID because it can't access the doc tree. Instead it
+        replaces the ``\MLabel`` by an element that is found by the parent
+        process using function :py:func:`innoconv.utils.extract_identifier`.
         """
 
         # check for previous header

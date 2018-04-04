@@ -8,8 +8,23 @@ from innoconv.constants import INDEX_LABEL_PREFIX
 
 class TestInnoconvIntegrationMlabel(unittest.TestCase):
 
+    def test_minfo(self):
+        r"""Test if \MInfo gets ID from \MLabel."""
+        doc = get_doc_from_markup(r"""\begin{MInfo}
+        \MLabel{VBKM01_Intervalle}
+        Für zwei verschiedene reelle Zahlen betrachtet man insbesondere alle
+        Zahlen.
+
+        \end{MInfo}""")
+
+        self.assertIsInstance(doc, pf.Doc)
+
+        info_box = doc.content[0]
+        self.assertIsInstance(info_box, pf.Div)
+        self.assertEqual(info_box.identifier, 'VBKM01_Intervalle')
+
     def test_various(self):
-        """Test if a latex string containing several `MLabel` commands in
+        r"""Test if a latex string containing several \MLabel commands in
         different environments and positions are parsed correctly."""
 
         doc = get_doc_from_markup(r"""\MSubSection{foo}

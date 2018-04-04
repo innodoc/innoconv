@@ -157,17 +157,30 @@ def parse_nested_args(string):
                 yield string[start + 1: i]
 
 
-def swallow_mlabel(content):
-    r"""Extract identifier from \MLabel and remove it."""
+def extract_identifier(content):
+    r"""Extract identifier from content and remove annotation element.
+
+    ``\MLabel`` commands that occur within environments are parsed in a
+    child process (:py:func:`innoconv.mintmod_filter.commands.handle_mlabel`).
+    The id attribute can't be set directly as they can't access the whole doc
+    tree. As a workaround they create a fake element and add the identifier.
+    This function extracts the identifier and removes the annotation element.
+
+    :param content: List of elements
+    :type string: list
+
+    :rtype: (list, str)
+    :returns: updated content list and identifier (might be ``None``)
+    """
     first_child = content[0]
-    label = None
+    identifier = None
     try:
         if INDEX_LABEL_PREFIX in first_child.classes:
             match = REGEX_PATTERNS['LABEL'].match(
                 first_child.identifier)
             if match:
-                label = match.groups()[0]
-                del content[0]  # remove label
+                identifier = match.groups()[0]
+                del content[0]  # remove id annotation element
     except AttributeError:
         pass
-    return content, label
+    return content, identifier

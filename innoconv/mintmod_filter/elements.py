@@ -2,7 +2,7 @@
 
 from slugify import slugify
 import panflute as pf
-from innoconv.utils import destringify, parse_fragment
+from innoconv.utils import destringify, parse_fragment, extract_identifier
 
 
 def create_content_box(elem_content, elem_classes):
@@ -24,6 +24,11 @@ def create_content_box(elem_content, elem_classes):
 
     div = pf.Div(classes=elem_classes)
     content = parse_fragment(elem_content)
+
+    content, identifier = extract_identifier(content)
+    if identifier:
+        div.identifier = identifier
+
     div.content.extend(content)
     return div
 

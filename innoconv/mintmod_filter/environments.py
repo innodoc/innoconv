@@ -13,7 +13,7 @@ Handle mintmod LaTeX environments.
 from innoconv.constants import ELEMENT_CLASSES
 from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.elements import create_content_box, create_header
-from innoconv.utils import parse_fragment, swallow_mlabel
+from innoconv.utils import parse_fragment, extract_identifier
 
 
 class Environments():
@@ -60,9 +60,9 @@ class Environments():
         r"""Handle ``\MXContent`` environment."""
         content = parse_fragment(elem_content)
         header = create_header(env_args[0], elem.doc, level=3)
-        content, label = swallow_mlabel(content)
-        if label:
-            header.identifier = label
+        content, identifier = extract_identifier(content)
+        if identifier:
+            header.identifier = identifier
         content.insert(0, header)
         return content
 
