@@ -4,6 +4,9 @@ import re
 import os
 
 
+#: Element class for index labels
+INDEX_LABEL_PREFIX = 'index-label'
+
 #: Regular expressions
 REGEX_PATTERNS = {
     # latex parsing
@@ -13,7 +16,7 @@ REGEX_PATTERNS = {
     'ENV_ARGS': re.compile(
         r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL),
 
-    'LABEL': re.compile(r'^label-(.+)$'),
+    'LABEL': re.compile(r'^{}-(.+)$'.format(INDEX_LABEL_PREFIX)),
     'STRIP_HASH_LINE': re.compile(r'^\%(\r\n|\r|\n)'),
 
     # panzer output parsing

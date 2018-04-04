@@ -12,7 +12,7 @@ Handle mintmod LaTeX commands.
 import panflute as pf
 from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
-                                REGEX_PATTERNS)
+                                REGEX_PATTERNS, INDEX_LABEL_PREFIX)
 from innoconv.utils import destringify, parse_fragment
 from innoconv.mintmod_filter.elements import create_header
 
@@ -106,8 +106,8 @@ class Commands():
             ret = pf.Div()
         else:
             ret = pf.Span()
-        ret.identifier = 'label-{}'.format(cmd_args[0])
-        ret.classes = ['label']
+        ret.identifier = '{}-{}'.format(INDEX_LABEL_PREFIX, cmd_args[0])
+        ret.classes = [INDEX_LABEL_PREFIX]
         ret.attributes = {'hidden': 'hidden'}
         return ret
 
