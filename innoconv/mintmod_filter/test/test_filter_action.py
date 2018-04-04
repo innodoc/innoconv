@@ -2,7 +2,6 @@
 
 import unittest
 import panflute as pf
-from innoconv.constants import ELEMENT_CLASSES
 from innoconv.errors import ParseError
 from innoconv.mintmod_filter.filter_action import MintmodFilterAction
 
@@ -69,12 +68,9 @@ class TestFilterAction(unittest.TestCase):
             format='latex')])
         elem_env = self.doc.content[0]  # this sets up elem.parent
         ret = self._filter_elem([elem_env], elem_env)
-        self.assertIsInstance(ret, pf.Div)
-        self.assertIsInstance(ret.content[0], pf.Header)
-        self.assertIsInstance(ret.content[1], pf.Para)
-        for cls in ELEMENT_CLASSES['MXCONTENT']:
-            with self.subTest(cls=cls):
-                self.assertIn(cls, ret.classes)
+        self.assertIsInstance(ret, list)
+        self.assertIsInstance(ret[0], pf.Header)
+        self.assertIsInstance(ret[1], pf.Para)
 
     def test_unknown_environment(self):
         """filter() handles unknown LaTeX environment"""

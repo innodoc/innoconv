@@ -3,7 +3,6 @@
 import unittest
 import panflute as pf
 from innoconv.test.utils import get_doc_from_markup
-from innoconv.utils import log
 
 TEX_MLABEL = r"""\MSubSection{foo}
 \MLabel{label1}
@@ -26,8 +25,6 @@ class TestInnoconvIntegration(unittest.TestCase):
 
         doc = get_doc_from_markup(TEX_MLABEL)
 
-        log(doc.to_json())
-
         self.assertIsInstance(doc, pf.Doc)
 
         header1 = doc.content[0]
@@ -38,18 +35,18 @@ class TestInnoconvIntegration(unittest.TestCase):
         self.assertIsInstance(header2, pf.Header)
         self.assertEqual(header2.identifier, 'label2')
 
-        # content div header should receive id from \MLabel command
-        content_div = doc.content[2]
-        header3 = content_div.content[0]
+        # header for \MXContent should receive id from \MLabel command
+        header3 = doc.content[2]
         self.assertIsInstance(header3, pf.Header)
         self.assertEqual(header3.identifier, 'LABEL_BASE_SITE_ONE')
 
+        para = doc.content[3]
+
         # \MLabel command should be removed
-        first_child = content_div.content[1]
-        self.assertIsInstance(first_child, pf.Para)
+        self.assertIsInstance(para, pf.Para)
 
         # Other label inside MXContent should be parsed
-        another_label = first_child.content[2]
+        another_label = para.content[2]
         self.assertIsInstance(another_label, pf.Span)
         self.assertIn('label', another_label.classes)
         self.assertEqual(another_label.identifier, 'label-paralabel')

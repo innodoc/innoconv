@@ -13,6 +13,7 @@ Handle mintmod LaTeX environments.
 from innoconv.constants import ELEMENT_CLASSES, REGEX_PATTERNS
 from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.elements import create_content_box, create_header
+from innoconv.utils import parse_fragment
 
 
 class Environments():
@@ -57,25 +58,24 @@ class Environments():
 
     def handle_mxcontent(self, elem_content, env_args, elem):
         r"""Handle ``\MXContent`` environment."""
-        div = create_content_box(elem_content, ELEMENT_CLASSES['MXCONTENT'])
+        content = parse_fragment(elem_content)
         header = create_header(env_args[0], elem.doc, level=3)
 
         # set identifier on header (extracted from \MLabel)
-        if div.content:
-            first_child = div.content[0]
-            try:
-                if 'label' in first_child.classes:
-                    match = REGEX_PATTERNS['LABEL'].match(
-                        first_child.identifier)
-                    if match:
-                        # set id and remove MLabel
-                        header.identifier = match.groups()[0]
-                        del div.content[0]
-            except AttributeError:
-                pass
+        first_child = content[0]
+        try:
+            if 'label' in first_child.classes:
+                match = REGEX_PATTERNS['LABEL'].match(
+                    first_child.identifier)
+                if match:
+                    # set id and remove MLabel
+                    header.identifier = match.groups()[0]
+                    del content[0]
+        except AttributeError:
+            pass
 
-        div.content.insert(0, header)
-        return div
+        content.insert(0, header)
+        return content
 
     def handle_mintro(self, elem_content, env_args, elem):
         r"""Handle ``\MIntro`` environment."""

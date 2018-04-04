@@ -73,22 +73,18 @@ class TestMxContent(unittest.TestCase):
         ret = self.environments.handle_mxcontent(
             'Foo bar', ['Nice title', 'Short title', 'STD'], self.elem)
 
-        self.assertIsInstance(ret, pf.Div)
+        self.assertIsInstance(ret, list)
 
-        header = ret.content[0]
+        header = ret[0]
         self.assertIsInstance(header, pf.Header)
         self.assertEqual(pf.stringify(header), 'Nice title')
 
-        para = ret.content[1]
+        para = ret[1]
         self.assertIsInstance(para.content[0], pf.Str)
         self.assertIsInstance(para.content[1], pf.Space)
         self.assertIsInstance(para.content[2], pf.Str)
         self.assertEqual(para.content[0].text, 'Foo')
         self.assertEqual(para.content[2].text, 'bar')
-
-        for cls in ELEMENT_CLASSES['MXCONTENT']:
-            with self.subTest(cls=cls):
-                self.assertIn(cls, ret.classes)  # pylint: disable=no-member
 
 
 class TestBoxesWithoutTitle(unittest.TestCase):

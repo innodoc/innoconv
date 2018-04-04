@@ -27,7 +27,6 @@ ELEMENT_CLASSES = {
     'IMAGE': ['img'],
     'DEBUG_UNKNOWN_CMD': ['innoconv-debug-unknown-command'],
     'DEBUG_UNKNOWN_ENV': ['innoconv-debug-unknown-environment'],
-    'MXCONTENT': ['content'],
     'MINTRO': ['content', 'intro'],
     'MEXERCISES': ['content', 'exercises'],
     'MEXERCISE': ['panel', 'panel-default', 'exercise'],
