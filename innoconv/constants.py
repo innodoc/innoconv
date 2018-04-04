@@ -14,6 +14,7 @@ REGEX_PATTERNS = {
         r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL),
 
     'LABEL': re.compile(r'^label-(.+)$'),
+    'STRIP_HASH_LINE': re.compile(r'^\%(\r\n|\r|\n)'),
 
     # panzer output parsing
     'PANZER_OUTPUT':

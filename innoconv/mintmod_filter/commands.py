@@ -11,7 +11,8 @@ Handle mintmod LaTeX commands.
 
 import panflute as pf
 from slugify import slugify
-from innoconv.constants import ELEMENT_CLASSES, MINTMOD_SUBJECTS
+from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
+                                REGEX_PATTERNS)
 from innoconv.utils import destringify, parse_fragment
 from innoconv.mintmod_filter.elements import create_header
 
@@ -228,6 +229,16 @@ class Commands():
             classes=ELEMENT_CLASSES['MYOUTUBE_VIDEO'],
             attributes=attrs
         )
+
+    def handle_mtikzauto(self, cmd_args, elem):
+        r"""Handle ``\MTikzAuto`` command.
+
+        Create a ``CodeBlock`` with TikZ code.
+        """
+        tikz_code = REGEX_PATTERNS['STRIP_HASH_LINE'].sub('', cmd_args[0])
+        ret = pf.CodeBlock(tikz_code)
+        ret.classes = ['tikz']
+        return ret
 
     ###########################################################################
     # Misc elements
