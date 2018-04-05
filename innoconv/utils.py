@@ -167,7 +167,7 @@ def extract_identifier(content):
     This function extracts the identifier and removes the annotation element.
 
     :param content: List of elements
-    :type string: list
+    :type content: list
 
     :rtype: (list, str)
     :returns: updated content list and identifier (might be ``None``)
