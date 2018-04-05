@@ -31,7 +31,6 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(last_header_elem.content[2].text, 'Test')
         self.assertIsInstance(last_header_elem.content[4], pf.Str)
         self.assertEqual(last_header_elem.content[4].text, 'Title')
-        self.assertEqual(last_header_elem.identifier, "a-test-title")
         self.assertEqual(last_header_elem.level, 2)
 
     def test_handle_msubsection(self):
@@ -45,7 +44,6 @@ class TestCommands(unittest.TestCase):
         self.assertIsInstance(ret.content[1], pf.Space)
         self.assertIsInstance(ret.content[2], pf.Str)
         self.assertEqual(ret.content[2].text, 'title')
-        self.assertEqual(ret.identifier, 'foo-title')
         self.assertEqual(ret.level, 3)
 
     def test_handle_mtitle(self):
@@ -59,7 +57,6 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.content[0].text, u'Schöne')
         self.assertIsInstance(ret.content[6], pf.Str)
         self.assertEqual(ret.content[6].text, u'Maß?')
-        self.assertEqual(ret.identifier, 'schone-titel-nach-mass')
         self.assertEqual(ret.level, 4)
 
     def test_handle_mlabel_no_last_header(self):
@@ -81,6 +78,7 @@ class TestCommands(unittest.TestCase):
         elem = doc.content[0]
         ret = self.commands.handle_mlabel(['HEADER'], elem)
         self.assertFalse(ret)
+        # pylint: disable=no-member
         self.assertEqual(header.identifier, 'HEADER')
 
     def test_handle_special_html(self):

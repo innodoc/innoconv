@@ -70,7 +70,7 @@ class Environments():
         r"""Handle ``\MIntro`` environment."""
         div = create_content_box(elem_content, ELEMENT_CLASSES['MINTRO'])
         title = 'Einführung'  # TODO: I18n
-        header = create_header(title, elem.doc, level=3, auto_id=True)
+        header = create_header(title, elem.doc, level=3)
         div.content.insert(0, header)
         return div
 

@@ -32,7 +32,7 @@ class TestMsectionStart(unittest.TestCase):
         """Should handle MSectionStart"""
 
         # mock a preceding header
-        create_header('foo', level=2, doc=self.elem.doc, auto_id=True)
+        create_header('foo', level=2, doc=self.elem.doc)
 
         ret = self.environments.handle_msectionstart(
             'Lorem ipsum', [], self.elem)

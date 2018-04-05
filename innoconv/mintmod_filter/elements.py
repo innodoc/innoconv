@@ -1,6 +1,5 @@
 """Convenience functions for creating common elements."""
 
-from slugify import slugify
 import panflute as pf
 from innoconv.utils import destringify, parse_fragment, extract_identifier
 
@@ -33,7 +32,7 @@ def create_content_box(elem_content, elem_classes):
     return div
 
 
-def create_header(title_str, doc, level=0, auto_id=False):
+def create_header(title_str, doc, level=0):
     """
     Create a header element.
 
@@ -45,7 +44,5 @@ def create_header(title_str, doc, level=0, auto_id=False):
 
     title = destringify(title_str)
     header = pf.Header(*title, level=level)
-    if auto_id:
-        header.identifier = slugify(title_str)
     doc.last_header_elem = header
     return header

@@ -47,19 +47,19 @@ class Commands():
 
         ``\MSectionStart`` environment will use this information later.
         """
-        create_header(cmd_args[0], level=2, doc=elem.doc, auto_id=True)
+        create_header(cmd_args[0], level=2, doc=elem.doc)
         return []
 
     def handle_msubsection(self, cmd_args, elem):
         r"""Handle ``\MSubsection``"""
-        return create_header(cmd_args[0], level=3, doc=elem.doc, auto_id=True)
+        return create_header(cmd_args[0], level=3, doc=elem.doc)
 
     def handle_mtitle(self, cmd_args, elem):
         r"""Handle ``\MTitle`` command.
 
         These is an equivalent to ``\subsubsection``
         """
-        return create_header(cmd_args[0], level=4, doc=elem.doc, auto_id=True)
+        return create_header(cmd_args[0], level=4, doc=elem.doc)
 
     ###########################################################################
     # Metadata
