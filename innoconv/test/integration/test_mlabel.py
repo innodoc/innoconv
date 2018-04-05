@@ -34,6 +34,43 @@ class TestInnoconvIntegrationMlabel(unittest.TestCase):
         self.assertIsInstance(info_box, pf.Div)
         self.assertEqual(info_box.identifier, 'VBKM01_Intervalle')
 
+    def test_minfo_without_id(self):
+        r"""\MInfo should not have ID without \MLabel."""
+
+        doc = get_doc_from_markup(r"""\begin{MInfo}
+        Foo bar
+        \end{MInfo}""")
+        self.assertIsInstance(doc, pf.Doc)
+        info_box = doc.content[0]
+        self.assertIsInstance(info_box, pf.Div)
+        self.assertEqual(info_box.identifier, '')
+
+    def test_mexample(self):
+        r"""Test if \MExample gets ID from \MLabel."""
+
+        doc = get_doc_from_markup(r"""\begin{MExample}
+        \MLabel{great-example}
+        Sind keine Klammern gesetzt, so wird $a^{p^q}$ als $a^{(p^q)}$
+        interpretiert.
+        \end{MExample}""")
+        self.assertIsInstance(doc, pf.Doc)
+        info_box = doc.content[0]
+        self.assertIsInstance(info_box, pf.Div)
+        self.assertEqual(info_box.identifier, 'great-example')
+
+    def test_mexercises(self):
+        r"""Test if \MExercises gets ID from \MLabel."""
+
+        doc = get_doc_from_markup(r"""\begin{MExercises}
+        \MLabel{VBKM01_AufgabenUmformen}
+        Im folgenden \MSRef{VBKM01_AufgabenUmformen}{Aufgabenabschnitt} können
+        Sie die Umformungstechniken an zahlreichen Aufgaben einüben.
+        \end{MExercises}""")
+        self.assertIsInstance(doc, pf.Doc)
+        info_box = doc.content[0]
+        self.assertIsInstance(info_box, pf.Div)
+        self.assertEqual(info_box.identifier, 'VBKM01_AufgabenUmformen')
+
     def test_various(self):
         r"""Test if a latex string containing several \MLabel commands in
         different environments and positions are parsed correctly."""
