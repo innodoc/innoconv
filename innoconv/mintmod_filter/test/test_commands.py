@@ -19,19 +19,15 @@ class TestCommands(unittest.TestCase):
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msection(['A Test Title'], elem)
 
-        self.assertEqual(ret, [])
-
-        last_header_elem = getattr(doc, 'last_header_elem')
-
-        self.assertIsInstance(last_header_elem, pf.Header)
-        self.assertIsInstance(last_header_elem.content[0], pf.Str)
-        self.assertEqual(last_header_elem.content[0].text, 'A')
-        self.assertIsInstance(last_header_elem.content[1], pf.Space)
-        self.assertIsInstance(last_header_elem.content[2], pf.Str)
-        self.assertEqual(last_header_elem.content[2].text, 'Test')
-        self.assertIsInstance(last_header_elem.content[4], pf.Str)
-        self.assertEqual(last_header_elem.content[4].text, 'Title')
-        self.assertEqual(last_header_elem.level, 2)
+        self.assertIsInstance(ret, pf.Header)
+        self.assertEqual(ret.level, 2)
+        self.assertIsInstance(ret.content[0], pf.Str)
+        self.assertEqual(ret.content[0].text, 'A')
+        self.assertIsInstance(ret.content[1], pf.Space)
+        self.assertIsInstance(ret.content[2], pf.Str)
+        self.assertEqual(ret.content[2].text, 'Test')
+        self.assertIsInstance(ret.content[4], pf.Str)
+        self.assertEqual(ret.content[4].text, 'Title')
 
     def test_handle_msubsection(self):
         """MSubsection command"""

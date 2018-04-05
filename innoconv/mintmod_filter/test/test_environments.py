@@ -3,9 +3,7 @@
 import unittest
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
-from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.environments import Environments
-from innoconv.mintmod_filter.elements import create_header
 
 
 class TestMsectionStart(unittest.TestCase):
@@ -21,38 +19,18 @@ class TestMsectionStart(unittest.TestCase):
             [pf.RawBlock(self.elem_content, format='latex')])
         self.elem = self.doc.content[0]  # this sets up elem.parent
 
-    def test_msectionstart_no_header(self):
-        """handle_msectionstart should raise NoPrecedingHeader if there's no
-        header"""
-        with self.assertRaises(NoPrecedingHeader):
-            self.environments.handle_msectionstart(
-                'Lorem ipsum', [], self.elem)
-
     def test_msectionstart(self):
         """Should handle MSectionStart"""
 
-        # mock a preceding header
-        create_header('foo', level=2, doc=self.elem.doc)
-
         ret = self.environments.handle_msectionstart(
-            'Lorem ipsum', [], self.elem)
+            'Lorem ipsum', [], self.elem)[0]
 
-        self.assertIsInstance(ret, pf.Div)
-
-        header = ret.content[0]
-        self.assertIsInstance(header, pf.Header)
-        self.assertEqual(pf.stringify(header), 'foo')
-
-        para = ret.content[1]
-        self.assertIsInstance(para.content[0], pf.Str)
-        self.assertIsInstance(para.content[1], pf.Space)
-        self.assertIsInstance(para.content[2], pf.Str)
-        self.assertEqual(para.content[0].text, 'Lorem')
-        self.assertEqual(para.content[2].text, 'ipsum')
-
-        for cls in ELEMENT_CLASSES['MSECTIONSTART']:
-            with self.subTest(cls=cls):
-                self.assertIn(cls, ret.classes)  # pylint: disable=no-member
+        self.assertIsInstance(ret, pf.Para)
+        self.assertIsInstance(ret.content[0], pf.Str)
+        self.assertEqual(ret.content[0].text, 'Lorem')
+        self.assertIsInstance(ret.content[1], pf.Space)
+        self.assertIsInstance(ret.content[2], pf.Str)
+        self.assertEqual(ret.content[2].text, 'ipsum')
 
 
 class TestMxContent(unittest.TestCase):

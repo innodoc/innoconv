@@ -43,12 +43,8 @@ class Commands():
     # Sections
 
     def handle_msection(self, cmd_args, elem):
-        r"""Remember ``\MSection`` name for later.
-
-        ``\MSectionStart`` environment will use this information later.
-        """
-        create_header(cmd_args[0], level=2, doc=elem.doc)
-        return []
+        r"""Handle ``\MSection`` command."""
+        return create_header(cmd_args[0], level=2, doc=elem.doc)
 
     def handle_msubsection(self, cmd_args, elem):
         r"""Handle ``\MSubsection``"""

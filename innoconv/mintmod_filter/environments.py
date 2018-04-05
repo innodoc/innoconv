@@ -11,7 +11,6 @@ Handle mintmod LaTeX environments.
 """
 
 from innoconv.constants import ELEMENT_CLASSES
-from innoconv.errors import NoPrecedingHeader
 from innoconv.mintmod_filter.elements import create_content_box, create_header
 from innoconv.utils import parse_fragment, extract_identifier
 
@@ -42,19 +41,7 @@ class Environments():
 
     def handle_msectionstart(self, elem_content, env_args, elem):
         r"""Handle ``\MSectionStart`` environment."""
-
-        div = create_content_box(
-            elem_content, ELEMENT_CLASSES['MSECTIONSTART'])
-
-        # Insert header created by previous \MSection command
-        header = getattr(elem.doc, 'last_header_elem', None)
-        if header:
-            div.content.insert(0, header)
-        else:
-            raise NoPrecedingHeader(
-                'MSectionStart must precede a header element.')
-
-        return div
+        return parse_fragment(elem_content)
 
     def handle_mxcontent(self, elem_content, env_args, elem):
         r"""Handle ``\MXContent`` environment."""

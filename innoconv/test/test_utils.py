@@ -8,7 +8,7 @@ import panflute as pf
 
 from innoconv.errors import ParseError
 from innoconv.utils import (parse_fragment, destringify, parse_cmd,
-                            parse_nested_args)
+                            parse_nested_args, remove_empty_paragraphs)
 from innoconv.test.utils import captured_output
 
 CONTENT = r"""
@@ -230,3 +230,22 @@ class TestParseNestedArgs(unittest.TestCase):
             r'{cont}{}{\foo{\bla{\stop}}}{\baz{}{}{}}'))
         self.assertEqual(cmd_args,
                          ['cont', '', r'\foo{\bla{\stop}}', r'\baz{}{}{}'])
+
+
+class TestRemoveEmptyParagraphs(unittest.TestCase):
+
+    def test_remove_empty_paragraphs(self):
+        """It should remove empty paras in document"""
+        doc = pf.Doc(
+            pf.Para(pf.Str('Foo'), pf.Space(), pf.Str('Bar')),
+            pf.Para(),
+            pf.Para(pf.Str('Bar'), pf.Space(), pf.Str('Baz')),
+        )
+        remove_empty_paragraphs(doc)
+        self.assertEqual(len(doc.content), 2)
+        para1 = doc.content[0]
+        self.assertEqual(para1.content[0].text, 'Foo')
+        self.assertEqual(para1.content[2].text, 'Bar')
+        para2 = doc.content[1]
+        self.assertEqual(para2.content[0].text, 'Bar')
+        self.assertEqual(para2.content[2].text, 'Baz')

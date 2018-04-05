@@ -8,6 +8,35 @@ from innoconv.constants import INDEX_LABEL_PREFIX
 
 class TestInnoconvIntegrationMlabel(unittest.TestCase):
 
+    def test_msection(self):
+        r"""Test if \MSection gets ID from \MLabel."""
+
+        doc = get_doc_from_markup(r"""\MSection{Elementares Rechnen}
+        \MLabel{VBKM01}
+        \MSetSectionID{VBKM01} % wird fuer tikz-Dateien verwendet
+
+        \begin{MSectionStart}
+        \MDeclareSiteUXID{VBKM01_START}
+        foo Bar
+        \end{MSectionStart}
+        """)
+        self.assertIsInstance(doc, pf.Doc)
+        header = doc.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertIsInstance(header.content[0], pf.Str)
+        self.assertEqual(header.content[0].text, 'Elementares')
+        self.assertIsInstance(header.content[1], pf.Space)
+        self.assertIsInstance(header.content[2], pf.Str)
+        self.assertEqual(header.content[2].text, 'Rechnen')
+        self.assertEqual(header.identifier, 'VBKM01')
+        para = doc.content[1]
+        self.assertIsInstance(para, pf.Para)
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertEqual(para.content[0].text, 'foo')
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[2].text, 'Bar')
+
     def test_msubsection(self):
         r"""Test if \MSubsection gets ID from \MLabel."""
 

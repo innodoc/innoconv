@@ -38,7 +38,6 @@ ELEMENT_CLASSES = {
     'MEXAMPLE': ['example'],
     'MHINT': ['hint'],
     'MINPUTHINT': ['hint-text'],
-    'MSECTIONSTART': ['section-start'],
     'MYOUTUBE_VIDEO': ['video', 'video-youtube'],
 }
 

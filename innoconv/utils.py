@@ -184,3 +184,17 @@ def extract_identifier(content):
     except AttributeError:
         pass
     return content, identifier
+
+
+def remove_empty_paragraphs(doc):
+    """Remove empty paragraphs from document.
+
+    :param doc: Document
+    :type doc: :py:class:`panflute.elements.Doc`
+    """
+    # pylint: disable=unused-argument,missing-docstring
+    def rem_para(elem, doc):
+        if isinstance(elem, pf.Para) and not elem.content:
+            return []  # delete element
+        return None
+    doc.walk(rem_para)
