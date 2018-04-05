@@ -3,7 +3,7 @@
 import unittest
 import panflute as pf
 from innoconv.test.utils import get_doc_from_markup
-from innoconv.constants import INDEX_LABEL_PREFIX
+from innoconv.constants import ELEMENT_CLASSES, INDEX_LABEL_PREFIX
 
 
 class TestInnoconvIntegrationMlabel(unittest.TestCase):
@@ -99,6 +99,22 @@ class TestInnoconvIntegrationMlabel(unittest.TestCase):
         info_box = doc.content[0]
         self.assertIsInstance(info_box, pf.Div)
         self.assertEqual(info_box.identifier, 'VBKM01_AufgabenUmformen')
+
+    def test_mgraphics(self):
+        r"""Test if \MGraphics gets ID from \MLabel."""
+        doc = get_doc_from_markup(
+            r"\MGraphicsSolo{test.png}{scale=1}\MLabel{G_TEST}")
+
+        div = doc.content[0]
+        self.assertIsInstance(div, pf.Div)
+        for cls in ELEMENT_CLASSES['FIGURE']:
+            self.assertIn(cls, div.classes)
+        self.assertEqual(div.identifier, 'G_TEST')
+
+        img = div.content[0].content[0]
+        self.assertIsInstance(img, pf.Image)
+        for cls in ELEMENT_CLASSES['IMAGE']:
+            self.assertIn(cls, img.classes)
 
     def test_various(self):
         r"""Test if a latex string containing several \MLabel commands in

@@ -39,7 +39,7 @@ def get_panzer_bin():
     return panzer_bin
 
 
-def parse_fragment(parse_string):
+def parse_fragment(parse_string, as_doc=False):
     """Parse a source fragment using panzer.
 
     :param parse_string: Source fragment
@@ -87,6 +87,9 @@ def parse_fragment(parse_string):
         raise RuntimeError("Unable to parse panzer output: {}".format(err))
 
     doc = json.loads(out, object_pairs_hook=from_json)
+
+    if as_doc:
+        return doc
     return doc.content.list
 
 
@@ -198,3 +201,18 @@ def remove_empty_paragraphs(doc):
             return []  # delete element
         return None
     doc.walk(rem_para)
+
+
+def remember_element(doc, elem):
+    """Rememember an element in the document for later."""
+    doc.remembered_element = elem
+
+
+def get_remembered_element(doc):
+    """Retrieve rememembered element from the document and forget it."""
+    try:
+        elem = doc.remembered_element
+    except AttributeError:
+        return None
+    del doc.remembered_element
+    return elem

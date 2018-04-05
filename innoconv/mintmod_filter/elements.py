@@ -1,7 +1,8 @@
 """Convenience functions for creating common elements."""
 
 import panflute as pf
-from innoconv.utils import destringify, parse_fragment, extract_identifier
+from innoconv.utils import (destringify, parse_fragment, extract_identifier,
+                            remember_element)
 
 
 def create_content_box(elem_content, elem_classes):
@@ -38,12 +39,12 @@ def create_header(title_str, doc, level=0):
     Create a header element.
 
     Because headers need to be referenced by later elements, references to the
-    last found header is stored in the doc.
+    last found header is remembered.
     """
     if not isinstance(doc, pf.Doc):
         raise ValueError('create_title without Doc element')
 
     title = destringify(title_str)
     header = pf.Header(*title, level=level)
-    doc.last_header_elem = header
+    remember_element(doc, header)
     return header

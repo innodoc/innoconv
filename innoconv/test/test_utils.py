@@ -8,7 +8,8 @@ import panflute as pf
 
 from innoconv.errors import ParseError
 from innoconv.utils import (parse_fragment, destringify, parse_cmd,
-                            parse_nested_args, remove_empty_paragraphs)
+                            parse_nested_args, remove_empty_paragraphs,
+                            remember_element, get_remembered_element)
 from innoconv.test.utils import captured_output
 
 CONTENT = r"""
@@ -249,3 +250,24 @@ class TestRemoveEmptyParagraphs(unittest.TestCase):
         para2 = doc.content[1]
         self.assertEqual(para2.content[0].text, 'Bar')
         self.assertEqual(para2.content[2].text, 'Baz')
+
+
+class TestRememberElement(unittest.TestCase):
+
+    def test_remember_element(self):
+        """It should remember and forget elements."""
+        doc = pf.Doc()
+
+        self.assertIsNone(get_remembered_element(doc))
+
+        header = pf.Header()
+        remember_element(doc, header)
+        rememembered_el = get_remembered_element(doc)
+        self.assertEqual(rememembered_el, header)
+        self.assertIsNone(get_remembered_element(doc))
+
+        img = pf.Image()
+        remember_element(doc, img)
+        rememembered_img = get_remembered_element(doc)
+        self.assertEqual(rememembered_img, img)
+        self.assertIsNone(get_remembered_element(doc))

@@ -13,7 +13,8 @@ import panflute as pf
 from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
-from innoconv.utils import destringify, parse_fragment
+from innoconv.utils import (destringify, parse_fragment,
+                            get_remembered_element, remember_element)
 from innoconv.mintmod_filter.elements import create_header
 
 
@@ -93,11 +94,14 @@ class Commands():
         process using function :py:func:`innoconv.utils.extract_identifier`.
         """
 
-        # check for previous header
-        last_header_elem = getattr(elem.doc, 'last_header_elem', None)
-        if last_header_elem:
-            last_header_elem.identifier = cmd_args[0]
+        identifier = cmd_args[0]
+
+        # attach identifier to previous element
+        try:
+            get_remembered_element(elem.doc).identifier = identifier
             return []
+        except AttributeError:
+            pass
 
         # otherwise return a div/span with ID that is parsed in the parent
         # process
@@ -105,7 +109,7 @@ class Commands():
             ret = pf.Div()
         else:
             ret = pf.Span()
-        ret.identifier = '{}-{}'.format(INDEX_LABEL_PREFIX, cmd_args[0])
+        ret.identifier = '{}-{}'.format(INDEX_LABEL_PREFIX, identifier)
         ret.classes = [INDEX_LABEL_PREFIX]
         ret.attributes = {'hidden': 'hidden'}
         return ret
@@ -183,36 +187,51 @@ class Commands():
     ###########################################################################
     # Media
 
+    def handle_mgraphics(self, cmd_args, elem, add_desc=True):
+        r"""Handle ``\MGraphics``.
+
+        Embed an image with title.
+
+        Example: \MGraphics{img.png}{scale=1}{title}
+        """
+        filename = cmd_args[0]
+        desc = parse_fragment(cmd_args[2], as_doc=True)
+        img = pf.Image(url=filename, title=pf.stringify(desc).strip(),
+                       classes=ELEMENT_CLASSES['IMAGE'])
+        # inline
+        if isinstance(elem, pf.RawInline):
+            remember_element(elem.doc, img)
+            return img
+        # block
+        img_content = pf.Plain(img)
+        div = pf.Div(img_content, classes=ELEMENT_CLASSES['FIGURE'])
+        if add_desc:
+            div.content.append(desc.content[0])
+        remember_element(elem.doc, div)
+        return div
+
+    def handle_mgraphicssolo(self, cmd_args, elem):
+        r"""Handle ``\MGraphicsSolo``.
+
+        Embed an image without title.
+        """
+        # use filename as title
+        new_cmd_args = [cmd_args[0], None, cmd_args[0], None]
+        return self.handle_mgraphics(new_cmd_args, elem, add_desc=False)
+
     def handle_mugraphics(self, cmd_args, elem):
         r"""Handle ``\MUGraphics``.
 
         Embed an image with title.
         """
-        filename = cmd_args[0]
-        title = cmd_args[2]
-        img = pf.Image(url=filename, title=title)
-        # inline
-        if isinstance(elem, pf.RawInline):
-            return img
-        # block
-        div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
-        div.content.extend([pf.Plain(img)])
-        return div
+        return self.handle_mgraphics([cmd_args[0], None, cmd_args[2]], elem)
 
     def handle_mugraphicssolo(self, cmd_args, elem):
         r"""Handle ``\MUGraphicsSolo``.
 
         Embed an image without title.
         """
-        filename = cmd_args[0]
-        img = pf.Image(url=filename)
-        # inline
-        if isinstance(elem, pf.RawInline):
-            return img
-        # block
-        div = pf.Div(classes=ELEMENT_CLASSES['IMAGE'])
-        div.content.extend([pf.Plain(img)])
-        return div
+        return self.handle_mgraphicssolo(cmd_args, elem)
 
     def handle_myoutubevideo(self, cmd_args, elem):
         r"""Handle ``\MYoutubeVideo``.

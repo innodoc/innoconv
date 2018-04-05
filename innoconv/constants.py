@@ -28,6 +28,7 @@ REGEX_PATTERNS = {
 #: Element classes
 ELEMENT_CLASSES = {
     'IMAGE': ['img'],
+    'FIGURE': ['figure'],
     'DEBUG_UNKNOWN_CMD': ['innoconv-debug-unknown-command'],
     'DEBUG_UNKNOWN_ENV': ['innoconv-debug-unknown-environment'],
     'MINTRO': ['intro'],
