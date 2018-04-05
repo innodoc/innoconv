@@ -254,8 +254,11 @@ class Commands():
         Create a ``CodeBlock`` with TikZ code.
         """
         tikz_code = REGEX_PATTERNS['STRIP_HASH_LINE'].sub('', cmd_args[0])
-        ret = pf.CodeBlock(tikz_code)
-        ret.classes = ['tikz']
+        if isinstance(elem, pf.Inline):
+            ret = pf.Code(tikz_code)
+        else:
+            ret = pf.CodeBlock(tikz_code)
+        ret.classes = ELEMENT_CLASSES['MTIKZAUTO']
         return ret
 
     ###########################################################################

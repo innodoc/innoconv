@@ -39,6 +39,7 @@ ELEMENT_CLASSES = {
     'MEXAMPLE': ['example'],
     'MHINT': ['hint'],
     'MINPUTHINT': ['hint-text'],
+    'MTIKZAUTO': ['tikz'],
     'MYOUTUBE_VIDEO': ['video', 'video-youtube'],
 }
 
