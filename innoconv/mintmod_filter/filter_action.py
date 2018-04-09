@@ -108,12 +108,19 @@ class MintmodFilterAction:
         # Parse optional arguments
         env_args = []
         rest = inner_code
-        while True:
-            match = REGEX_PATTERNS['ENV_ARGS'].search(rest)
-            if match is None:
-                break
-            env_args.append(match.group('arg'))
-            rest = match.group('rest')
+        if inner_code.startswith('{'):
+            stack = []
+            for i, cha in enumerate(rest):
+                if not stack and cha != '{':
+                    break
+                elif cha == '{':
+                    stack.append(i)
+                elif cha == '}' and stack:
+                    start = stack.pop()
+                    if not stack:
+                        env_args.append(rest[start + 1: i])
+            chars_to_remove = len(''.join(env_args)) + 2 * len(env_args)
+            rest = rest[chars_to_remove:]
 
         function_name = 'handle_%s' % slugify(env_name)
         func = getattr(self._environments, function_name, None)

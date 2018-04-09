@@ -72,6 +72,29 @@ class TestFilterAction(unittest.TestCase):
         self.assertIsInstance(ret[0], pf.Header)
         self.assertIsInstance(ret[1], pf.Para)
 
+    def test_known_environment_nested_arg(self):
+        """filter() handles known LaTeX environment argument containing
+        commands"""
+        self.doc.content.extend([pf.RawBlock(
+            r'\begin{MXInfo}{Ableitung von $x^{\frac{1}{n}}$}'
+            'FOOBARCONTENT'
+            r'\end{MXInfo}',
+            format='latex')])
+        elem_env = self.doc.content[0]  # this sets up elem.parent
+        ret = self._filter_elem([elem_env], elem_env)
+        self.assertIsInstance(ret, pf.Div)
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertIsInstance(header.content[0], pf.Str)
+        self.assertEqual(header.content[0].text, 'Ableitung')
+        self.assertIsInstance(header.content[1], pf.Space)
+        self.assertIsInstance(header.content[2], pf.Str)
+        self.assertEqual(header.content[2].text, 'von')
+        self.assertIsInstance(header.content[3], pf.Space)
+        self.assertIsInstance(header.content[4], pf.Math)
+        self.assertEqual(header.content[4].text, r'x^{\frac{1}{n}}')
+        self.assertIsInstance(ret.content[1], pf.Para)
+
     def test_unknown_environment(self):
         """filter() handles unknown LaTeX environment"""
         elem_env = pf.RawBlock(
