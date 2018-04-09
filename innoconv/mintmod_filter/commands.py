@@ -13,7 +13,8 @@ import panflute as pf
 from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
-from innoconv.utils import destringify, parse_fragment, get_remembered_element
+from innoconv.utils import (destringify, parse_fragment, log,
+                            get_remembered_element)
 from innoconv.mintmod_filter.elements import create_header, create_image
 
 
@@ -136,6 +137,10 @@ class Commands():
 
         This command inserts a section link.
         """
+
+        if isinstance(elem, pf.Block):
+            log("Warning: Expected Inline for MNRef: {}".format(cmd_args))
+
         identifier = cmd_args[0]
         span = pf.Span()
         span.attributes = {'data-link-section': identifier}
@@ -159,6 +164,10 @@ class Commands():
 
         This command creates an entry for the glossary/index.
         """
+
+        if isinstance(elem, pf.Block):
+            log("Warning: Expected Inline for MNRef: {}".format(cmd_args))
+
         text = cmd_args[0]
         concept = cmd_args[1]
         strong = pf.Strong()
@@ -174,6 +183,10 @@ class Commands():
 
         This command creates an invisible entry for the glossary/index.
         """
+
+        if isinstance(elem, pf.Block):
+            log("Warning: Expected Inline for MNRef: {}".format(cmd_args))
+
         concept = cmd_args[0]
         span = pf.Span()
         span.identifier = 'index-{}'.format(slugify(concept))
