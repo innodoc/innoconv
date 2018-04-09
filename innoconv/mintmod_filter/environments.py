@@ -73,6 +73,13 @@ class Environments():
         r"""Handle ``\MInfo`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MINFO'])
 
+    def handle_mxinfo(self, elem_content, env_args, elem):
+        r"""Handle ``\MXInfo`` environment."""
+        div = create_content_box(elem_content, ELEMENT_CLASSES['MINFO'])
+        header = create_header(env_args[0], elem.doc, level=4, parse_text=True)
+        div.content.insert(0, header)
+        return div
+
     def handle_mexperiment(self, elem_content, env_args, elem):
         r"""Handle ``\MExperiment`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MEXPERIMENT'])

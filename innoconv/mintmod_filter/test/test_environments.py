@@ -157,3 +157,66 @@ class TestMTest(unittest.TestCase):
         self.assertIsInstance(para.content[1], pf.Space)
         self.assertIsInstance(para.content[2], pf.Str)
         self.assertEqual(para.content[2].text, 'bar')
+
+
+class TestMXInfo(unittest.TestCase):
+
+    def setUp(self):
+        self.environments = Environments()
+
+    def test_handle_mtest(self):
+        """MXInfo"""
+        doc = pf.Doc()
+        elem_content = r"""
+        \begin{MXInfo}{Ableitung}
+        Foo bar
+        \end{MXInfo}
+        """
+        doc = pf.Doc()
+        doc.content.extend([pf.RawBlock(elem_content, format='latex')])
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.environments.handle_mxinfo('Foo bar', ['Ableitung'], elem)
+
+        self.assertIsInstance(ret, pf.Div)
+
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertEqual(pf.stringify(header), 'Ableitung')
+
+        para = ret.content[1]
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertEqual(para.content[0].text, 'Foo')
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[2].text, 'bar')
+
+    def test_handle_mtest_math_title(self):
+        """MXInfo"""
+        doc = pf.Doc()
+        elem_content = r"""
+        \begin{MXInfo}{Ableitung $x^n$}
+        Foo bar
+        \end{MXInfo}
+        """
+        doc.content.extend([pf.RawBlock(elem_content, format='latex')])
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.environments.handle_mxinfo(
+            'Foo bar', ['Ableitung $x^n$'], elem)
+
+        self.assertIsInstance(ret, pf.Div)
+
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertIsInstance(header.content[0], pf.Str)
+        self.assertEqual(header.content[0].text, 'Ableitung')
+        self.assertIsInstance(header.content[1], pf.Space)
+        self.assertIsInstance(header.content[2], pf.Math)
+        self.assertEqual(header.content[2].text, 'x^n')
+        self.assertEqual(header.content[2].format, 'InlineMath')
+
+        para = ret.content[1]
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertEqual(para.content[0].text, 'Foo')
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[2].text, 'bar')
