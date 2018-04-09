@@ -13,9 +13,8 @@ import panflute as pf
 from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
-from innoconv.utils import (destringify, parse_fragment,
-                            get_remembered_element, remember_element)
-from innoconv.mintmod_filter.elements import create_header
+from innoconv.utils import destringify, parse_fragment, get_remembered_element
+from innoconv.mintmod_filter.elements import create_header, create_image
 
 
 class Commands():
@@ -194,30 +193,17 @@ class Commands():
 
         Example: \MGraphics{img.png}{scale=1}{title}
         """
-        filename = cmd_args[0]
-        desc = parse_fragment(cmd_args[2], as_doc=True)
-        img = pf.Image(url=filename, title=pf.stringify(desc).strip(),
-                       classes=ELEMENT_CLASSES['IMAGE'])
-        # inline
-        if isinstance(elem, pf.RawInline):
-            remember_element(elem.doc, img)
-            return img
-        # block
-        img_content = pf.Plain(img)
-        div = pf.Div(img_content, classes=ELEMENT_CLASSES['FIGURE'])
-        if add_desc:
-            div.content.append(desc.content[0])
-        remember_element(elem.doc, div)
-        return div
+        is_block = isinstance(elem, pf.Block)
+        return create_image(cmd_args[0], cmd_args[2], elem, block=is_block)
 
     def handle_mgraphicssolo(self, cmd_args, elem):
         r"""Handle ``\MGraphicsSolo``.
 
-        Embed an image without title.
+        Embed an image without title. Uses filename as image title.
         """
-        # use filename as title
-        new_cmd_args = [cmd_args[0], None, cmd_args[0], None]
-        return self.handle_mgraphics(new_cmd_args, elem, add_desc=False)
+        is_block = isinstance(elem, pf.Block)
+        return create_image(cmd_args[0], cmd_args[0], elem, block=is_block,
+                            add_descr=False)
 
     def handle_mugraphics(self, cmd_args, elem):
         r"""Handle ``\MUGraphics``.
