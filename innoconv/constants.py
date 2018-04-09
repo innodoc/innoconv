@@ -22,7 +22,10 @@ REGEX_PATTERNS = {
     # panzer output parsing
     'PANZER_OUTPUT':
         re.compile(r"----- filter -----.+?json(?:\n|\r\n?)(?P<messages>.+)"
-                   "----- pandoc write -----", re.MULTILINE | re.DOTALL)
+                   "----- pandoc write -----", re.MULTILINE | re.DOTALL),
+
+    'FIX_MTEST': re.compile(
+        r" (zu )?(Kapitel|Modul) (\d{1,2}|\\arabic{section})"),
 }
 
 #: Element classes
@@ -39,6 +42,7 @@ ELEMENT_CLASSES = {
     'MEXAMPLE': ['example'],
     'MHINT': ['hint'],
     'MINPUTHINT': ['hint-text'],
+    'MTEST': ['test'],
     'MTIKZAUTO': ['tikz'],
     'MYOUTUBE_VIDEO': ['video', 'video-youtube'],
 }

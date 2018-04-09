@@ -49,7 +49,7 @@ class TestMxContent(unittest.TestCase):
     def test_mxcontent(self):
         """Should handle MXContent"""
         ret = self.environments.handle_mxcontent(
-            'Foo bar', ['Nice title', 'Short title', 'STD'], self.elem)
+            'Lorem ipsum', ['Nice title', 'Short title', 'STD'], self.elem)
 
         self.assertIsInstance(ret, list)
 
@@ -61,8 +61,8 @@ class TestMxContent(unittest.TestCase):
         self.assertIsInstance(para.content[0], pf.Str)
         self.assertIsInstance(para.content[1], pf.Space)
         self.assertIsInstance(para.content[2], pf.Str)
-        self.assertEqual(para.content[0].text, 'Foo')
-        self.assertEqual(para.content[2].text, 'bar')
+        self.assertEqual(para.content[0].text, 'Lorem')
+        self.assertEqual(para.content[2].text, 'ipsum')
 
 
 class TestBoxesWithoutTitle(unittest.TestCase):
@@ -125,3 +125,35 @@ class TestBoxesWithoutTitle(unittest.TestCase):
         self.assertIsInstance(bullet_list, pf.BulletList)
         self.assertEqual(bullet_list.content[0].content[0].content[0]
                          .content[0].text, 'item1')
+
+
+class TestMTest(unittest.TestCase):
+
+    def setUp(self):
+        self.doc = pf.Doc()
+        self.environments = Environments()
+        self.elem_content = r"""
+        \begin{MTest}{Abschlusstest}
+            Foo bar
+        \end{MXContent}"""
+        self.doc.content.extend(
+            [pf.RawBlock(self.elem_content, format='latex')])
+        self.elem = self.doc.content[0]  # this sets up elem.parent
+
+    def test_handle_mtest(self):
+        """MTest"""
+        ret = self.environments.handle_mtest(
+            'Foo bar', ['Abschlusstest'], self.elem)
+
+        self.assertIsInstance(ret, pf.Div)
+
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertEqual(pf.stringify(header), 'Abschlusstest')
+
+        para = ret.content[1]
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertEqual(para.content[0].text, 'Foo')
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[2].text, 'bar')

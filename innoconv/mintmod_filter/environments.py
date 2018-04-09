@@ -84,3 +84,14 @@ class Environments():
     def handle_mhint(self, elem_content, env_args, elem):
         r"""Handle ``\MHint`` command."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MHINT'])
+
+    def handle_mtest(self, elem_content, env_args, elem):
+        r"""Handle ``\MTest`` environment."""
+        div = create_content_box(elem_content, ELEMENT_CLASSES['MTEST'])
+        header = create_header(env_args[0], elem.doc, level=3)
+        content, identifier = extract_identifier(div.content)
+        if identifier:
+            div.content = content
+            header.identifier = identifier
+        div.content.insert(0, header)
+        return div
