@@ -43,7 +43,10 @@ def get_doc_from_markup(markup):
     except subprocess.TimeoutExpired:
         proc.kill()
         outs, errs = proc.communicate()
-    log('errout: {}'.format(errs.decode(ENCODING)))
+
+    errout = errs.decode(ENCODING).strip()
+    if errout:
+        pf.debug(errout)
 
     if proc.returncode != 0:
         raise RuntimeError("Failed to run panzer!")
