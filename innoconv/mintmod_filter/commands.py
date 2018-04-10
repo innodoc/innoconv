@@ -494,6 +494,10 @@ class Commands():
         r"""Handle ``\bigskip`` command."""
         return self._noop()
 
+    def handle_hspace(self, cmd_args, elem):
+        r"""Handle ``\hspace`` and ``\hspace*`` command."""
+        return self._noop()
+
     @staticmethod
     def _noop():
         """Return no elements."""
