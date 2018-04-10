@@ -102,9 +102,6 @@ class MintmodFilterAction:
         env_name = match.group('env_name')
         inner_code = match.groups()[1]
 
-        # Remove unpleasant nested commands ("\arabic{section}") in \MTest
-        inner_code = REGEX_PATTERNS['FIX_MTEST'].sub('', inner_code)
-
         # Parse optional arguments
         env_args = []
         rest = inner_code

@@ -130,20 +130,46 @@ class TestBoxesWithoutTitle(unittest.TestCase):
 class TestMTest(unittest.TestCase):
 
     def setUp(self):
-        self.doc = pf.Doc()
         self.environments = Environments()
-        self.elem_content = r"""
-        \begin{MTest}{Abschlusstest}
-            Foo bar
-        \end{MXContent}"""
-        self.doc.content.extend(
-            [pf.RawBlock(self.elem_content, format='latex')])
-        self.elem = self.doc.content[0]  # this sets up elem.parent
 
     def test_handle_mtest(self):
         """MTest"""
+        doc = pf.Doc()
+        elem_content = r"""
+        \begin{MTest}{Abschlusstest}
+            Foo bar
+        \end{MXContent}"""
+        doc.content.extend([pf.RawBlock(elem_content, format='latex')])
+        elem = doc.content[0]  # this sets up elem.parent
+
         ret = self.environments.handle_mtest(
-            'Foo bar', ['Abschlusstest'], self.elem)
+            'Foo bar', ['Abschlusstest'], elem)
+
+        self.assertIsInstance(ret, pf.Div)
+
+        header = ret.content[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertEqual(pf.stringify(header), 'Abschlusstest')
+
+        para = ret.content[1]
+        self.assertIsInstance(para.content[0], pf.Str)
+        self.assertEqual(para.content[0].text, 'Foo')
+        self.assertIsInstance(para.content[1], pf.Space)
+        self.assertIsInstance(para.content[2], pf.Str)
+        self.assertEqual(para.content[2].text, 'bar')
+
+    def test_handle_mtest_section_title(self):
+        """MTest"""
+        doc = pf.Doc()
+        elem_content = r"""
+        \begin{MTest}{Abschlusstest Kapitel \arabic{section}}
+            Foo bar
+        \end{MXContent}"""
+        doc.content.extend([pf.RawBlock(elem_content, format='latex')])
+        elem = doc.content[0]  # this sets up elem.parent
+
+        ret = self.environments.handle_mtest(
+            'Foo bar', [r'Abschlusstest Kapitel \arabic{section}'], elem)
 
         self.assertIsInstance(ret, pf.Div)
 
