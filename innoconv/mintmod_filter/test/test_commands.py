@@ -4,7 +4,7 @@ import unittest
 import panflute as pf
 
 from innoconv import utils
-from innoconv.constants import INDEX_LABEL_PREFIX
+from innoconv.constants import ELEMENT_CLASSES, INDEX_LABEL_PREFIX
 from innoconv.mintmod_filter.commands import Commands
 from innoconv.utils import remember_element
 
@@ -214,6 +214,59 @@ class TestCommands(unittest.TestCase):
             with self.subTest(name=handler.__name__):
                 ret = handler(elem_args, pf.RawBlock(elem_code))
                 self.assertListEqual(ret, [])
+
+
+class TestFormatting(unittest.TestCase):
+
+    def setUp(self):
+        self.commands = Commands()
+
+    def test_handle_modstextbf(self):
+        """modstextbf command"""
+        content = r'\modstextbf{foo $x^2$}'
+        doc = pf.Doc(pf.RawBlock(content, format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        strong = self.commands.handle_modstextbf(['foo $x^2$'], elem)
+        self.assertIsInstance(strong, pf.Strong)
+        string = strong.content[0]
+        self.assertIsInstance(string, pf.Str)
+        self.assertEqual(string.text, 'foo')
+        self.assertIsInstance(strong.content[1], pf.Space)
+        math = strong.content[2]
+        self.assertIsInstance(math, pf.Math)
+        self.assertEqual(math.text, 'x^2')
+
+    def test_handle_modsemph(self):
+        """modsemph command"""
+        content = r'\modsemph{foo $x^2$}'
+        doc = pf.Doc(pf.RawBlock(content, format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        emph = self.commands.handle_modsemph(['foo $x^2$'], elem)
+        self.assertIsInstance(emph, pf.Emph)
+        string = emph.content[0]
+        self.assertIsInstance(string, pf.Str)
+        self.assertEqual(string.text, 'foo')
+        self.assertIsInstance(emph.content[1], pf.Space)
+        math = emph.content[2]
+        self.assertIsInstance(math, pf.Math)
+        self.assertEqual(math.text, 'x^2')
+
+    def test_handle_highlight(self):
+        """highlight command"""
+        content = r'\highlight{foo $x^2$}'
+        doc = pf.Doc(pf.RawBlock(content, format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        highlight = self.commands.handle_highlight(['foo $x^2$'], elem)
+        self.assertIsInstance(highlight, pf.Span)
+        for cls in ELEMENT_CLASSES['HIGHLIGHT']:
+            self.assertIn(cls, getattr(highlight, 'classes'))
+        string = highlight.content[0]
+        self.assertIsInstance(string, pf.Str)
+        self.assertEqual(string.text, 'foo')
+        self.assertIsInstance(highlight.content[1], pf.Space)
+        math = highlight.content[2]
+        self.assertIsInstance(math, pf.Math)
+        self.assertEqual(math.text, 'x^2')
 
 
 class TestGraphics(unittest.TestCase):

@@ -30,6 +30,7 @@ REGEX_PATTERNS = {
 
 #: Element classes
 ELEMENT_CLASSES = {
+    'HIGHLIGHT': ['highlight'],
     'IMAGE': ['img'],
     'FIGURE': ['figure'],
     'DEBUG_UNKNOWN_CMD': ['innoconv-debug-unknown-command'],

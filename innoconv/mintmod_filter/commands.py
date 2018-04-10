@@ -322,6 +322,27 @@ class Commands():
         return pf.Space()
 
     ###########################################################################
+    # Formatting
+
+    def handle_modstextbf(self, cmd_args, elem):
+        r"""Handle \modstextbf command."""
+        return pf.Strong(*parse_fragment(cmd_args[0])[0].content)
+
+    def handle_modsemph(self, cmd_args, elem):
+        r"""Handle \modsemph command."""
+        return pf.Emph(*parse_fragment(cmd_args[0])[0].content)
+
+    def handle_highlight(self, cmd_args, elem):
+        r"""Handle \highlight command.
+
+        This seems to be some sort of formatting command. There's no
+        documentation and it does nothing in the mintmod code. We just keep
+        the information here.
+        """
+        return pf.Span(*parse_fragment(cmd_args[0])[0].content,
+                       classes=ELEMENT_CLASSES['HIGHLIGHT'])
+
+    ###########################################################################
     # No-ops
 
     def handle_mdeclaresiteuxid(self, cmd_args, elem):
