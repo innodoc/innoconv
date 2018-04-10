@@ -209,6 +209,13 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.content[0].title, 'Carry out a case analysis.')
         self.assertEqual(ret.content[0].url, 'vidbsp1.mp4')
 
+    def test_handle_mzahl(self):
+        r"""Test \MZahl outside of Math environment"""
+        elem = pf.RawInline(r'\MZahl{1}{2}', format='latex')
+        ret = self.commands.handle_mzahl(['1', '2'], elem)
+        self.assertIsInstance(ret, pf.Math)
+        self.assertEqual(ret.text, r'\num{1.2}')
+
     def test_noops(self):
         """Test no-op commands."""
         noops = (

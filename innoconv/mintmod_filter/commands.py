@@ -324,6 +324,17 @@ class Commands():
                 r'Encountered \MZXYZhltrennzeichen as block element!')
         return pf.Math(r'\decmarker', format='InlineMath')
 
+    def handle_mzahl(self, cmd_args, elem):
+        r"""Handle ``\MZahl`` command.
+
+        This is a math command but in fact occurs also in text.
+        """
+        if isinstance(elem, pf.Block):
+            raise ValueError(
+                r'Encountered \MZahl as block element!')
+        return pf.Math(r'\num{{{}.{}}}'.format(cmd_args[0], cmd_args[1]),
+                       format='InlineMath')
+
     ###########################################################################
     # Simple substitutions
 
