@@ -482,6 +482,18 @@ class Commands():
         r"""Handle ``\MWatermarkSettings`` command."""
         return self._noop()
 
+    def handle_smallskip(self, cmd_args, elem):
+        r"""Handle ``\smallskip`` command."""
+        return self._noop()
+
+    def handle_medskip(self, cmd_args, elem):
+        r"""Handle ``\medskip`` command."""
+        return self._noop()
+
+    def handle_bigskip(self, cmd_args, elem):
+        r"""Handle ``\bigskip`` command."""
+        return self._noop()
+
     @staticmethod
     def _noop():
         """Return no elements."""
