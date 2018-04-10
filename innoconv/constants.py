@@ -35,6 +35,7 @@ ELEMENT_CLASSES = {
     'FIGURE': ['figure'],
     'DEBUG_UNKNOWN_CMD': ['innoconv-debug-unknown-command'],
     'DEBUG_UNKNOWN_ENV': ['innoconv-debug-unknown-environment'],
+    'MCOSHZUSATZ': ['secondary'],
     'MEXAMPLE': ['example'],
     'MEXERCISE': ['exercise'],
     'MEXERCISES': ['exercises'],

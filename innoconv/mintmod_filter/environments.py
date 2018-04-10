@@ -110,3 +110,7 @@ class Environments():
             header.identifier = identifier
         div.content.insert(0, header)
         return div
+
+    def handle_mcoshzusatz(self, elem_content, env_args, elem):
+        r"""Handle ``\MCOSHZusatz`` environment."""
+        return create_content_box(elem_content, ELEMENT_CLASSES['MCOSHZUSATZ'])
