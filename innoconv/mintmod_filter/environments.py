@@ -53,6 +53,10 @@ class Environments():
         content.insert(0, header)
         return content
 
+    def handle_mcontent(self, elem_content, env_args, elem):
+        r"""Handle ``\MContent`` environment."""
+        return parse_fragment(elem_content)
+
     def handle_mintro(self, elem_content, env_args, elem):
         r"""Handle ``\MIntro`` environment."""
         div = create_content_box(elem_content, ELEMENT_CLASSES['MINTRO'])
