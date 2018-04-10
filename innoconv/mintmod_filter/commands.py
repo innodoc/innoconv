@@ -419,6 +419,58 @@ class Commands():
         """
         return self._noop()
 
+    def handle_mcontenttable(self, cmd_args, elem):
+        r"""Handle ``\MContentTable`` command."""
+        return self._noop()
+
+    def handle_mglobalstart(self, cmd_args, elem):
+        r"""Handle ``\MGlobalStart`` command."""
+        return self._noop()
+
+    def handle_mpullsite(self, cmd_args, elem):
+        r"""Handle ``\MPullSite`` command."""
+        return self._noop()
+
+    def handle_mglobalchaptertag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalChapterTag`` command."""
+        return self._noop()
+
+    def handle_mglobalconftag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalConfTag`` command."""
+        return self._noop()
+
+    def handle_mgloballogouttag(self, cmd_args, elem):
+        r"""handle ``\MGlobalLogoutTag`` command."""
+        return self._noop()
+
+    def handle_mgloballogintag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalLoginTag`` command."""
+        return self._noop()
+
+    def handle_mgloballocationtag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalLocationTag`` command."""
+        return self._noop()
+
+    def handle_mglobaldatatag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalDataTag`` command."""
+        return self._noop()
+
+    def handle_mglobalsearchtag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalSearchTag`` command."""
+        return self._noop()
+
+    def handle_mglobalfavotag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalFavoTag`` command."""
+        return self._noop()
+
+    def handle_mglobalstesttag(self, cmd_args, elem):
+        r"""Handle ``\MGlobalSTestTag`` command."""
+        return self._noop()
+
+    def handle_mwatermarksettings(self, cmd_args, elem):
+        r"""Handle ``\MWatermarkSettings`` command."""
+        return self._noop()
+
     @staticmethod
     def _noop():
         """Return no elements."""
