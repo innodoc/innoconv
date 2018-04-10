@@ -235,17 +235,35 @@ class Commands():
     def handle_myoutubevideo(self, cmd_args, elem):
         r"""Handle ``\MYoutubeVideo``.
 
-        Just return a Link Element
+        Just return a Link Element.
         """
-        title, width, height, url = cmd_args
-        attrs = {'width': width, 'height': height}
-        return pf.Link(
+        title, _, _, url = cmd_args
+        link = pf.Link(
             *destringify(title),
             url=url,
             title=title,
-            classes=ELEMENT_CLASSES['MYOUTUBE_VIDEO'],
-            attributes=attrs
+            classes=ELEMENT_CLASSES['MYOUTUBE_VIDEO']
         )
+        if isinstance(elem, pf.Block):
+            return pf.Plain(link)
+        return link
+
+    def handle_mvideo(self, cmd_args, elem):
+        r"""Handle ``\MVideo``.
+
+        Just return a Link Element.
+        """
+        filename = '{}.mp4'.format(cmd_args[0])
+        title = cmd_args[1]
+        link = pf.Link(
+            *destringify(title),
+            url=filename,
+            title=title,
+            classes=ELEMENT_CLASSES['MVIDEO'],
+        )
+        if isinstance(elem, pf.Block):
+            return pf.Plain(link)
+        return link
 
     def handle_mtikzauto(self, cmd_args, elem):
         r"""Handle ``\MTikzAuto`` command.

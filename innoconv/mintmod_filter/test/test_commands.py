@@ -196,6 +196,19 @@ class TestCommands(unittest.TestCase):
         self.assertIsInstance(ret.content[0], pf.Link)
         self.assertEqual(ret.content[0].title, 'Newtons Laws (2)')
 
+    def test_handle_mvideo(self):
+        video = pf.RawBlock(
+            r'\MVideo{vidbsp1}{Carry out a case analysis.}',
+            format='latex'
+        )
+        doc = pf.Doc(video)
+        elem = doc.content[0]  # this sets up elem.parent
+        cmd_args = ['vidbsp1', 'Carry out a case analysis.']
+        ret = self.commands.handle_mvideo(cmd_args, elem)
+        self.assertIsInstance(ret.content[0], pf.Link)
+        self.assertEqual(ret.content[0].title, 'Carry out a case analysis.')
+        self.assertEqual(ret.content[0].url, 'vidbsp1.mp4')
+
     def test_noops(self):
         """Test no-op commands."""
         noops = (
