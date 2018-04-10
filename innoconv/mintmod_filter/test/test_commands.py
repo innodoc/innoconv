@@ -3,7 +3,6 @@
 import unittest
 import panflute as pf
 
-from innoconv import utils
 from innoconv.constants import ELEMENT_CLASSES, INDEX_LABEL_PREFIX
 from innoconv.mintmod_filter.commands import Commands
 from innoconv.utils import remember_element
@@ -184,15 +183,18 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(elem_repl.text, r'“')
 
     def test_handle_myoutubevideo(self):
-        command = r'''\MYoutubeVideo{Newtons Laws (2)}{400}{300}{https://www.you
-        tube.com/embed/WzvhuQ5RWJE?rel=0&amp;wmode=transparent}'''
-        elem, args = utils.parse_cmd(command)
-        ret = self.commands.handle_myoutubevideo(args, elem)
-        self.assertIsInstance(ret, pf.Link)
-        # pylint: disable=no-member
-        self.assertEqual(ret.attributes['width'], '400')
-        self.assertEqual(ret.attributes['height'], '300')
-        self.assertEqual(ret.title, args[0])
+        video = pf.RawBlock(
+            r'\MYoutubeVideo{Newtons Laws (2)}{400}{300}'
+            '{https://www.youtube.com/embed/WzvhuQ5RWJE}',
+            format='latex'
+        )
+        doc = pf.Doc(video)
+        elem = doc.content[0]  # this sets up elem.parent
+        cmd_args = ['Newtons Laws (2)', '400', '300',
+                    'https://www.youtube.com/embed/WzvhuQ5RWJE']
+        ret = self.commands.handle_myoutubevideo(cmd_args, elem)
+        self.assertIsInstance(ret.content[0], pf.Link)
+        self.assertEqual(ret.content[0].title, 'Newtons Laws (2)')
 
     def test_noops(self):
         """Test no-op commands."""
