@@ -360,6 +360,10 @@ class Commands():
         return pf.Span(*parse_fragment(cmd_args[0])[0].content,
                        classes=ELEMENT_CLASSES['HIGHLIGHT'])
 
+    def handle_newline(self, cmd_args, elem):
+        r"""Handle \newline command."""
+        return pf.LineBreak()
+
     ###########################################################################
     # No-ops
 

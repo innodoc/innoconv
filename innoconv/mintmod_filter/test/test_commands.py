@@ -283,6 +283,14 @@ class TestFormatting(unittest.TestCase):
         self.assertIsInstance(math, pf.Math)
         self.assertEqual(math.text, 'x^2')
 
+    def test_handle_newline(self):
+        """newline command"""
+        content = r'\newline'
+        doc = pf.Doc(pf.RawBlock(content, format='latex'))
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.commands.handle_newline([], elem)
+        self.assertIsInstance(ret, pf.LineBreak)
+
 
 class TestGraphics(unittest.TestCase):
 
