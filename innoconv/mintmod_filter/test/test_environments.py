@@ -164,7 +164,7 @@ class TestMXInfo(unittest.TestCase):
     def setUp(self):
         self.environments = Environments()
 
-    def test_handle_mtest(self):
+    def test_handle_mxinfo(self):
         """MXInfo"""
         doc = pf.Doc()
         elem_content = r"""
@@ -190,8 +190,8 @@ class TestMXInfo(unittest.TestCase):
         self.assertIsInstance(para.content[2], pf.Str)
         self.assertEqual(para.content[2].text, 'bar')
 
-    def test_handle_mtest_math_title(self):
-        """MXInfo"""
+    def test_handle_mxinfo_math_title(self):
+        """MXInfo with Math in title"""
         doc = pf.Doc()
         elem_content = r"""
         \begin{MXInfo}{Ableitung $x^n$}
