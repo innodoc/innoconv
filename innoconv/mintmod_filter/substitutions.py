@@ -18,6 +18,13 @@ MATH_SUBSTITUTIONS = (
     (r'\\MElSetSep', ';'),
     (r'\\MIntvlSep', ';'),
     (r'\\MEU', 'e'),
+    (r'\\MDwSp', r'\,d'),
+    (r'\\ML', 'L'),
+    (r'\\MEmptyset', r'\emptyset'),
+    (r'\\MUnderset', r'\underset'),
+    (r'\\MBinom', r'\\binom'),
+    (r'\\MTextSF', r'\\textsf'),
+    (r'\\MHDots', r'\\dots'),
 
     # handled by innoconv.mathjax.js
     (r'\\MZahl{([0-9]+?)}{([0-9]*?)}', r'\\num{\1.\2}'),
@@ -28,6 +35,11 @@ MATH_SUBSTITUTIONS = (
     (r'\\MoIr\[\\right\]', r'\\right['),
     (r'\\MoIl', ']'),
     (r'\\MoIr', '['),
+
+    # vectors
+    (r'\\MVector{([^}]+?)}', r'\\begin{pmatrix}\1\end{pmatrix}'),
+    (r'\\MDVec', r'\\overrightarrow'),
+    (r'\\MVec', r'\\vec'),
 )
 
 
