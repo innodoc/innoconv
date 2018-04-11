@@ -207,6 +207,12 @@ class TestParseCmd(unittest.TestCase):
         self.assertEqual(cmd_name, 'foobar')
         self.assertEqual(cmd_args, [r'word\bar{two}bbb', 'baz'])
 
+    def test_parse_cmd_mvector(self):
+        r"""It should parse \MVector command"""
+        cmd_name, cmd_args = parse_cmd(r'\MVector{2\\-\Mtfrac{5}{2}\\-2}')
+        self.assertEqual(cmd_name, 'MVector')
+        self.assertEqual(cmd_args, [r'2\\-\Mtfrac{5}{2}\\-2'])
+
 
 class TestParseNestedArgs(unittest.TestCase):
 

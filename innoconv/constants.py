@@ -24,6 +24,9 @@ REGEX_PATTERNS = {
 
     'FIX_MTEST': re.compile(
         r" (zu )?(Kapitel|Modul) (\d{1,2}|\\arabic{section})"),
+
+    'IRREG_MATH_CMDS':
+        re.compile(r'(\\MVector|\\MPointTwoAS|\\MPointTwo|\\MPointThree)'),
 }
 
 #: Element classes

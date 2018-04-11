@@ -11,4 +11,4 @@ innoconv.mintmod_filter
   innoconv.mintmod_filter.elements
   innoconv.mintmod_filter.environments
   innoconv.mintmod_filter.filter_action
-  innoconv.mintmod_filter.substitutions
+  innoconv.mintmod_filter.math

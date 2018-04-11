@@ -8,7 +8,7 @@ from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES
 from innoconv.utils import log, destringify, parse_cmd, parse_nested_args
 from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.commands import Commands
-from innoconv.mintmod_filter.substitutions import handle_math_substitutions
+from innoconv.mintmod_filter.math import handle_math
 
 
 class MintmodFilterAction:
@@ -41,7 +41,7 @@ class MintmodFilterAction:
 
         # simple command subtitutions in Math environments
         if isinstance(elem, pf.Math):
-            return handle_math_substitutions(elem)
+            return handle_math(elem)
 
         elif hasattr(elem, 'format') and elem.format == 'latex':
             # block commands and environments
