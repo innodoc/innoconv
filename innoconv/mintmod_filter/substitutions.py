@@ -26,6 +26,15 @@ MATH_SUBSTITUTIONS = (
     (r'\\MTextSF', r'\\textsf'),
     (r'\\MHDots', r'\\dots'),
 
+    (r'\\MSep', r'\\left\|{\\phantom{\\frac1g}}\\right.'),
+    (r'\\MGrad', r'^{\\circ}'),
+
+    (r'\\MGeoAbstand{([A-Za-z0-9])}{([A-Za-z0-9])}',
+     r'[\\overline{\1\2}]'),
+    (r'\\MGeoStrecke{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\\overline{\1\2}'),
+    (r'\\MGeoGerade{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2'),
+    (r'\\MGeoDreieck{([A-Za-z0-9])}{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2\3'),
+
     # handled by innoconv.mathjax.js
     (r'\\MZahl{([0-9]+?)}{([0-9]*?)}', r'\\num{\1.\2}'),
     (r'\\MZXYZhltrennzeichen}', r'\decmarker'),
