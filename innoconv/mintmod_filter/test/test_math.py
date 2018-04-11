@@ -57,6 +57,15 @@ class TestHandleIrregular(unittest.TestCase):
             r'(x = \tfrac{2}{19}\coordsep y = - \tfrac{5}{19}\coordsep '
             r'z = \tfrac{2}{19})')
 
+    def test_handle_math_mpointthree_big(self):
+        r"""MPointThree[\big]: commands in arguments"""
+        elem_math = pf.Math(
+            r'\MPointThree[\Big]{\frac{3}{2}}{1}{2}')
+        elem_math_repl = handle_math(elem_math)
+        self.assertEqual(
+            elem_math_repl.text,
+            r'\Big(\frac{3}{2}\coordsep 1\coordsep 2{}\Big)')
+
     def test_handle_math_multiple(self):
         r"""multiple commands in one math string"""
         elem_math = pf.Math(

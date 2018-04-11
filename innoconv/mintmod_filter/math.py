@@ -61,6 +61,7 @@ MATH_SUBSTITUTIONS = (
 
     # preprocess '\MPointTwo[\Big]{}{}' -> '\MPointTwo{\Big}{}{}'
     (r'\\MPointTwo\[([^]]+)\]', r'\\MPointTwo{\1}'),
+    (r'\\MPointThree\[([^]]+)\]', r'\\MPointThree{\1}'),
 )
 
 
@@ -75,7 +76,11 @@ def _handle_irregular(cmd_name, cmd_args):
     elif cmd_name == 'MPointTwoAS':
         ret = r'\left({}\coordsep {}\right)'.format(*cmd_args)
     elif cmd_name == 'MPointThree':
-        ret = r'({}\coordsep {}\coordsep {})'.format(*cmd_args)
+        if len(cmd_args) == 4:  # \Big variant
+            ret = r'{0}({1}\coordsep {2}\coordsep {3}{{}}{0})'.format(
+                *cmd_args)
+        else:
+            ret = r'({}\coordsep {}\coordsep {})'.format(*cmd_args)
     elif cmd_name == 'MCases':
         ret = r'\left\lbrace{{\begin{{array}}{{rl}} {} \end{{array}}}}\right.'\
             .format(*cmd_args)
