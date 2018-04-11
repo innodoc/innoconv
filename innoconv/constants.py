@@ -13,8 +13,6 @@ REGEX_PATTERNS = {
     'CMD': re.compile(r'\A\\([^\\\s{]+)(.*)\Z', re.DOTALL),
     'ENV': re.compile(r'\A\\begin{(?P<env_name>[^}]+)}(.+)'
                       r'\\end{(?P=env_name)}\Z', re.DOTALL),
-    'ENV_ARGS': re.compile(
-        r'\A{(?P<arg>[^\n\r}]+)}(?P<rest>.+)\Z', re.DOTALL),
 
     'LABEL': re.compile(r'^{}-(.+)$'.format(INDEX_LABEL_PREFIX)),
     'STRIP_HASH_LINE': re.compile(r'^\%(\r\n|\r|\n)'),

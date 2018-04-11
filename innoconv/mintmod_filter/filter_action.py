@@ -5,7 +5,7 @@ from slugify import slugify
 
 from innoconv.errors import ParseError
 from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES
-from innoconv.utils import log, destringify, parse_cmd
+from innoconv.utils import log, destringify, parse_cmd, parse_nested_args
 from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.commands import Commands
 from innoconv.mintmod_filter.substitutions import handle_math_substitutions
@@ -103,21 +103,7 @@ class MintmodFilterAction:
         inner_code = match.groups()[1]
 
         # Parse optional arguments
-        env_args = []
-        rest = inner_code
-        if inner_code.startswith('{'):
-            stack = []
-            for i, cha in enumerate(rest):
-                if not stack and cha != '{':
-                    break
-                elif cha == '{':
-                    stack.append(i)
-                elif cha == '}' and stack:
-                    start = stack.pop()
-                    if not stack:
-                        env_args.append(rest[start + 1: i])
-            chars_to_remove = len(''.join(env_args)) + 2 * len(env_args)
-            rest = rest[chars_to_remove:]
+        env_args, rest = parse_nested_args(inner_code)
 
         function_name = 'handle_%s' % slugify(env_name)
         func = getattr(self._environments, function_name, None)

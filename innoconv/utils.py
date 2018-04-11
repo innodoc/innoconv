@@ -136,28 +136,41 @@ def parse_cmd(text):
         raise ParseError("Could not parse LaTeX command: '%s'" % text)
     groups = match.groups()
     cmd_name = groups[0]
-    cmd_args = list(parse_nested_args(groups[1]))
+    cmd_args, _ = parse_nested_args(groups[1])
     return cmd_name, cmd_args
 
 
-def parse_nested_args(string):
+def parse_nested_args(to_parse):
     r"""
-    Generator that parses LaTeX command arguments that can have nested
-    commands.
+    Parse LaTeX command arguments that can have nested commands. Returns
+    arguments and rest string.
 
-    Parses strings like: ``{bar}{baz{}}``
+    Parses strings like: ``{bar}{baz{}}rest`` into
+    ``[['bar', 'baz{}'], 'rest']``.
 
-    :param string: String to parse
-    :type string: str
+    :param to_parse: String to parse
+    :type to_parse: str
+
+    :rtype: (list, str)
+    :returns: parsed arguments and rest string
     """
-    stack = []
-    for i, cha in enumerate(string):
-        if cha == '{':
-            stack.append(i)
-        elif cha == '}' and stack:
-            start = stack.pop()
-            if not stack:
-                yield string[start + 1: i]
+    pargs = []
+    if to_parse.startswith('{'):
+        stack = []
+        for i, cha in enumerate(to_parse):
+            if not stack and cha != '{':
+                break
+            elif cha == '{':
+                stack.append(i)
+            elif cha == '}' and stack:
+                start = stack.pop()
+                if not stack:
+                    pargs.append(to_parse[start + 1: i])
+        chars_to_remove = len(''.join(pargs)) + 2 * len(pargs)
+        to_parse = to_parse[chars_to_remove:]
+    if not to_parse:
+        to_parse = None
+    return (pargs, to_parse)
 
 
 def extract_identifier(content):

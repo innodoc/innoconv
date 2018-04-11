@@ -212,25 +212,38 @@ class TestParseNestedArgs(unittest.TestCase):
 
     def test_parse_nested_args_empty(self):
         """It should parse nested arguments: empty"""
-        cmd_args = list(parse_nested_args(''))
-        self.assertEqual(cmd_args, [])
+        ret = list(parse_nested_args(''))
+        self.assertEqual(ret, [[], None])
 
     def test_parse_nested_args_simple(self):
         """It should parse nested arguments: simple"""
-        cmd_args = list(parse_nested_args('{bbb}{baz}{foo}'))
-        self.assertEqual(cmd_args, ['bbb', 'baz', 'foo'])
+        ret = list(parse_nested_args('{bbb}{baz}{foo}'))
+        self.assertEqual(ret, [['bbb', 'baz', 'foo'], None])
 
     def test_parse_nested_args_1(self):
         """It should parse nested arguments: nested 1"""
-        cmd_args = list(parse_nested_args(r'{word\bar{two}bbb}{baz}'))
-        self.assertEqual(cmd_args, [r'word\bar{two}bbb', 'baz'])
+        ret = list(parse_nested_args(r'{word\bar{two}bbb}{baz}'))
+        self.assertEqual(ret, [[r'word\bar{two}bbb', 'baz'], None])
 
     def test_parse_nested_args_2(self):
         """It should parse nested arguments: nested 2"""
-        cmd_args = list(parse_nested_args(
+        ret = list(parse_nested_args(
             r'{cont}{}{\foo{\bla{\stop}}}{\baz{}{}{}}'))
-        self.assertEqual(cmd_args,
-                         ['cont', '', r'\foo{\bla{\stop}}', r'\baz{}{}{}'])
+        self.assertEqual(
+            ret,
+            [['cont', '', r'\foo{\bla{\stop}}', r'\baz{}{}{}'], None]
+        )
+
+    def test_parse_nested_args_rest(self):
+        """It should parse nested arguments with rest"""
+        ret = list(parse_nested_args(
+            r'''{word\bar{two}bbb}{baz}
+there is more
+stuff here'''))
+        rest = '''
+there is more
+stuff here'''
+        self.assertEqual(ret, [[r'word\bar{two}bbb', 'baz'], rest])
 
 
 class TestRemoveEmptyParagraphs(unittest.TestCase):
