@@ -41,7 +41,7 @@ $ ./setup.py develop
 Get the content source code and convert it to JSON.
 
 ```sh
-$ git clone -b pandoc git@gitlab.tubit.tu-berlin.de:innodoc/tub_base
+$ git clone -b innoconv git@gitlab.tubit.tu-berlin.de:innodoc/tub_base
 $ innoconv tub_base
 ```
 
