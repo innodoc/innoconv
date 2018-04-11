@@ -26,7 +26,9 @@ REGEX_PATTERNS = {
         r" (zu )?(Kapitel|Modul) (\d{1,2}|\\arabic{section})"),
 
     'IRREG_MATH_CMDS':
-        re.compile(r'(\\MVector|\\MPointTwoAS|\\MPointTwo|\\MPointThree)'),
+        re.compile(
+            r'(\\MVector|\\MPointTwoAS|\\MPointTwo|\\MPointThree|\\MCases)'
+        ),
 }
 
 #: Element classes

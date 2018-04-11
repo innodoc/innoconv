@@ -71,3 +71,16 @@ class TestHandleIrregular(unittest.TestCase):
             r'q=\left(2\coordsep 1+\frac{\sqrt{3}}{2}\right);'
             r'f(x)=x^2'
         )
+
+    def test_handle_math_mcases(self):
+        r"""mcases: commands in arguments"""
+        elem_math = pf.Math(
+            r'\MCases{\text{Term} & \text{falls}\;\text{Term}\geq 0\\ '
+            r'-\text{Term} & \text{falls}\;\text{Term}<0}'
+        )
+        elem_math_repl = handle_math(elem_math)
+        self.assertEqual(
+            elem_math_repl.text,
+            r'\left\lbrace{\begin{array}{rl} \text{Term} & \text{falls}\;'
+            r'\text{Term}\geq 0\\ -\text{Term} & \text{falls}\;\text{Term}<0 '
+            r'\end{array}}\right.')

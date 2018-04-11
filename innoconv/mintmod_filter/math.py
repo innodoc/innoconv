@@ -36,6 +36,11 @@ MATH_SUBSTITUTIONS = (
     (r'\\MGeoGerade{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2'),
     (r'\\MGeoDreieck{([A-Za-z0-9])}{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2\3'),
 
+    (r'\\Id\((.*?)\)', r'\\operatorname{Id(\\mathrm{\1}}'),
+    (r'\\MRelates', r'\\stackrel{\\scriptscriptstyle\\wedge}{=}'),
+    (r'\\Mmapsto', r'\\mapsto'),
+    (r'\\MD\s', r'\\mathop{}\\!\\mathrm{d}'),
+
     # handled by innoconv.mathjax.js
     (r'\\MZahl{([0-9]+?)}{([0-9]*?)}', r'\\num{\1.\2}'),
     (r'\\MZXYZhltrennzeichen}', r'\decmarker'),
@@ -67,6 +72,9 @@ def _handle_irregular(cmd_name, cmd_args):
         ret = r'\left({}\coordsep {}\right)'.format(*cmd_args)
     elif cmd_name == 'MPointThree':
         ret = r'({}\coordsep {}\coordsep {})'.format(*cmd_args)
+    elif cmd_name == 'MCases':
+        ret = r'\left\lbrace{{\begin{{array}}{{rl}} {} \end{{array}}}}\right.'\
+            .format(*cmd_args)
     return ret
 
 
