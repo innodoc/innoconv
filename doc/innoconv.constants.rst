@@ -3,6 +3,12 @@ innoconv.constants
 
 .. automodule:: innoconv.constants
 
+.. autodata:: INDEX_LABEL_PREFIX
+  :annotation:
+
+.. autodata:: COMMANDS_IRREGULAR
+  :annotation:
+
 .. autodata:: REGEX_PATTERNS
   :annotation:
 

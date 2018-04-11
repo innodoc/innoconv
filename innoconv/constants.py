@@ -1,11 +1,31 @@
 """Project constants are defined here."""
 
+from collections import OrderedDict
 import re
 import os
 
 
 #: Element class for index labels
 INDEX_LABEL_PREFIX = 'index-label'
+
+#: Math commands with irregular arguments, key=command-name,
+#: value=formatstring or value=dict (number of arguments, formatstring)
+COMMANDS_IRREGULAR = OrderedDict((
+    ('MVector', r'\begin{{pmatrix}}{}\end{{pmatrix}}'),
+    ('MPointTwoAS', r'\left({}\coordsep {}\right)'),
+    ('MPointTwo', {
+        2: r'({0}\coordsep {1})',
+        3: r'{0}({1}\coordsep {2}{{}}{0})',
+    }),
+    ('MPointThree', {
+        3: r'({}\coordsep {}\coordsep {})',
+        4: r'{0}({1}\coordsep {2}\coordsep {3}{{}}{0})',
+    }),
+    (
+        'MCases',
+        r'\left\lbrace{{\begin{{array}}{{rl}} {} \end{{array}}}}\right.'
+    ),
+))
 
 #: Regular expressions
 REGEX_PATTERNS = {
@@ -26,9 +46,9 @@ REGEX_PATTERNS = {
         r" (zu )?(Kapitel|Modul) (\d{1,2}|\\arabic{section})"),
 
     'IRREG_MATH_CMDS':
-        re.compile(
-            r'(\\MVector|\\MPointTwoAS|\\MPointTwo|\\MPointThree|\\MCases)'
-        ),
+        re.compile('({})'.format(
+            '|'.join(r'\\{}'.format(cmd)
+                     for cmd in list(COMMANDS_IRREGULAR.keys())))),
 }
 
 #: Element classes

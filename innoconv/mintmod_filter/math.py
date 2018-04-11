@@ -1,7 +1,7 @@
 """Handle mintmod math commands."""
 
 import re
-from innoconv.constants import REGEX_PATTERNS
+from innoconv.constants import REGEX_PATTERNS, COMMANDS_IRREGULAR
 from innoconv.utils import parse_nested_args
 
 
@@ -63,31 +63,8 @@ MATH_SUBSTITUTIONS = (
     (r'\\MVec{', r'\\vec{'),  # trailing '{' so it doesn't touch \MVector
 
     # preprocess '\MPointTwo[\Big]{}{}' -> '\MPointTwo{\Big}{}{}'
-    (r'\\MPointTwo\[([^]]+)\]', r'\\MPointTwo{\1}'),
-    (r'\\MPointThree\[([^]]+)\]', r'\\MPointThree{\1}'),
+    (r'\\MPoint(Two|Three)\[([^]]+)\]', r'\\MPoint\1{\2}'),
 )
-
-
-def _handle_irregular(cmd_name, cmd_args):
-    if cmd_name == 'MVector':
-        ret = r'\begin{{pmatrix}}{}\end{{pmatrix}}'.format(*cmd_args)
-    elif cmd_name == 'MPointTwo':
-        if len(cmd_args) == 3:  # \Big variant
-            ret = r'{0}({1}\coordsep {2}{{}}{0})'.format(*cmd_args)
-        else:
-            ret = r'({0}\coordsep {1})'.format(*cmd_args)
-    elif cmd_name == 'MPointTwoAS':
-        ret = r'\left({}\coordsep {}\right)'.format(*cmd_args)
-    elif cmd_name == 'MPointThree':
-        if len(cmd_args) == 4:  # \Big variant
-            ret = r'{0}({1}\coordsep {2}\coordsep {3}{{}}{0})'.format(
-                *cmd_args)
-        else:
-            ret = r'({}\coordsep {}\coordsep {})'.format(*cmd_args)
-    elif cmd_name == 'MCases':
-        ret = r'\left\lbrace{{\begin{{array}}{{rl}} {} \end{{array}}}}\right.'\
-            .format(*cmd_args)
-    return ret
 
 
 def handle_math(elem):
@@ -98,6 +75,12 @@ def handle_math(elem):
 
     if not REGEX_PATTERNS['IRREG_MATH_CMDS'].search(elem.text):
         return elem
+
+    def _handle_irregular(cmd_name, cmd_args):
+        sub = COMMANDS_IRREGULAR[cmd_name]
+        if isinstance(sub, dict):
+            sub = sub[len(cmd_args)]
+        return sub.format(*cmd_args)
 
     # commands with arguments that may contain nested arguments (can't be
     # handled by regex)
