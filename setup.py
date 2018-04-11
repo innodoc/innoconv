@@ -129,11 +129,11 @@ def setup_package():
             ],
         },
         include_package_data=True,
-        install_requires={
+        install_requires=[
             'panflute',
             'panzer',
             'python-slugify',
-        },
+        ],
         packages=[
             'innoconv',
         ],
