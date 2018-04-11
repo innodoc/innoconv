@@ -78,12 +78,18 @@ def handle_math(elem):
         def _handle_irregular(cmd_name, cmd_args):
             sub = COMMANDS_IRREGULAR[cmd_name]
             if isinstance(sub, dict):
-                sub = sub[len(cmd_args)]
+                try:
+                    sub = sub[len(cmd_args)]
+                except KeyError:
+                    log('Could not find substitution for this number of args: '
+                        '{} ({})'.format(cmd_name, cmd_args))
+                    raise
             try:
                 return sub.format(*cmd_args)
             except IndexError:
                 log('Received wrong number of arguments for math command: '
                     '{} ({})'.format(cmd_name, cmd_args))
+                raise
 
         # commands with arguments that may contain nested arguments (can't be
         # handled by regex)
