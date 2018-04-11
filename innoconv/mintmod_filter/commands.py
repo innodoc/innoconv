@@ -259,7 +259,7 @@ class Commands():
             *destringify(title),
             url=filename,
             title=title,
-            classes=ELEMENT_CLASSES['MVIDEO'],
+            classes=ELEMENT_CLASSES['MVIDEO']
         )
         if isinstance(elem, pf.Block):
             return pf.Plain(link)
