@@ -9,9 +9,11 @@
  *
  *  Use \decmarker to output the decimal marker.
  *
+ * Use \coordsep to insert a coordination point separator (x; y)
+ *
  */
 
- MathJax.Extension.innoconv = {};
+MathJax.Extension.innoconv = {};
 
 MathJax.Hub.Register.StartupHook("TeX Jax Ready", function() {
   var TEX = MathJax.InputJax.TeX;
@@ -25,10 +27,13 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready", function() {
     decimalMarker = MML.mo('.');
   }
 
+  var coordSeparator = MML.mo(';');
+
   TEXDEF.Add({
     macros: {
       decmarker: 'DecimalMarker',
       num: 'Num',
+      coordsep: 'CoordSeparator'
     }
   }, null, true);
 
@@ -47,6 +52,9 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready", function() {
         MML.mrow(decimalMarker).With({class: 'MJX-TeXAtom-ORD'}),
         MML.mn(match[2])
       );
+    },
+    CoordSeparator: function(name) {
+      this.Push(coordSeparator);
     }
   });
 
