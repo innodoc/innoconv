@@ -17,6 +17,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\MDFPSpace', r'\,'),
     (r'\\MDFPaSpace', r'\,\,'),
     (r'\\MDFPeriod', r'\, .'),
+    (r'\\MTSP', r'\\:'),
     (r'\\MSetminus', r'\setminus'),
     (r'\\MElSetSep', ';'),
     (r'\\MIntvlSep', ';'),
@@ -41,6 +42,8 @@ MATH_SUBSTITUTIONS = (
     (r'\\MGeoDreieck{([A-Za-z0-9])}{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2\3'),
 
     (r'\\Id\((.*?)\)', r'\\operatorname{Id(\\mathrm{\1}}'),
+    (r'\\Mid', r'\\mathrm{id}'),
+
     (r'\\MRelates', r'\\stackrel{\\scriptscriptstyle\\wedge}{=}'),
     (r'\\Mmapsto', r'\\mapsto'),
     (r'\\MD\s', r'\\mathop{}\\!\\mathrm{d}'),
