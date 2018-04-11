@@ -13,17 +13,27 @@ INDEX_LABEL_PREFIX = 'index-label'
 COMMANDS_IRREGULAR = OrderedDict((
     ('MVector', r'\begin{{pmatrix}}{}\end{{pmatrix}}'),
     ('MPointTwoAS', r'\left({}\coordsep {}\right)'),
-    ('MPointTwo', {
-        2: r'({0}\coordsep {1})',
-        3: r'{0}({1}\coordsep {2}{{}}{0})',
-    }),
-    ('MPointThree', {
-        3: r'({}\coordsep {}\coordsep {})',
-        4: r'{0}({1}\coordsep {2}\coordsep {3}{{}}{0})',
-    }),
+    (
+        'MPointTwo', {
+            2: r'({0}\coordsep {1})',
+            3: r'{0}({1}\coordsep {2}{{}}{0})',
+        }
+    ),
+    (
+        'MPointThree', {
+            3: r'({}\coordsep {}\coordsep {})',
+            4: r'{0}({1}\coordsep {2}\coordsep {3}{{}}{0})',
+        }
+    ),
     (
         'MCases',
-        r'\left\lbrace{{\begin{{array}}{{rl}} {} \end{{array}}}}\right.'
+        r'\left\lbrace{{\begin{{array}}{{rl}} {} \end{{array}}}}\right.',
+    ),
+    (
+        'function',
+        r'{}:\;\left\lbrace{{\begin{{array}}{{rcl}} {} '
+        r'&\longrightarrow & {} \\ {} &\longmapsto  '
+        r'& {} \end{{array}}}}\right.',
     ),
 ))
 

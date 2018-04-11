@@ -8,9 +8,10 @@ from innoconv.mintmod_filter.math import handle_math
 class TestHandleSubstitutions(unittest.TestCase):
     def test_handle_math_substitutions(self):
         """Math substitutions should work"""
-        elem_math = pf.Math(r'\N \R')
+        elem_math = pf.Math(r'\N \Q {\R}')
         elem_math_repl = handle_math(elem_math)
-        self.assertEqual(elem_math_repl.text, r'\mathbb{N} \mathbb{R}')
+        self.assertEqual(
+            elem_math_repl.text, r'\mathbb{N} \mathbb{Q} {\mathbb{R}}')
 
 
 class TestHandleIrregular(unittest.TestCase):
@@ -92,4 +93,18 @@ class TestHandleIrregular(unittest.TestCase):
             elem_math_repl.text,
             r'\left\lbrace{\begin{array}{rl} \text{Term} & \text{falls}\;'
             r'\text{Term}\geq 0\\ -\text{Term} & \text{falls}\;\text{Term}<0 '
+            r'\end{array}}\right.')
+
+    def test_handle_math_function(self):
+        r"""function: commands in arguments"""
+        elem_math = pf.Math(
+            r'\function{h}{(-\frac{\pi}{2}\MIntvlSep \frac{\pi}{2})}'
+            r'{\R}{\alpha}{\tan(\alpha)}'
+        )
+        elem_math_repl = handle_math(elem_math)
+        self.assertEqual(
+            elem_math_repl.text,
+            r'h:\;\left\lbrace{\begin{array}{rcl} '
+            r'(-\frac{\pi}{2}; \frac{\pi}{2}) &\longrightarrow &'
+            r' \mathbb{R} \\ \alpha &\longmapsto  & \tan(\alpha) '
             r'\end{array}}\right.')
