@@ -8,6 +8,7 @@ from innoconv.utils import parse_nested_args
 MATH_SUBSTITUTIONS = (
     # leave \Rightarrow, ... intact
     (r'\\([NZQRC])($|[_\\$:=\s^,.])', r'\mathbb{\1}\2'),
+    (r'{\\([NZQRC])}', r'\mathbb{\1}'),
 
     (r'\\Mtfrac', r'\\tfrac'),
     (r'\\Mdfrac', r'\\dfrac'),
@@ -27,6 +28,9 @@ MATH_SUBSTITUTIONS = (
     (r'\\MBinom', r'\\binom'),
     (r'\\MTextSF', r'\\textsf'),
     (r'\\MHDots', r'\\dots'),
+    (r'\\Mvarphi', r'\\varphi'),
+    (r'\\lto', r'\\longrightarrow'),
+    (r'\\null', r''),
 
     (r'\\MSep', r'\\left\|{\\phantom{\\frac1g}}\\right.'),
     (r'\\MGrad', r'^{\\circ}'),
