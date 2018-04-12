@@ -122,4 +122,4 @@ class TestHandleIrregular(unittest.TestCase):
         elem_math = pf.Math(r'\MEinheit{kg}')
         elem_math_repl = handle_math(elem_math)
         self.assertEqual(elem_math_repl.text,
-                         r'\MThinspace  \mathrm{kg}')
+                         r'\, \mathrm{kg}')
