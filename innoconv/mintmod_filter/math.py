@@ -22,7 +22,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\MIntvlSep', ';'),
     (r'\\MEU', 'e'),
     (r'\\MDwSp', r'\,d'),
-    (r'\\ML', 'L'),
+    (r'\\ML', ' L'),
     (r'\\MEmptyset', r'\emptyset'),
     (r'\\MUnderset', r'\underset'),
     (r'\\MBinom', r'\\binom'),
