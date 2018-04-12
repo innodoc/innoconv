@@ -35,7 +35,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\null', r''),
     (r'\\MOhm', r'\\Omega'),
     (r'\\Mvarepsilon', r'\\varepsilon'),
-    (r'\\ld', r'\\text{ld}'),
+    (r'\\ld', r'\\mathrm{ld}'),
 
     (r'\\MSep', r'\\left\|{\\phantom{\\frac1g}}\\right.'),
     (r'\\MGrad', r'^{\\circ}'),
@@ -45,7 +45,8 @@ MATH_SUBSTITUTIONS = (
     (r'\\MGeoGerade{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2'),
     (r'\\MGeoDreieck{([A-Za-z0-9])}{([A-Za-z0-9])}{([A-Za-z0-9])}', r'\1\2\3'),
 
-    (r'\\Id\((.*?)\)', r'\\operatorname{Id(\\mathrm{\1}}'),
+    (r'\\Id\((.*?)\)', r'\\operatorname{Id}(\1)'),
+    (r'\\Id', r'\\mathrm{Id}'),
     (r'\\Mid', r'\\mathrm{id}'),
 
     (r'\\MRelates', r'\\stackrel{\\scriptscriptstyle\\wedge}{=}'),
