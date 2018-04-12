@@ -16,7 +16,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\MDFPSpace', r'\,'),
     (r'\\MDFPaSpace', r'\,\,'),
     (r'\\MDFPeriod', r'\, .'),
-    (r'\\MTSP', r'\\:'),
+    (r'\\MTSP', r''),
     (r'\\MSetminus', r'\setminus'),
     (r'\\MElSetSep', ';'),
     (r'\\MIntvlSep', ';'),
@@ -29,6 +29,8 @@ MATH_SUBSTITUTIONS = (
     (r'\\MTextSF', r'\\textsf'),
     (r'\\MHDots', r'\\dots'),
     (r'\\Mvarphi', r'\\varphi'),
+    (r'\\MDFPeriod', r'\, .'),
+    (r'\\Mmeasuredangle', r'\\measuredangle'),
     (r'\\lto', r'\\longrightarrow'),
     (r'\\null', r''),
 
