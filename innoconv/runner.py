@@ -3,7 +3,8 @@
 import os
 import subprocess
 
-from innoconv.constants import PANZER_SUPPORT_DIR, OUTPUT_FORMAT_EXT_MAP
+from innoconv.constants import (PANZER_SUPPORT_DIR, PANZER_TIMEOUT,
+                                OUTPUT_FORMAT_EXT_MAP)
 
 
 class InnoconvRunner():
@@ -55,7 +56,7 @@ class InnoconvRunner():
         proc = subprocess.Popen(
             cmd, cwd=source_lang_dir, stderr=subprocess.STDOUT, env=env)
 
-        return_code = proc.wait(timeout=600)
+        return_code = proc.wait(timeout=PANZER_TIMEOUT)
         if return_code != 0:
             raise RuntimeError("Failed to run panzer!")
 

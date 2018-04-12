@@ -9,7 +9,8 @@ import sys
 import panflute as pf
 from panflute.elements import from_json
 
-from innoconv.constants import REGEX_PATTERNS, ENCODING, INDEX_LABEL_PREFIX
+from innoconv.constants import (REGEX_PATTERNS, ENCODING, INDEX_LABEL_PREFIX,
+                                PANZER_TIMEOUT)
 from innoconv.errors import ParseError
 
 
@@ -70,7 +71,8 @@ def parse_fragment(parse_string, as_doc=False):
         raise RuntimeError("Panzer recursion depth exceeded!")
 
     proc = Popen(panzer_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=env)
-    out, err = proc.communicate(input=parse_string.encode(ENCODING))
+    out, err = proc.communicate(
+        input=parse_string.encode(ENCODING), timeout=PANZER_TIMEOUT)
     out = out.decode(ENCODING)
     err = err.decode(ENCODING)
 
