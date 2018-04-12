@@ -40,6 +40,14 @@ class TestHandleIrregular(unittest.TestCase):
             elem_math_repl.text,
             r'\Big(\frac{3}{2}\coordsep 1+\frac{\sqrt{3}}{2}{}\Big)')
 
+    def test_handle_math_mpointtwo_parse_bug(self):
+        r"""MPointTwo[\big]: a particular bug"""
+        elem_math = pf.Math(r'\MPointTwo[\Big]{\frac{1}{n}}{0}\MCondSetSep')
+        elem_math_repl = handle_math(elem_math)
+        self.assertEqual(
+            elem_math_repl.text,
+            r'\Big(\frac{1}{n}\coordsep 0{}\Big) {\,}:{\,}')
+
     def test_handle_math_mpointtwoas(self):
         r"""MPointTwoAS: commands in arguments"""
         elem_math = pf.Math(r'\MPointTwoAS{-\sqrt6}{-\frac12\sqrt6}')

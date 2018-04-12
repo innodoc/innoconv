@@ -12,7 +12,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\Mtfrac', r'\\tfrac'),
     (r'\\Mdfrac', r'\\dfrac'),
     (r'\\MBlank', r'\ '),
-    (r'\\MCondSetSep', r'{\,}:{\,}'),
+    (r'\\MCondSetSep', r' {\,}:{\,}'),
     (r'\\MDFPSpace', r'\,'),
     (r'\\MDFPaSpace', r'\,\,'),
     (r'\\MDFPeriod', r'\, .'),
