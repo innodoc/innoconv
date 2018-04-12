@@ -38,7 +38,18 @@ Special characters
 -  ``\"A`` → ``Ä``
 -  ``\"O`` → ``Ö``
 -  ``\"U`` → ``Ü``
+
+.. raw:: html
+
+   <!-- -->
+
 -  ``\"s`` → ``ß``
+-  ``\"s`` → ``ß``
+-  ``{\ss}`` → ``ß``
+-  ``\ss `` → ``ß``
+-  ``\ss\`` → ``ß``
+-  ``\ss{}`` → ``ß``
+-  ``\ss`` → ``ß``
 
 .. raw:: html
 
@@ -51,11 +62,20 @@ Special characters
 -  ``"O`` → ``Ö``
 -  ``"U`` → ``Ü``
 
+.. raw:: html
+
+   <!-- -->
+
+-  ``"``` → ``„``
+-  `````` → ``„``
+-  ``''`` → ``“``
+-  ``"'`` → ``“``
+
 Automate:
 
 .. code:: shell
 
-    find . -type f -name '*.tex' | xargs sed -i 's/\\"a/ä/g'
+    find . -type f -name '*.tex' -or -name '*.rtex' | xargs sed -i 's/\\"a/ä/g'
 
 ``\IncludeModule``
 ~~~~~~~~~~~~~~~~~~
