@@ -33,6 +33,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\Mmeasuredangle', r'\\measuredangle'),
     (r'\\lto', r'\\longrightarrow'),
     (r'\\null', r''),
+    (r'\\MOhm', r'\\Omega'),
 
     (r'\\MSep', r'\\left\|{\\phantom{\\frac1g}}\\right.'),
     (r'\\MGrad', r'^{\\circ}'),
