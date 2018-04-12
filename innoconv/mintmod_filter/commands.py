@@ -54,9 +54,14 @@ class Commands():
     def handle_mtitle(self, cmd_args, elem):
         r"""Handle ``\MTitle`` command.
 
-        These is an equivalent to ``\subsubsection``
+        This is an equivalent to ``\subsubsection``
         """
         return create_header(cmd_args[0], level=4, doc=elem.doc)
+
+    def handle_msubsubsubsectionx(self, cmd_args, elem):
+        r"""Handle ``\MSeubsubsubsectionx`` command. Which will generate a level
+        5 header."""
+        return create_header(cmd_args[0], level=5, doc=elem.doc)
 
     ###########################################################################
     # Metadata
