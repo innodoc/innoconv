@@ -89,6 +89,13 @@ jQuery(function() {
     });
     return result;
   };
+
+  window.showUnhandledEnvironments = function() {
+    var unhandledEnvs = $('.innoconv-debug-unknown-environment');
+    $('body').html('');
+    $('body').append(unhandledEnvs);
+  }
+
 });
 </script>
 $for(include-after)$
