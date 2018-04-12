@@ -37,7 +37,7 @@ COMMANDS_IRREGULAR = OrderedDict((
     ),
     (
         'MEinheit',
-        r'\MThinspace  \mathrm{{{}}}'
+        r'\, \mathrm{{{}}}'
     ),
 ))
 
