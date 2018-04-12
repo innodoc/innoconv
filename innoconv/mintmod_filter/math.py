@@ -51,7 +51,6 @@ MATH_SUBSTITUTIONS = (
 
     (r'\\MRelates', r'\\stackrel{\\scriptscriptstyle\\wedge}{=}'),
     (r'\\Mmapsto', r'\\mapsto'),
-    (r'\\MD\s', r'\\mathop{}\\!\\mathrm{d}'),
 
     # handled by innoconv.mathjax.js
     (r'\\MZahl{([0-9]+?)}{([0-9]*?)}', r'\\num{\1.\2}'),
@@ -66,6 +65,9 @@ MATH_SUBSTITUTIONS = (
     # vectors
     (r'\\MDVec', r'\\overrightarrow'),
     (r'\\MVec{', r'\\vec{'),  # trailing '{' so it doesn't touch \MVector
+
+    # italic integral
+    (r'\\MD', r'd'),
 
     # preprocess '\MPointTwo[\Big]{}{}' -> '\MPointTwo{\Big}{}{}'
     (r'\\MPoint(Two|Three)\[([^]]+)\]', r'\\MPoint\1{\2}'),
