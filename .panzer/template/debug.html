@@ -90,10 +90,42 @@ jQuery(function() {
     return result;
   };
 
+  window.findUnknownEnvironments = function() {
+    return jQuery('.innoconv-debug-unknown-environment');
+  }
+
+  window.findUnknownCommands = function() {
+    return jQuery('.innoconv-debug-unknown-command');
+  }
+
+  window.findUniqueElementsFromList = function(arr) {
+    var result = [];
+    jQuery.each(arr, function(idx, elem) {
+      var elemType = jQuery(elem).attr('class').split(" ").pop();
+      if (jQuery.inArray(elemType, result) == -1) result.push(elemType);
+    });
+    return result;
+  }
+
+  window.findUnknownEnvironmentsUnique = function() {
+    return findUniqueElementsFromList(findUnknownEnvironments());
+  }
+
+  window.findUnknownCommandsUnique = function() {
+    return findUniqueElementsFromList(findUnknownCommands());
+  }
+
+  window.showElemsWithSpecificClass = function(classname) {
+    var elements = jQuery('.' + classname);
+    jQuery('body').html('');
+    jQuery('body').append(elements);
+  }
+
   window.showUnhandledEnvironments = function() {
-    var unhandledEnvs = $('.innoconv-debug-unknown-environment');
-    $('body').html('');
-    $('body').append(unhandledEnvs);
+    window.showElemsWithSpecificClass('innoconv-debug-unknown-environment');
+  }
+  window.showUnhandledCommands = function() {
+    window.showElemsWithSpecificClass('innoconv-debug-unknown-command');
   }
 
 });
