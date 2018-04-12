@@ -65,6 +65,9 @@ class Environments():
         div.content.insert(0, header)
         return div
 
+    ###########################################################################
+    # Exercises
+
     def handle_mexercises(self, elem_content, env_args, elem):
         r"""Handle ``\MExercises`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISES'])
@@ -72,6 +75,21 @@ class Environments():
     def handle_mexercise(self, elem_content, env_args, elem):
         r"""Handle ``\MExercise`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISE'])
+
+    def handle_mexerciseitems(self, elem_content, env_args, elem):
+        r"""Handle ``\MExerciseitems`` environments by returning an ordered list
+        containing the ``\item`` s defined in the environment. This is needed
+        on top of handle_itemize as there are also mexerciseitems environments
+        outside itemize environments."""
+        return self._replace_mexerciseitems(elem)
+
+    ###########################################################################
+
+    def handle_itemize(self, elem_content, env_args, elem):
+        r"""Handle itemize environments, that were not correctly recognized by
+        pandoc. This e.g. happens if there are ``\MExerciseItems`` environments
+        contained in the items."""
+        return self._replace_mexerciseitems(elem)
 
     def handle_minfo(self, elem_content, env_args, elem):
         r"""Handle ``\MInfo`` environment."""
@@ -114,3 +132,12 @@ class Environments():
     def handle_mcoshzusatz(self, elem_content, env_args, elem):
         r"""Handle ``\MCOSHZusatz`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MCOSHZUSATZ'])
+
+    def _replace_mexerciseitems(self, elem):
+        r"""Helper function to replace `MExerciseItems` with enumerate in elem
+        text and return the pandoc output of the parsed altered element."""
+        elem.text = elem.text.replace('\\begin{MExerciseItems}',
+                                      '\\begin{enumerate}')
+        elem.text = elem.text.replace('\\end{MExerciseItems}',
+                                      '\\end{enumerate}')
+        return parse_fragment(elem.text)
