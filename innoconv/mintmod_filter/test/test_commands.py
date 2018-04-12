@@ -227,6 +227,32 @@ class TestCommands(unittest.TestCase):
         self.assertIsInstance(ret, pf.Math)
         self.assertEqual(ret.text, r'\num{1.2}')
 
+    def test_handle_mentry(self):
+        r"""\MEntry without math"""
+        elem = pf.RawInline(r'\MEntry{Bla bla}{bla}', format='latex')
+        ret = self.commands.handle_mentry(['Bla bla', 'bla'], elem)
+        self.assertIsInstance(ret, pf.Span)
+        self.assertEqual('index-bla', ret.identifier)
+        strong = ret.content[0]
+        self.assertIsInstance(strong, pf.Strong)
+        self.assertEqual(strong.content[0].text, 'Bla')
+        self.assertEqual(strong.content[2].text, 'bla')
+
+    def test_handle_mentry_math(self):
+        r"""\MEntry with math inside"""
+        elem = pf.RawInline(
+            r'\MEntry{$\MTextSF{floor}$-Funktion}{floor-Funktion}',
+            format='latex')
+        ret = self.commands.handle_mentry([
+            r'$\MTextSF{floor}$-Funktion', 'floor-Funktion'], elem)
+        self.assertIsInstance(ret, pf.Span)
+        self.assertEqual('index-floor-funktion', ret.identifier)
+        strong = ret.content[0]
+        self.assertIsInstance(strong, pf.Strong)
+        self.assertIsInstance(strong.content[0], pf.Math)
+        self.assertEqual(strong.content[0].text, r'\textsf{floor}')
+        self.assertEqual(strong.content[1].text, '-Funktion')
+
     def test_noops(self):
         """Test no-op commands."""
         noops = (

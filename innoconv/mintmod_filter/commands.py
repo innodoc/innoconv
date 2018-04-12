@@ -176,7 +176,8 @@ class Commands():
         text = cmd_args[0]
         concept = cmd_args[1]
         strong = pf.Strong()
-        strong.content.extend(destringify(text))
+
+        strong.content.extend(parse_fragment(text)[0].content)
         span = pf.Span()
         span.identifier = 'index-{}'.format(slugify(concept))
         span.attributes = {'data-index-concept': concept}
