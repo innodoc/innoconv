@@ -7,7 +7,7 @@ from innoconv.utils import parse_nested_args, log
 
 MATH_SUBSTITUTIONS = (
     # leave \Rightarrow, ... intact
-    (r'\\([NZQRC])($|[_\\$:=\s^,.}])', r'\mathbb{\1}\2'),
+    (r'\\([NZQRC])($|[_\\$:=\s^,.})])', r'\mathbb{\1}\2'),
 
     (r'\\Mtfrac', r'\\tfrac'),
     (r'\\Mdfrac', r'\\dfrac'),
