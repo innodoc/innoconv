@@ -77,11 +77,18 @@ Automate:
 
     find . -type f -name '*.tex' -or -name '*.rtex' | xargs sed -i 's/\\"a/ä/g'
 
+Unwanted LaTeX
+~~~~~~~~~~~~~~~~~~
+
+-  ``\-`` → ```` (remove all occurences of hyphenation)
+
 ``\IncludeModule``
 ~~~~~~~~~~~~~~~~~~
 
 ``\IncludeModule{VBKM01}{vbkm01.tex}`` becomes
 ``\input{VBKM01/vbkm01.tex}``.
+
+
 
 Clean up code
 ~~~~~~~~~~~~~
