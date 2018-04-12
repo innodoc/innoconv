@@ -116,3 +116,10 @@ class TestHandleIrregular(unittest.TestCase):
             r'(-\frac{\pi}{2}; \frac{\pi}{2}) &\longrightarrow &'
             r' \mathbb{R} \\ \alpha &\longmapsto  & \tan(\alpha) '
             r'\end{array}}\right.')
+
+    def test_handle_math_meinheit(self):
+        r"""MEinheit"""
+        elem_math = pf.Math(r'\MEinheit{kg}')
+        elem_math_repl = handle_math(elem_math)
+        self.assertEqual(elem_math_repl.text,
+                         r'\MThinspace  \mathrm{kg}')

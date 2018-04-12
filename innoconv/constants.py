@@ -35,6 +35,10 @@ COMMANDS_IRREGULAR = OrderedDict((
         r'&\longrightarrow & {} \\ {} &\longmapsto  '
         r'& {} \end{{array}}}}\right.',
     ),
+    (
+        'MEinheit',
+        r'\MThinspace  \mathrm{{{}}}'
+    ),
 ))
 
 #: Regular expressions
