@@ -119,7 +119,7 @@ class TestHandleIrregular(unittest.TestCase):
 
     def test_handle_math_meinheit(self):
         r"""MEinheit"""
-        elem_math = pf.Math(r'\MEinheit{kg}')
+        elem_math = pf.Math(r'\MEinheit{kg} -58^{\circ}{\MEinheit[]{C}}')
         elem_math_repl = handle_math(elem_math)
         self.assertEqual(elem_math_repl.text,
-                         r'\, \mathrm{kg}')
+                         r'\, \mathrm{kg} -58^{\circ}{\mathrm{C}}')

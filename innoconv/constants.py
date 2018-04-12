@@ -36,8 +36,10 @@ COMMANDS_IRREGULAR = OrderedDict((
         r'& {} \end{{array}}}}\right.',
     ),
     (
-        'MEinheit',
-        r'\, \mathrm{{{}}}'
+        'MEinheit', {
+            1: r'\, \mathrm{{{}}}',
+            2: r'\mathrm{{{1}}}',
+        },
     ),
 ))
 

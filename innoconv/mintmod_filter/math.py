@@ -69,6 +69,9 @@ MATH_SUBSTITUTIONS = (
 
     # preprocess '\MPointTwo[\Big]{}{}' -> '\MPointTwo{\Big}{}{}'
     (r'\\MPoint(Two|Three)\[([^]]+)\]', r'\\MPoint\1{\2}'),
+
+    # preprocess '\MEinheit[]' -> '\MEinheit{}'
+    (r'\\MEinheit\[\]', r'\\MEinheit{}'),
 )
 
 
