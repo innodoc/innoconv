@@ -36,6 +36,7 @@ MATH_SUBSTITUTIONS = (
     (r'\\MOhm', r'\\Omega'),
     (r'\\Mvarepsilon', r'\\varepsilon'),
     (r'\\ld\(', r'\\mathrm{ld}('),
+    (r'\\MGGT', r'\\mathrm{ggT}'),
 
     (r'\\MSep', r'\\left\|{\\phantom{\\frac1g}}\\right.'),
     (r'\\MGrad', r'^{\\circ}'),
