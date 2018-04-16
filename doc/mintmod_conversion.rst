@@ -81,6 +81,7 @@ Unwanted LaTeX
 ~~~~~~~~~~~~~~~~~~
 
 -  ``\-`` → ```` (remove all occurences of hyphenation)
+- remove all ``\pagebreak`` commands
 
 ``\IncludeModule``
 ~~~~~~~~~~~~~~~~~~
