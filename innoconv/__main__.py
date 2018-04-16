@@ -69,6 +69,11 @@ def parse_cli_args():
                                     action='store_true',
                                     help=debug_help)
 
+    ign_exercises_help = "don't show logs for unknown exercise commands/envs"
+    innoconv_argparser.add_argument('-i', '--ignore-exercises',
+                                    action='store_true',
+                                    help=ign_exercises_help)
+
     return vars(innoconv_argparser.parse_args())
 
 
@@ -84,6 +89,7 @@ def main():
 
     runner = InnoconvRunner(
         args['source_dir'], output_dir, args['language_code'],
+        ignore_exercises=args['ignore_exercises'],
         output_format=args['output_format'], debug=args['debug'])
     filename_out = runner.run()
     debug('Build finished: {}'.format(filename_out))

@@ -1,10 +1,12 @@
 """Pandoc filter that transforms mintmod commands."""
 
+from os import environ
 import panflute as pf
 from slugify import slugify
 
 from innoconv.errors import ParseError
-from innoconv.constants import REGEX_PATTERNS, ELEMENT_CLASSES
+from innoconv.constants import (REGEX_PATTERNS, ELEMENT_CLASSES,
+                                EXERCISE_CMDS_ENVS)
 from innoconv.utils import log, destringify, parse_cmd, parse_nested_args
 from innoconv.mintmod_filter.environments import Environments
 from innoconv.mintmod_filter.commands import Commands
@@ -26,7 +28,7 @@ class MintmodFilterAction:
 
         This method receives document elements from Pandoc and delegates
         handling of simple subtitutions, mintmod commands and
-        environments.
+        .ments.
 
         :param elem: Element to handle
         :type elem: :class:`panflute.base.Element`
@@ -70,7 +72,10 @@ class MintmodFilterAction:
         func = getattr(self._commands, function_name, None)
         if callable(func):
             return func(cmd_args, elem)
-        log("Could not handle command %s." % cmd_name, level='WARNING')
+
+        if (not bool(environ.get('INNOCONV_IGNORE_EXERCISES', False)) or
+                cmd_name not in EXERCISE_CMDS_ENVS):
+            log("Could not handle command %s." % cmd_name, level='WARNING')
         if self._debug:
             return self._unknown_command_debug(cmd_name, elem)
         return None
@@ -109,7 +114,11 @@ class MintmodFilterAction:
         func = getattr(self._environments, function_name, None)
         if callable(func):
             return func(rest, env_args, elem)
-        log("Could not handle environment %s." % env_name, level='WARNING')
+
+        if (not bool(environ.get('INNOCONV_IGNORE_EXERCISES', False)) or
+                env_name not in EXERCISE_CMDS_ENVS):
+            log("Could not handle environment %s." % env_name, level='WARNING')
+
         if self._debug:
             return self._unknown_environment_debug(env_name, elem)
         return None

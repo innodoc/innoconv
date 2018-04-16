@@ -8,6 +8,14 @@ import os
 #: Element class for index labels
 INDEX_LABEL_PREFIX = 'index-label'
 
+#: Don't show this unknown commands/envs in error log
+EXERCISE_CMDS_ENVS = (
+    'MLParsedQuestion', 'MLSimplifyQuestion', 'MLFunctionQuestion',
+    'MDirectRouletteExercises', 'MSetPoints', 'MLCheckbox',
+    'MLIntervalQuestion', 'MGroupButton', 'MLQuestion', 'MExerciseCollection',
+    'MQuestionGroup',
+)
+
 #: Simple Regex substitutions for math
 MATH_SUBSTITUTIONS = (
     # leave \Rightarrow, ... intact
