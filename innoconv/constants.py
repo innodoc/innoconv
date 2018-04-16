@@ -74,6 +74,10 @@ MATH_SUBSTITUTIONS = (
     # italic integral
     (r'\\MD', r'd'),
 
+    # MCaseEnv
+    (r'\\begin{MCaseEnv}', r'\\left\\lbrace\\begin{array}{rl}'),
+    (r'\\end{MCaseEnv}', r'\\end{array}\\right.'),
+
     # preprocess '\MPointTwo[\Big]{}{}' -> '\MPointTwo{\Big}{}{}'
     (r'\\MPoint(Two|Three)\[([^]]+)\]', r'\\MPoint\1{\2}'),
 
@@ -138,6 +142,8 @@ REGEX_PATTERNS = {
         re.compile('({})'.format(
             '|'.join(r'\\{}'.format(cmd)
                      for cmd in list(COMMANDS_IRREGULAR.keys())))),
+
+    'MATH_MCASEENV': re.compile('\begin{MCaseEnv}'),
 }
 
 #: Element classes

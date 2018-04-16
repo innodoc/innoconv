@@ -123,3 +123,16 @@ class TestHandleIrregular(unittest.TestCase):
         elem_math_repl = handle_math(elem_math)
         self.assertEqual(elem_math_repl.text,
                          r'\, \mathrm{kg} -58^{\circ}{\mathrm{C}}')
+
+
+class TestHandleMCaseEnv(unittest.TestCase):
+    def test_handle_mcaseenv(self):
+        """MMCaseEnv"""
+        elem_math = pf.Math(
+            r'|x| = \begin{MCaseEnv} x & \text{falls}\;x\geq 0 '
+            r'\\ -x & \text{falls}\;x<0 \MDFPeriod \end{MCaseEnv}')
+        elem_math_repl = handle_math(elem_math)
+        self.assertEqual(
+            elem_math_repl.text,
+            r'|x| = \left\lbrace\begin{array}{rl} x & \text{falls}\;x\geq 0 '
+            r'\\ -x & \text{falls}\;x<0 \, . \end{array}\right.')
