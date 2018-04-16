@@ -80,17 +80,29 @@ Automate:
 Unwanted LaTeX
 ~~~~~~~~~~~~~~~~~~
 
--  ``\-`` → ```` (remove all occurences of hyphenation)
-- remove all ``\pagebreak`` commands
-- remove all ``\relax`` commands
+Remove
+
+- ``\input{mintmod.tex}``
+- ``\input{english.tex}``
+- ``\begin{document}`` ``\begin{document}``
+- ``\MPragma{MathSkip}``
+- ``\Mtikzexternalize``
+- ``\relax`` commands
+- ``\-`` (remove all occurences of hyphenation)
+- ``\pagebreak`` commands
+- ``\newpage`` commands
+- ``\MPrintIndex`` commands
+- ``\relax`` commands
+
+.. code:: shell
+
+    find . -type f -name '*.tex' -or -name '*.rtex' | xargs perl -i -pe 's/\\input{mintmod(.tex|)}\w*\n//igs'
 
 ``\IncludeModule``
 ~~~~~~~~~~~~~~~~~~
 
 ``\IncludeModule{VBKM01}{vbkm01.tex}`` becomes
 ``\input{VBKM01/vbkm01.tex}``.
-
-
 
 Clean up code
 ~~~~~~~~~~~~~
