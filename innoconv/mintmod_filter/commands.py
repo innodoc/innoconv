@@ -51,6 +51,10 @@ class Commands():
         r"""Handle ``\MSubsection``"""
         return create_header(cmd_args[0], level=3, doc=elem.doc)
 
+    def handle_msubsubsection(self, cmd_args, elem):
+        r"""Handle ``\MSubsubsection``"""
+        return create_header(cmd_args[0], level=4, doc=elem.doc)
+
     def handle_mtitle(self, cmd_args, elem):
         r"""Handle ``\MTitle`` command.
 
@@ -59,7 +63,7 @@ class Commands():
         return create_header(cmd_args[0], level=4, doc=elem.doc)
 
     def handle_msubsubsubsectionx(self, cmd_args, elem):
-        r"""Handle ``\MSeubsubsubsectionx`` command. Which will generate a level
+        r"""Handle ``\MSubsubsubsectionx`` command. Which will generate a level
         5 header."""
         return create_header(cmd_args[0], level=5, doc=elem.doc)
 
