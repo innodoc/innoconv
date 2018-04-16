@@ -68,6 +68,11 @@ class MintmodFilterAction:
 
     def _handle_command(self, cmd_name, cmd_args, elem):
         """Parse and handle mintmod commands."""
+
+        if (bool(environ.get('INNOCONV_REMOVE_EXERCISES', False)) and
+                cmd_name in EXERCISE_CMDS_ENVS):
+            return []
+
         function_name = 'handle_%s' % slugify(cmd_name)
         func = getattr(self._commands, function_name, None)
         if callable(func):
@@ -106,6 +111,10 @@ class MintmodFilterAction:
 
         env_name = match.group('env_name')
         inner_code = match.groups()[1]
+
+        if (bool(environ.get('INNOCONV_REMOVE_EXERCISES', False)) and
+                env_name in EXERCISE_CMDS_ENVS):
+            return []
 
         # Parse optional arguments
         env_args, rest = parse_nested_args(inner_code)

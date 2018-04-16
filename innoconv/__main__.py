@@ -74,6 +74,11 @@ def parse_cli_args():
                                     action='store_true',
                                     help=ign_exercises_help)
 
+    rem_exercises_help = "remove all exercise commands/envs"
+    innoconv_argparser.add_argument('-r', '--remove-exercises',
+                                    action='store_true',
+                                    help=rem_exercises_help)
+
     return vars(innoconv_argparser.parse_args())
 
 
@@ -87,9 +92,15 @@ def main():
 
     output_dir = os.path.join(args['output_dir_base'], args['language_code'])
 
+    if args['remove_exercises'] and not args['ignore_exercises']:
+        debug(
+            "Warning: Setting --remove-exercises implies --ignore-exercises.")
+        args['ignore_exercises'] = True
+
     runner = InnoconvRunner(
         args['source_dir'], output_dir, args['language_code'],
         ignore_exercises=args['ignore_exercises'],
+        remove_exercises=args['remove_exercises'],
         output_format=args['output_format'], debug=args['debug'])
     filename_out = runner.run()
     debug('Build finished: {}'.format(filename_out))
