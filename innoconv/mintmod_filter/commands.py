@@ -300,13 +300,6 @@ class Commands():
             return pf.RawBlock(cmd_args[0][5:], format='html')
         return None
 
-    def handle_mssectionlabelprefix(self, cmd_args, elem):
-        r"""Handle ``\MSsectionlabelprefix`` command.
-
-        This command inserts the translation for 'section'.
-        """
-        return pf.Str('Abschnitt')  # TODO: i18n (#4)
-
     def handle_minputhint(self, cmd_args, elem):
         r"""Handle ``\MInputHint`` command."""
         content = parse_fragment(cmd_args[0])

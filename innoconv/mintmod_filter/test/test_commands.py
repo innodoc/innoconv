@@ -140,10 +140,6 @@ class TestCommands(unittest.TestCase):
             [r'python:print("html:")'], elem)
         self.assertIsNone(ret)
 
-    def test_handle_mssectionlabelprefix(self):
-        # TODO implement handle_mssectionlabelprefix, not specified, see #4
-        pass
-
     def test_handle_msref(self):
         """MSRef command"""
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
