@@ -219,15 +219,52 @@ def remove_empty_paragraphs(doc):
 
 
 def remember_element(doc, elem):
-    """Rememember an element in the document for later."""
+    """Rememember an element in the document for later.
+
+    To retrieve remembered elements use :py:func:`get_remembered_element`.
+
+    :param doc: Document where to store the memory
+    :type doc: :py:class:`panflute.elements.Doc`
+    :param elem: Element to remember
+    :type elem: :py:class:`panflute.base.Element`
+    """
     doc.remembered_element = elem
 
 
 def get_remembered_element(doc):
-    """Retrieve rememembered element from the document and forget it."""
+    """Retrieve rememembered element from the document and forget it.
+
+    To remember elements use :py:func:`remember_element`.
+
+    :param doc: Document where the element is stored
+    :type doc: :py:class:`panflute.elements.Doc`
+
+    :rtype: :py:class:`panflute.base.Element`
+    :returns: The remembered element or `None`
+    """
     try:
         elem = doc.remembered_element
     except AttributeError:
         return None
     del doc.remembered_element
+    return elem
+
+
+def block_wrap(elem, orig_elem):
+    """Wraps an element in a block if necessary.
+
+    If the original element was block panflute expects the return value to be
+    also block. In many places we need to detect this and wrap an inline.
+
+    :param elem: Element to be wrapped
+    :type elem: :py:class:`panflute.base.Element`
+    :param orig_elem: Original element
+    :type orig_elem: :py:class:`panflute.base.Element`
+
+    :rtype: :py:class:`panflute.base.Element`
+    :returns: ``elem`` or ``elem`` wrapped in
+        :py:class:`panflute.elements.Plain`
+    """
+    if isinstance(orig_elem, pf.Block):
+        return pf.Plain(elem)
     return elem

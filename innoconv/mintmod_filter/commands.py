@@ -13,7 +13,7 @@ import panflute as pf
 from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
-from innoconv.utils import (destringify, parse_fragment, log,
+from innoconv.utils import (block_wrap, destringify, parse_fragment, log,
                             get_remembered_element)
 from innoconv.mintmod_filter.elements import create_header, create_image
 
@@ -130,7 +130,7 @@ class Commands():
         """
         url = '#%s' % cmd_args[0]
         # TODO: insert referenced number (e.g. '1.2')
-        return pf.Link(pf.Str('PLACEHOLDER'), url=url)
+        return block_wrap(pf.Link(pf.Str('PLACEHOLDER'), url=url), elem)
 
     def handle_msref(self, cmd_args, elem):
         r"""Handle ``\MSRef`` command.
@@ -139,22 +139,18 @@ class Commands():
         """
         url = '#%s' % cmd_args[0]
         description = destringify(cmd_args[1])
-        return pf.Link(*description, url=url)
+        return block_wrap(pf.Link(*description, url=url), elem)
 
     def handle_mnref(self, cmd_args, elem):
         r"""Handle ``\MNRef`` command.
 
         This command inserts a section link.
         """
-
-        if isinstance(elem, pf.Block):
-            log("Warning: Expected Inline for MNRef: {}".format(cmd_args))
-
         identifier = cmd_args[0]
         span = pf.Span()
         span.attributes = {'data-link-section': identifier}
         span.content = [pf.Str(identifier)]
-        return span
+        return block_wrap(span, elem)
 
     def handle_mextlink(self, cmd_args, elem):
         r"""Handle ``\MExtLink`` command.
@@ -163,7 +159,8 @@ class Commands():
         """
         url = cmd_args[0]
         text = destringify(cmd_args[1])
-        return pf.Link(*text, url=url)
+        link = pf.Link(*text, url=url)
+        return block_wrap(link, elem)
 
     ###########################################################################
     # Glossary/index
@@ -186,7 +183,7 @@ class Commands():
         span.identifier = 'index-{}'.format(slugify(concept))
         span.attributes = {'data-index-concept': concept}
         span.content = [strong]
-        return span
+        return block_wrap(span, elem)
 
     def handle_mindex(self, cmd_args, elem):
         r"""Handle ``\MIndex`` command.
@@ -204,7 +201,7 @@ class Commands():
             'data-index-concept': concept,
             'hidden': 'hidden',
         }
-        return span
+        return block_wrap(span, elem)
 
     ###########################################################################
     # Media
@@ -254,9 +251,7 @@ class Commands():
             title=title,
             classes=ELEMENT_CLASSES['MYOUTUBE_VIDEO']
         )
-        if isinstance(elem, pf.Block):
-            return pf.Plain(link)
-        return link
+        return block_wrap(link, elem)
 
     def handle_mvideo(self, cmd_args, elem):
         r"""Handle ``\MVideo``.
@@ -271,9 +266,7 @@ class Commands():
             title=title,
             classes=ELEMENT_CLASSES['MVIDEO']
         )
-        if isinstance(elem, pf.Block):
-            return pf.Plain(link)
-        return link
+        return block_wrap(link, elem)
 
     def handle_mtikzauto(self, cmd_args, elem):
         r"""Handle ``\MTikzAuto`` command.

@@ -145,10 +145,11 @@ class TestCommands(unittest.TestCase):
         doc = pf.Doc(pf.RawBlock(r'\MSRef{fooid}{linktext}'), format='latex')
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msref(['fooid', 'linktext'], elem)
-        self.assertIsInstance(ret, pf.Link)
-        self.assertIsInstance(ret.content[0], pf.Str)
-        self.assertEqual(ret.content[0].text, 'linktext')
-        self.assertEqual(ret.url, '#fooid')
+        link = ret.content[0]
+        self.assertIsInstance(link, pf.Link)
+        self.assertIsInstance(link.content[0], pf.Str)
+        self.assertEqual(link.content[0].text, 'linktext')
+        self.assertEqual(link.url, '#fooid')
 
     def test_handle_mextlink(self):
         """MExtLink command"""
