@@ -129,6 +129,10 @@ class Environments():
         r"""Handle ``\MCOSHZusatz`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MCOSHZUSATZ'])
 
+    def handle_html(self, elem_content, env_args, elem):
+        r"""Handle ``\html`` environment."""
+        return parse_fragment(elem_content, from_format='html')
+
     def _replace_mexerciseitems(self, elem):
         r"""Helper function to replace `MExerciseItems` with enumerate in elem
         text and return the pandoc output of the parsed altered element."""

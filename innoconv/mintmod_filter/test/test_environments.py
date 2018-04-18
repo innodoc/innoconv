@@ -246,3 +246,37 @@ class TestMXInfo(unittest.TestCase):
         self.assertIsInstance(para.content[1], pf.Space)
         self.assertIsInstance(para.content[2], pf.Str)
         self.assertEqual(para.content[2].text, 'bar')
+
+
+class TestHtml(unittest.TestCase):
+
+    def setUp(self):
+        self.environments = Environments()
+
+    def test_handle_html(self):
+        """html"""
+        doc = pf.Doc()
+        html = r"""<p>
+        <h3 class="start">Suitable browsers</h3>
+        The following browsers can be used for the course: Firefox, Internet
+        Explorer, Chrome, Safari, Opera.<br />
+        Some other browsers have difficulties rendering our unit pages
+        correctly.
+        <br />
+        We recommend using only the fully updated latest versions of these
+        browsers. In particular, the course cannot be completed with obsolete
+        browsers such as Internet Explorer 8 or earlier.
+        </p>"""
+        elem_content = r"\\begin{{html}}\n{}\n\\end{{html}}""".format(html)
+        doc.content.extend([pf.RawBlock(elem_content, format='latex')])
+        elem = doc.content[0]  # this sets up elem.parent
+        ret = self.environments.handle_html(html, [], elem)
+        self.assertIsInstance(ret, list)
+        header = ret[0]
+        self.assertIsInstance(header, pf.Header)
+        self.assertEqual(header.content[0].text, 'Suitable')
+        self.assertEqual(header.content[2].text, 'browsers')
+        para = ret[1]
+        self.assertIsInstance(para, pf.Para)
+        self.assertEqual(len(para.content), 107)
+        self.assertEqual(para.content[106].text, 'earlier.')

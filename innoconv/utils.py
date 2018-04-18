@@ -40,14 +40,20 @@ def get_panzer_bin():
     return panzer_bin
 
 
-def parse_fragment(parse_string, as_doc=False):
+def parse_fragment(parse_string, as_doc=False, from_format='latex+raw_tex'):
     """Parse a source fragment using panzer.
 
     :param parse_string: Source fragment
     :type parse_string: str
+    :param as_doc: Return elements as :class:`panflute.elements.Doc`
+    :type as_doc: bool
+    :param from_format: Source format
+    :type from_format: str
 
-    :rtype: list
-    :returns: list of :class:`panflute.base.Element`
+    :rtype: list of :class:`panflute.base.Element` or
+        :class:`panflute.elements.Doc`
+    :returns: parsed elements
+
     :raises OSError: if panzer executable is not found
     :raises RuntimeError: if panzer recursion depth is exceeded
     :raises RuntimeError: if panzer output could not be parsed
@@ -57,7 +63,7 @@ def parse_fragment(parse_string, as_doc=False):
     panzer_cmd = [
         get_panzer_bin(),
         '---panzer-support', os.path.join(root_dir, '.panzer'),
-        '--from=latex+raw_tex',
+        '--from={}'.format(from_format),
         '--to=json',
         '--metadata=style:innoconv',
     ]
