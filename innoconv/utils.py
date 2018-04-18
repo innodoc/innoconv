@@ -101,6 +101,31 @@ def parse_fragment(parse_string, as_doc=False, from_format='latex+raw_tex'):
     return doc.content.list
 
 
+def to_inline(elem):
+    """Convert any given pandoc element to inline element(s). Some information
+    may be lost."""
+
+    classes = getattr(elem, 'classes', [])
+
+    if isinstance(elem, pf.Inline):
+        return elem
+    elif isinstance(elem, pf.CodeBlock):
+        return pf.Code(elem.text, classes=classes)
+
+    elif isinstance(elem, pf.Block):
+        elems = elem.content
+    elif isinstance(elem, list):
+        elems = elem
+
+    # dont nest too many spans
+    if len(elems) == 1:
+        return to_inline(elems[0])
+
+    ret = [to_inline(x) for x in elems]
+
+    return pf.Span(*ret, classes=classes)
+
+
 def destringify(string):
     """Takes a string and transforms it into list of Str and Space objects.
 

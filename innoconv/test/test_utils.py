@@ -9,7 +9,8 @@ import panflute as pf
 from innoconv.errors import ParseError
 from innoconv.utils import (parse_fragment, destringify, parse_cmd,
                             parse_nested_args, remove_empty_paragraphs,
-                            remember_element, get_remembered_element)
+                            remember_element, get_remembered_element,
+                            to_inline)
 from innoconv.test.utils import captured_output
 
 CONTENT = r"""
@@ -288,3 +289,61 @@ class TestRememberElement(unittest.TestCase):
         rememembered_img = get_remembered_element(doc)
         self.assertEqual(rememembered_img, img)
         self.assertIsNone(get_remembered_element(doc))
+
+
+class TestToInline(unittest.TestCase):
+
+    def test_to_inline(self):
+        """It should convert different elements correctly to inline"""
+
+        content1 = pf.Para(
+            pf.Strong(pf.Str('just some text'))
+        )
+        transformed1 = content1.content[0]
+
+        content2 = pf.Div(
+            pf.Para(
+                pf.Strong(pf.Str('again')),
+                pf.Space,
+                pf.Emph(pf.Str('normal'))
+            )
+        )
+
+        content3 = pf.Div(
+            pf.Para(
+                pf.Span(
+                    pf.Str('foo'),
+                    classes=['1st-span-class']
+                ),
+                pf.Span(
+                    pf.Strong(
+                        pf.Str('Unhandled'), pf.Space, pf.Str('command:')
+                    ),
+                    classes=['2nd-span-class']
+                ),
+            ),
+            pf.CodeBlock(r'\MLFunctionQuestion{10}{sin(x)}{5}{x}{5}{DS2}'),
+            classes=['div-class']
+        )
+
+        self.assertEqual(to_inline(content1), transformed1)
+
+        # test if nested inlining works
+        il_content2 = to_inline(content2)
+        self.assertIsInstance(il_content2.content[0], pf.Strong)
+        self.assertEqual(il_content2.content[0].content[0].text, 'again')
+        self.assertIsInstance(il_content2.content[2], pf.Emph)
+
+        # test if class conservation works and advanced nesting
+        il_content3 = to_inline(content3)
+        self.assertEqual(len(il_content3.content), 2)
+        self.assertEqual(len(il_content3.content[0].content), 2)
+        self.assertEqual(il_content3.classes, ['div-class'])
+        self.assertEqual(
+            il_content3.content[0].content[0].classes,
+            ['1st-span-class']
+        )
+        self.assertEqual(
+            il_content3.content[0].content[1].classes,
+            ['2nd-span-class']
+        )
