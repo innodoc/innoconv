@@ -14,7 +14,7 @@ from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
 from innoconv.utils import (block_wrap, destringify, parse_fragment, log,
-                            get_remembered_element)
+                            get_remembered_element, to_inline)
 from innoconv.mintmod_filter.elements import create_header, create_image
 
 
@@ -304,6 +304,23 @@ class Commands():
         if content and isinstance(content[0], pf.Para):
             span.content.extend(content[0].content)
         return span
+
+    def handle_mequationitem(self, cmd_args, elem):
+        r"""Handle ``\MEquationItem`` command."""
+
+        if len(cmd_args) != 2:
+            pf.debug("MEquationItem args must be math expressions: a = b")
+
+        content_left = parse_fragment(cmd_args[0])
+        content_right = parse_fragment(cmd_args[1])
+
+        return to_inline(
+            [
+                content_left,
+                pf.Math(r'\;\;=\;', format='InlineMath'),
+                content_right
+            ]
+        )
 
     ###########################################################################
     # Command pass-thru
