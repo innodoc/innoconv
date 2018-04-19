@@ -309,18 +309,24 @@ class Commands():
         r"""Handle ``\MEquationItem`` command."""
 
         if len(cmd_args) != 2:
-            pf.debug("MEquationItem args must be math expressions: a = b")
+            raise ValueError(
+                r'\MEquationItem needs 2 arguments. Received: {}'.format(
+                    cmd_args))
 
         content_left = parse_fragment(cmd_args[0])
         content_right = parse_fragment(cmd_args[1])
 
-        return to_inline(
+        content = to_inline(
             [
                 content_left,
                 pf.Math(r'\;\;=\;', format='InlineMath'),
-                content_right
+                content_right,
             ]
         )
+
+        if isinstance(elem, pf.Block):
+            return pf.Plain(content)
+        return content
 
     ###########################################################################
     # Command pass-thru
