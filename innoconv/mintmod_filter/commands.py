@@ -515,6 +515,10 @@ class Commands():
         r"""Handle ``\clearpage`` command."""
         return self._noop()
 
+    def handle_noindent(self, cmd_args, elem):
+        r"""Handle ``\noindent`` command."""
+        return self._noop()
+
     @staticmethod
     def _noop():
         """Return no elements."""
