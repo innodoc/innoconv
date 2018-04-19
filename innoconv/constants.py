@@ -219,7 +219,7 @@ ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 PANZER_SUPPORT_DIR = os.path.join(ROOT_DIR, '.panzer')
 
 #: timeout for panzer child-process (in seconds)
-PANZER_TIMEOUT = 1200
+PANZER_TIMEOUT = 1800
 
 #: encoding used in this project
 ENCODING = 'utf-8'
