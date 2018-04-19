@@ -80,7 +80,12 @@ class MintmodFilterAction:
 
         if (not bool(environ.get('INNOCONV_IGNORE_EXERCISES', False)) or
                 cmd_name not in EXERCISE_CMDS_ENVS):
-            log("Could not handle command %s." % cmd_name, level='WARNING')
+            if len(cmd_name) == 1:
+                log("1-character-command '{}': {}".format(cmd_name, elem),
+                    level='WARNING')
+                log("Parent: {}".format(elem.parent))
+            else:
+                log("Could not handle command %s." % cmd_name, level='WARNING')
         if self._debug:
             return self._unknown_command_debug(cmd_name, elem)
         return None
