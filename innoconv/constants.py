@@ -13,7 +13,7 @@ EXERCISE_CMDS_ENVS = (
     'MLParsedQuestion', 'MLSimplifyQuestion', 'MLFunctionQuestion',
     'MDirectRouletteExercises', 'MSetPoints', 'MLCheckbox',
     'MLIntervalQuestion', 'MGroupButton', 'MLQuestion', 'MExerciseCollection',
-    'MQuestionGroup',
+    'MQuestionGroup', 'MLSpecialQuestion',
 )
 
 #: Simple Regex substitutions for math
