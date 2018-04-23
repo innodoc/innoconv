@@ -80,8 +80,9 @@ class Commands():
 
         Command defines the document title.
         """
-        elem.doc.metadata['title'] = pf.MetaString(cmd_args[0])
-        return []
+        if not hasattr(elem.doc.metadata, 'title'):
+            elem.doc.metadata['title'] = pf.MetaString(cmd_args[0])
+        return create_header(cmd_args[0], level=1, doc=elem.doc)
 
     def handle_msetsubject(self, cmd_args, elem):
         r"""Handle ``\MSetSubject{}`` command.
