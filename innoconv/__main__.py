@@ -41,8 +41,8 @@ def parse_cli_args():
     innoconv_argparser.add_argument('-h', '--help',
                                     action='help',
                                     help="show this help message and exit")
-    innoconv_argparser.add_argument('source_dir',
-                                    help="content directory")
+    innoconv_argparser.add_argument('source',
+                                    help="content directory or file")
 
     output_help = 'output base directory (default: "{}")'.format(
         DEFAULT_OUTPUT_DIR_BASE)
@@ -90,15 +90,13 @@ def main():
         debug("Warning: Setting output format to 'html5' in debug mode.")
         args['output_format'] = 'html5'
 
-    output_dir = os.path.join(args['output_dir_base'], args['language_code'])
-
     if args['remove_exercises'] and not args['ignore_exercises']:
         debug(
             "Warning: Setting --remove-exercises implies --ignore-exercises.")
         args['ignore_exercises'] = True
 
     runner = InnoconvRunner(
-        args['source_dir'], output_dir, args['language_code'],
+        args['source'], args['output_dir_base'], args['language_code'],
         ignore_exercises=args['ignore_exercises'],
         remove_exercises=args['remove_exercises'],
         output_format=args['output_format'], debug=args['debug'])

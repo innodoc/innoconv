@@ -45,11 +45,11 @@ class Commands():
 
     def handle_msection(self, cmd_args, elem):
         r"""Handle ``\MSection`` command."""
-        return create_header(cmd_args[0], level=2, doc=elem.doc)
+        return create_header(cmd_args[0], level=1, doc=elem.doc)
 
     def handle_msubsection(self, cmd_args, elem):
         r"""Handle ``\MSubsection``"""
-        return create_header(cmd_args[0], level=3, doc=elem.doc)
+        return create_header(cmd_args[0], level=2, doc=elem.doc)
 
     def handle_msubsubsection(self, cmd_args, elem):
         r"""Handle ``\MSubsubsection``"""
