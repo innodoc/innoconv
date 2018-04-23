@@ -223,3 +223,11 @@ PANZER_TIMEOUT = 1800
 
 #: encoding used in this project
 ENCODING = 'utf-8'
+
+#: Translatable strings
+TRANSLATIONS = {
+    'introduction': {
+        'de': 'Einführung',
+        'en': 'Introduction',
+    },
+}

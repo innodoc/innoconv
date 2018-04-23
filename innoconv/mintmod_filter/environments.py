@@ -10,7 +10,7 @@ Handle mintmod LaTeX environments.
     ``\begin{MXContent}…\end{MXContent}`` environment.
 """
 
-from innoconv.constants import ELEMENT_CLASSES, REGEX_PATTERNS
+from innoconv.constants import ELEMENT_CLASSES, REGEX_PATTERNS, TRANSLATIONS
 from innoconv.mintmod_filter.elements import create_content_box, create_header
 from innoconv.utils import parse_fragment, extract_identifier
 
@@ -59,7 +59,14 @@ class Environments():
 
     def handle_mintro(self, elem_content, env_args, elem):
         r"""Handle ``\MIntro`` environment."""
-        return create_content_box(elem_content, ELEMENT_CLASSES['MINTRO'])
+        content = parse_fragment(elem_content)
+        lang = elem.doc.metadata['lang'].text
+        header = create_header(
+            TRANSLATIONS['introduction'][lang], elem.doc, level=3)
+        # pylint: disable=no-member
+        header.classes.extend(ELEMENT_CLASSES['MINTRO'])
+        content.insert(0, header)
+        return content
 
     ###########################################################################
     # Exercises
