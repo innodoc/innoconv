@@ -111,6 +111,8 @@ def to_inline(elem):
         return elem
     elif isinstance(elem, pf.CodeBlock):
         return pf.Code(elem.text, classes=classes)
+    elif isinstance(elem, pf.RawBlock):
+        return pf.RawInline(elem.text, format=elem.format)
 
     elif isinstance(elem, pf.Block):
         elems = elem.content
