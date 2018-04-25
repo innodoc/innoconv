@@ -86,6 +86,20 @@ class Environments():
         outside itemize environments."""
         return self._replace_mexerciseitems(elem)
 
+    def handle_mquestiongroup(self, elem_content, env_args, elem):
+        r"""Handle ``\MQuestionGroup`` environments. That are used to group
+        together exercises, in order to allow synchronous validation.
+        Especially used in checkbox grids.
+        In mintmod, a button is also rendered below the contained exercises in
+        the group.
+        This function just returns a div with a class, in order to leave the
+        validation logic, to client scripts"""
+        print(env_args)
+        return create_content_box(
+            elem_content,
+            ELEMENT_CLASSES['MQUESTIONGROUP']
+        )
+
     ###########################################################################
 
     def handle_itemize(self, elem_content, env_args, elem):

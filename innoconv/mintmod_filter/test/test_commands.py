@@ -396,3 +396,23 @@ class TestGraphics(unittest.TestCase):
         ret = self.commands.handle_mugraphicssolo(elem_args, elem)
         self.assertIsInstance(ret, pf.Image)
         self.assertEqual(ret.url, 'foo.jpg')
+
+
+class TestExercises(unittest.TestCase):
+
+    def setUp(self):
+        self.commands = Commands()
+
+    def test_handle_mquestion(self):
+        """MQuestion command inline"""
+        content = r'\MLParsedQuestion{10}{5}{3}{ER1}'
+        doc = pf.Doc(pf.RawBlock(content), format='latex')
+        elem = doc.content[0]  # this sets up elem.parent
+        elem_args = ['10', '5', '3', 'ER1']
+        ret = self.commands.handle_mlparsedquestion(elem_args, elem)
+        self.assertEqual(ret.classes, ['exercise', 'text'])
+        self.assertEqual(ret.attributes['length'], '10')
+        self.assertEqual(ret.attributes['solution'], '5')
+        self.assertEqual(ret.attributes['precision'], '3')
+        self.assertEqual(ret.attributes['uxid'], 'ER1')
+        self.assertEqual(ret.attributes['validator'], 'math')

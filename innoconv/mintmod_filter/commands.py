@@ -14,7 +14,7 @@ from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
 from innoconv.utils import (block_wrap, destringify, parse_fragment, log,
-                            get_remembered_element, to_inline)
+                            get_remembered_element, to_inline, Exercise)
 from innoconv.mintmod_filter.elements import create_header, create_image
 
 
@@ -285,6 +285,44 @@ class Commands():
         else:
             ret = pf.CodeBlock(tikz_code)
         ret.classes = ELEMENT_CLASSES['MTIKZAUTO']
+        return ret
+
+    ###########################################################################
+    # Exercises
+    def handle_mlquestion(self, cmd_args, elem):
+        if len(cmd_args) != 3:
+            log('Found \MLQuestion - item with invalid args: %s, args: %s'
+                % (elem, cmd_args), 'WARNING')
+
+        # attrs = [
+        #     ['length', cmd_args[0]],
+        #     ['solution', cmd_args[1]],
+        #     ['uxid', cmd_args[2]]
+        # ]
+
+        return Exercise('MLQuestion', cmd_args)
+
+        # return pf.Code('', '', ['exercise', 'inline', 'text'], attrs)
+
+    def handle_mlparsedquestion(self, cmd_args, elem):
+
+        return Exercise('MLParsedQuestion', cmd_args)
+
+    @staticmethod
+    def _parse_ex_args(cmd_args, *names):
+        """receive a list of argument names and a list of values and return
+        a pandoc conformant argument array containing element's arguments."""\
+
+        if len(names) != len(cmd_args):
+            log('invalid args: %s, args: %s'
+                % (names, cmd_args), 'ERROR')
+            raise ValueError("Warning: Expected different number of args: {}"
+                             .format(cmd_args))
+
+        ret = []
+        for idx in range(len(names)):
+            ret.append([names[idx], cmd_args[idx]])
+
         return ret
 
     ###########################################################################

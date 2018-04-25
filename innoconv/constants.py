@@ -165,6 +165,7 @@ ELEMENT_CLASSES = {
     'MEXAMPLE': ['example'],
     'MEXERCISE': ['exercise'],
     'MEXERCISES': ['exercises'],
+    'MQUESTIONGROUP': ['question-group'],
     'MEXPERIMENT': ['experiment'],
     'MHINT': ['hint'],
     'MINFO': ['info'],

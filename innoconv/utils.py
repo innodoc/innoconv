@@ -301,3 +301,42 @@ def block_wrap(elem, orig_elem):
     if isinstance(orig_elem, pf.Block):
         return pf.Plain(elem)
     return elem
+
+
+def _parse_ex_args(cmd_args, *names):
+    """receive a list of argument names and a list of values and return
+    a pandoc conformant argument array containing element's arguments."""\
+
+    if len(names) != len(cmd_args):
+        log('invalid args: %s, args: %s'
+            % (names, cmd_args), 'ERROR')
+        raise ValueError("Warning: Expected different number of args: {}"
+                         .format(cmd_args))
+
+    ret = []
+    for idx in range(len(names)):
+        ret.append([names[idx], cmd_args[idx]])
+
+    return ret
+
+
+class Exercise(pf.Element):
+
+    __slots__ = ['identifier', 'classes', 'attributes']
+
+    def __new__(self, mintmod_class, cmd_args):
+
+        if mintmod_class == 'MLQuestion':
+            classes = ['exercise', 'text']
+            attributes = _parse_ex_args(cmd_args, 'length', 'solution', 'uxid')
+            return pf.Code('', '', classes, attributes)
+
+        elif mintmod_class == 'MLParsedQuestion':
+            classes = ['exercise', 'text']
+            attributes = _parse_ex_args(cmd_args, 'length', 'solution',
+                                        'precision', 'uxid')
+            attributes.append(['validator', 'math'])
+            return pf.Code('', '', classes, attributes)
+
+    def _slots_to_json(self):
+        return [self._ica_to_json()]
