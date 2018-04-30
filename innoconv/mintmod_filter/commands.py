@@ -290,22 +290,9 @@ class Commands():
     ###########################################################################
     # Exercises
     def handle_mlquestion(self, cmd_args, elem):
-        if len(cmd_args) != 3:
-            log('Found \MLQuestion - item with invalid args: %s, args: %s'
-                % (elem, cmd_args), 'WARNING')
-
-        # attrs = [
-        #     ['length', cmd_args[0]],
-        #     ['solution', cmd_args[1]],
-        #     ['uxid', cmd_args[2]]
-        # ]
-
         return Exercise('MLQuestion', cmd_args)
 
-        # return pf.Code('', '', ['exercise', 'inline', 'text'], attrs)
-
     def handle_mlparsedquestion(self, cmd_args, elem):
-
         return Exercise('MLParsedQuestion', cmd_args)
 
     @staticmethod
