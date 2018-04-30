@@ -3,7 +3,6 @@
 """Main entry for the innoconv document converter."""
 
 import argparse
-import os
 from panflute import debug
 
 from innoconv.utils import get_panzer_bin
