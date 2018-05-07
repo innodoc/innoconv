@@ -5,18 +5,15 @@
   cache:
     paths:
     - ~/.cache/pip/
+    - /root/
 
   before_script:
 
     - python -V # Print out python version for debugging
     # Uncomment next line if your Django app needs a JS runtime:
     # - apt-get update -q && apt-get install nodejs -yqq
-    - apt-get update
-    - curl -sSL https://get.haskellstack.org/ | sh
-    - git clone https://github.com/jgm/pandoc
-    - cd pandoc
-    - stack setup # only first time
-    - stack install
+    - apt-get update && apt-get install pandoc
+    - apt-get update && sudo 
     - pandoc --version
     - pip install -r requirements.txt
 
