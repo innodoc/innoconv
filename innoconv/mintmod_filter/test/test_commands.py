@@ -412,6 +412,7 @@ class TestExercises(unittest.TestCase):
         elem = doc.content[0]  # this sets up elem.parent
         elem_args = ['10', '5', '3', 'ER1']
         ret = self.commands.handle_mlparsedquestion(elem_args, elem)
+        # pylint: disable=no-member
         self.assertEqual(ret.classes, ['exercise', 'text'])
         self.assertEqual(ret.attributes['length'], '10')
         self.assertEqual(ret.attributes['solution'], '5')

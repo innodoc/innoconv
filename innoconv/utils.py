@@ -305,7 +305,7 @@ def block_wrap(elem, orig_elem):
 
 def _parse_ex_args(cmd_args, *names):
     """receive a list of argument names and a list of values and return
-    a pandoc conformant argument array containing element's arguments."""\
+    a pandoc conformant argument array containing element's arguments."""
 
     if len(names) != len(cmd_args):
         log('invalid args: %s, args: %s'
@@ -314,17 +314,29 @@ def _parse_ex_args(cmd_args, *names):
                          .format(cmd_args))
 
     ret = []
-    for idx in range(len(names)):
-        ret.append([names[idx], cmd_args[idx]])
+    for idx, name in enumerate(names):
+        ret.append([name, cmd_args[idx]])
 
     return ret
 
 
 class Exercise(pf.Element):
-
+    """
+    Class that inherits from pf.Element and will return pf.Code instances, with
+    special classes and attributes, depending on the passed mintmod class.
+    """
     __slots__ = ['identifier', 'classes', 'attributes']
 
-    def __new__(self, mintmod_class, cmd_args):
+    def __new__(cls, *args, **kwargs):
+        """ The __new__ function expects a keyword argument with the key
+        'mintmod_class' that specifies the type of exercise in the mintmod
+        converter.
+        """
+        mintmod_class = kwargs.get('mintmod_class', None)
+        cmd_args = args[0]
+        if mintmod_class is None:
+            raise ValueError("Expected named keyword arg "
+                             "mintmod_class in: {}".format(kwargs))
 
         if mintmod_class == 'MLQuestion':
             classes = ['exercise', 'text']
@@ -337,6 +349,9 @@ class Exercise(pf.Element):
                                         'precision', 'uxid')
             attributes.append(['validator', 'math'])
             return pf.Code('', '', classes, attributes)
+
+        return pf.Code('Unknown type of exercise', '', ['unknown-exercise'],
+                       attributes)
 
     def _slots_to_json(self):
         return [self._ica_to_json()]

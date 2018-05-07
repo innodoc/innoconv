@@ -290,27 +290,12 @@ class Commands():
     ###########################################################################
     # Exercises
     def handle_mlquestion(self, cmd_args, elem):
-        return Exercise('MLQuestion', cmd_args)
+        r"""Handle exercises defined by ``\MLQuestion`` command"""
+        return Exercise(cmd_args, mintmod_class='MLQuestion')
 
     def handle_mlparsedquestion(self, cmd_args, elem):
-        return Exercise('MLParsedQuestion', cmd_args)
-
-    @staticmethod
-    def _parse_ex_args(cmd_args, *names):
-        """receive a list of argument names and a list of values and return
-        a pandoc conformant argument array containing element's arguments."""\
-
-        if len(names) != len(cmd_args):
-            log('invalid args: %s, args: %s'
-                % (names, cmd_args), 'ERROR')
-            raise ValueError("Warning: Expected different number of args: {}"
-                             .format(cmd_args))
-
-        ret = []
-        for idx in range(len(names)):
-            ret.append([names[idx], cmd_args[idx]])
-
-        return ret
+        r"""Handle exercises defined by ``\MLParsedQuestion`` command"""
+        return Exercise(cmd_args, mintmod_class='MLParsedQuestion')
 
     ###########################################################################
     # Misc elements
