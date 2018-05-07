@@ -20,7 +20,7 @@ class TestCommands(unittest.TestCase):
         ret = self.commands.handle_msection(['A Test Title'], elem)
 
         self.assertIsInstance(ret, pf.Header)
-        self.assertEqual(ret.level, 2)
+        self.assertEqual(ret.level, 1)
         self.assertIsInstance(ret.content[0], pf.Str)
         self.assertEqual(ret.content[0].text, 'A')
         self.assertIsInstance(ret.content[1], pf.Space)
@@ -40,7 +40,7 @@ class TestCommands(unittest.TestCase):
         self.assertIsInstance(ret.content[1], pf.Space)
         self.assertIsInstance(ret.content[2], pf.Str)
         self.assertEqual(ret.content[2].text, 'title')
-        self.assertEqual(ret.level, 3)
+        self.assertEqual(ret.level, 2)
 
     def test_handle_mtitle(self):
         """MTitle command"""
@@ -173,7 +173,9 @@ class TestCommands(unittest.TestCase):
         doc = pf.Doc(pf.RawBlock(r'\MSubject{footitle}', format='latex'))
         elem = doc.content[0]  # this sets up elem.parent
         ret = self.commands.handle_msubject(['footitle'], elem)
-        self.assertEqual(ret, [])
+        self.assertIsInstance(ret, pf.Header)
+        self.assertEqual(ret.level, 1)
+        self.assertEqual(ret.content[0].text, 'footitle')
         self.assertIsInstance(doc.metadata, pf.MetaMap)
         # pylint: disable=no-member
         self.assertEqual(doc.get_metadata('title'), 'footitle')
