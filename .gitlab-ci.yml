@@ -12,7 +12,6 @@ before_script:
   # - apt-get update -q && apt-get install nodejs -yqq
   - pip install -r requirements.txt
 
-
 test:
   script:
   - python setup.py test
