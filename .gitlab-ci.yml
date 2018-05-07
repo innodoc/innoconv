@@ -1,15 +1,21 @@
-image: jpbernius/pandoc
+image: python:latest
 
-# # This folder is cached between builds
-# # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
-# cache:
-#   paths:
-#   - ~/.cache/pip/
+# This folder is cached between builds
+# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+cache:
+  paths:
+  - ~/.cache/pip/
 
 before_script:
   - python -V # Print out python version for debugging
   # Uncomment next line if your Django app needs a JS runtime:
   # - apt-get update -q && apt-get install nodejs -yqq
+  - curl -sSL https://get.haskellstack.org/ | sh
+  - git clone https://github.com/jgm/pandoc
+  - cd pandoc
+  - stack setup # only first time
+  - stack install
+  - pandoc --version
   - pip install -r requirements.txt
 
 test:
