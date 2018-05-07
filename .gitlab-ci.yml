@@ -8,8 +8,10 @@ cache:
 
 before_script:
   - python -V # Print out python version for debugging
+  - pandoc --version
   # Uncomment next line if your Django app needs a JS runtime:
   # - apt-get update -q && apt-get install nodejs -yqq
+  - apt-get install pandoc
   - pip install -r requirements.txt
 
 test:
