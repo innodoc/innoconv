@@ -12,8 +12,7 @@
     - python -V # Print out python version for debugging
     # Uncomment next line if your Django app needs a JS runtime:
     # - apt-get update -q && apt-get install nodejs -yqq
-    - apt-get update && apt-get install pandoc
-    - apt-get update && sudo 
+    - apt-get update && apt-get install -y --no-install-recommends pandoc
     - pandoc --version
     - pip install -r requirements.txt
 
