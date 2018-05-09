@@ -101,13 +101,14 @@ def parse_fragment(parse_string, as_doc=False, from_format='latex+raw_tex'):
     return doc.content.list
 
 
+# pylint: disable=dangerous-default-value
 def to_inline(elem, classes=[], attributes={}):
     """Convert any given pandoc element to inline element(s). Some information
     may be lost."""
 
-    if len(classes) == 0:
+    if not classes:
         classes = getattr(elem, 'classes', [])
-    if len(attributes) == 0:
+    if not attributes:
         attributes = getattr(elem, 'attributes', {})
 
     if isinstance(elem, pf.Inline):
