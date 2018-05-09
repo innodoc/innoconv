@@ -364,7 +364,7 @@ class Exercise(pf.Element):
                 'precision',
                 'uxid'
             )
-            attributes.append(['validator', 'math'])
+            attributes.append(['validator', 'function'])
 
         if oktypes == pf.Block:
             return pf.CodeBlock('', '', classes, attributes)
