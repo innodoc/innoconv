@@ -297,6 +297,11 @@ class Commands():
         r"""Handle exercises defined by ``\MLParsedQuestion`` command"""
         return Exercise(cmd_args, mintmod_class='MLParsedQuestion')
 
+    def handle_mlfunctionquestion(self, cmd_args, elem):
+        r"""Handle exercises defined by ``\MFunctionQuestion`` command"""
+        return Exercise(cmd_args, mintmod_class='MLFunctionQuestion',
+                        oktypes=elem.parent.content.oktypes)
+
     ###########################################################################
     # Misc elements
 
@@ -342,6 +347,7 @@ class Commands():
 
         if isinstance(elem, pf.Block):
             return pf.Plain(content)
+
         return content
 
     ###########################################################################
