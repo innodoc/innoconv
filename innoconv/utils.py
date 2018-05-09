@@ -101,16 +101,19 @@ def parse_fragment(parse_string, as_doc=False, from_format='latex+raw_tex'):
     return doc.content.list
 
 
-def to_inline(elem):
+def to_inline(elem, classes=[], attributes={}):
     """Convert any given pandoc element to inline element(s). Some information
     may be lost."""
 
-    classes = getattr(elem, 'classes', [])
+    if len(classes) == 0:
+        classes = getattr(elem, 'classes', [])
+    if len(attributes) == 0:
+        attributes = getattr(elem, 'attributes', {})
 
     if isinstance(elem, pf.Inline):
         return elem
     elif isinstance(elem, pf.CodeBlock):
-        return pf.Code(elem.text, classes=classes)
+        return pf.Code(elem.text, classes=classes, attributes=attributes)
     elif isinstance(elem, pf.RawBlock):
         return pf.RawInline(elem.text, format=elem.format)
 
@@ -121,11 +124,11 @@ def to_inline(elem):
 
     # dont nest too many spans
     if len(elems) == 1:
-        return to_inline(elems[0])
+        return to_inline(elems[0], classes=classes, attributes=attributes)
 
-    ret = [to_inline(x) for x in elems]
+    ret = [to_inline(x, classes=classes, attributes=attributes) for x in elems]
 
-    return pf.Span(*ret, classes=classes)
+    return pf.Span(*ret, classes=classes, attributes=attributes)
 
 
 def destringify(string):
@@ -333,7 +336,9 @@ class Exercise(pf.Element):
         converter.
         """
         mintmod_class = kwargs.get('mintmod_class', None)
+        oktypes = kwargs.get('oktypes', None)
         cmd_args = args[0]
+
         if mintmod_class is None:
             raise ValueError("Expected named keyword arg "
                              "mintmod_class in: {}".format(kwargs))
@@ -341,17 +346,30 @@ class Exercise(pf.Element):
         if mintmod_class == 'MLQuestion':
             classes = ['exercise', 'text']
             attributes = _parse_ex_args(cmd_args, 'length', 'solution', 'uxid')
-            return pf.Code('', '', classes, attributes)
 
         elif mintmod_class == 'MLParsedQuestion':
             classes = ['exercise', 'text']
             attributes = _parse_ex_args(cmd_args, 'length', 'solution',
                                         'precision', 'uxid')
             attributes.append(['validator', 'math'])
-            return pf.Code('', '', classes, attributes)
 
-        return pf.Code('Unknown type of exercise', '', ['unknown-exercise'],
-                       attributes)
+        elif mintmod_class == 'MLFunctionQuestion':
+            classes = ['exercise', 'text']
+            attributes = _parse_ex_args(
+                cmd_args,
+                'length',
+                'solution',
+                'supporting-points',
+                'variables',
+                'precision',
+                'uxid'
+            )
+            attributes.append(['validator', 'math'])
+
+        if oktypes == pf.Block:
+            return pf.CodeBlock('', '', classes, attributes)
+
+        return pf.Code('', '', classes, attributes)
 
     def _slots_to_json(self):
         return [self._ica_to_json()]
