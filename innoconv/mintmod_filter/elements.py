@@ -86,6 +86,16 @@ class Exercise(pf.Element):
                 'uxid'
             )
 
+        elif mintmod_class == 'MLIntervalQuestion':
+            classes = ['exercise', 'text']
+            attributes = parse_ex_args(
+                cmd_args,
+                'length',
+                'solution',
+                'precision',
+                'uxid'
+            )
+
         if oktypes == pf.Block:
             return pf.CodeBlock('', '', classes, attributes)
 

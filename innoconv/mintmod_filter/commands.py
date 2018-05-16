@@ -321,7 +321,12 @@ class Commands():
         return Exercise(cmd_args, mintmod_class='MLCheckbox',
                         oktypes=elem.parent.content.oktypes)
 
-    ##TODO MLIntervalQuestion, MGroupButton (chapter4)
+    def handle_mlintervalquestion(self, cmd_args, elem):
+        r"""Handle exercises defined by ``\MLIntervalQuestion`` command"""
+        return Exercise(cmd_args, mintmod_class='MLIntervalQuestion',
+                        oktypes=elem.parent.content.oktypes)
+
+    ##TODO MGroupButton (chapter4)
 
     ###########################################################################
     # Misc elements
