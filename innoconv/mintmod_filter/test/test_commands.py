@@ -54,7 +54,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(ret.content[0].text, u'Schöne')
         self.assertIsInstance(ret.content[6], pf.Str)
         self.assertEqual(ret.content[6].text, u'Maß?')
-        self.assertEqual(ret.level, 4)
+        self.assertEqual(ret.level, 3)
 
     def test_handle_msubsubsubsectionx(self):
         doc = pf.Doc(pf.RawBlock(r'\MSubsubsubsectionx{Subsubsubsectionx}'),
@@ -65,7 +65,7 @@ class TestCommands(unittest.TestCase):
         self.assertIsInstance(ret, pf.Header)
         self.assertIsInstance(ret.content[0], pf.Str)
         self.assertEqual(ret.content[0].text, u'Subsubsubsectionx')
-        self.assertEqual(ret.level, 5)
+        self.assertEqual(ret.level, 4)
 
     def test_handle_mlabel_no_last_header(self):
         """MTitle command without a last header element"""
