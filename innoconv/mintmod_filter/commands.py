@@ -14,8 +14,9 @@ from slugify import slugify
 from innoconv.constants import (ELEMENT_CLASSES, MINTMOD_SUBJECTS,
                                 REGEX_PATTERNS, INDEX_LABEL_PREFIX)
 from innoconv.utils import (block_wrap, destringify, parse_fragment, log,
-                            get_remembered_element, to_inline, Exercise)
-from innoconv.mintmod_filter.elements import create_header, create_image
+                            get_remembered_element, to_inline)
+from innoconv.mintmod_filter.elements import (Exercise, create_header,
+                                              create_image)
 
 
 class Commands():
@@ -298,8 +299,13 @@ class Commands():
         return Exercise(cmd_args, mintmod_class='MLParsedQuestion')
 
     def handle_mlfunctionquestion(self, cmd_args, elem):
-        r"""Handle exercises defined by ``\MFunctionQuestion`` command"""
+        r"""Handle exercises defined by ``\MLFunctionQuestion`` command"""
         return Exercise(cmd_args, mintmod_class='MLFunctionQuestion',
+                        oktypes=elem.parent.content.oktypes)
+
+    def handle_mlspecialquestion(self, cmd_args, elem):
+        r"""Handle exercises defined by ``\MLSpecialquestion`` command"""
+        return Exercise(cmd_args, mintmod_class='MLSpecialQuestion',
                         oktypes=elem.parent.content.oktypes)
 
     ###########################################################################
