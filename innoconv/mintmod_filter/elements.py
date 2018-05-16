@@ -4,13 +4,14 @@ from textwrap import shorten
 import panflute as pf
 from innoconv.constants import ELEMENT_CLASSES
 from innoconv.utils import (destringify, parse_fragment, extract_identifier,
-                            remember_element)
+                            remember_element, log)
 
 
 class Exercise(pf.Element):
     """
-    Class that inherits from pf.Element and will return pf.Code instances, with
-    special classes and attributes, depending on the passed mintmod class.
+    Wrapper/Factory class that inherits from pf.Element and will return pf.Code
+    instances, with special classes and attributes, depending on the given
+    mintmod class.
     """
     __slots__ = ['identifier', 'classes', 'attributes']
 
@@ -29,18 +30,18 @@ class Exercise(pf.Element):
 
         if mintmod_class == 'MLQuestion':
             classes = ['exercise', 'text']
-            attributes = cls._parse_ex_args(
+            attributes = parse_ex_args(
                 cmd_args, 'length', 'solution', 'uxid')
 
         elif mintmod_class == 'MLParsedQuestion':
             classes = ['exercise', 'text']
-            attributes = cls._parse_ex_args(cmd_args, 'length', 'solution',
-                                            'precision', 'uxid')
+            attributes = parse_ex_args(cmd_args, 'length', 'solution',
+                                       'precision', 'uxid')
             attributes.append(['validator', 'math'])
 
         elif mintmod_class == 'MLFunctionQuestion':
             classes = ['exercise', 'text']
-            attributes = cls._parse_ex_args(
+            attributes = parse_ex_args(
                 cmd_args,
                 'length',
                 'solution',
@@ -53,7 +54,7 @@ class Exercise(pf.Element):
 
         elif mintmod_class == 'MLSpecialQuestion':
             classes = ['exercise', 'text']
-            attributes = cls._parse_ex_args(
+            attributes = parse_ex_args(
                 cmd_args,
                 'length',
                 'solution',
@@ -64,32 +65,34 @@ class Exercise(pf.Element):
                 'uxid'
             )
 
+        elif mintmod_class == 'MLSimplifyQuestion':
+            classes = ['exercise', 'text']
+            attributes = parse_ex_args(
+                cmd_args,
+                'length',
+                'solution',
+                'supporting-points',
+                'variables',
+                'precision',
+                'simplification-code',
+                'uxid'
+            )
+
+        elif mintmod_class == 'MLCheckbox':
+            classes = ['exercise', 'checkbox']
+            attributes = parse_ex_args(
+                cmd_args,
+                'solution',
+                'uxid'
+            )
+
         if oktypes == pf.Block:
             return pf.CodeBlock('', '', classes, attributes)
 
         return pf.Code('', '', classes, attributes)
 
-    def _parse_ex_args(cmd_args, *names):
-        """receive a list of argument names and a list of values and return
-        a pandoc conformant argument array containing element's arguments.
-        In other words: take a list of arguments and make them named arguments
-        for easier referencing."""
-
-        if len(names) != len(cmd_args):
-            log('invalid args: %s, args: %s'
-                % (names, cmd_args), 'ERROR')
-            raise ValueError("Warning: Expected different number of args: {}"
-                             .format(cmd_args))
-
-        ret = []
-        for idx, name in enumerate(names):
-            ret.append([name, cmd_args[idx]])
-
-        return ret
-
-        def _slots_to_json(self):
-            return [self._ica_to_json()]
-
+    def _slots_to_json(self):
+        return [self._ica_to_json()]
 
 
 def create_content_box(elem_content, elem_classes):
@@ -160,5 +163,24 @@ def create_image(filename, descr, elem, add_descr=True, block=True):
     else:
         remember_element(elem.doc, img)
         ret = img
+
+    return ret
+
+
+def parse_ex_args(cmd_args, *names):
+    """receive a list of argument names and a list of values and return
+    a pandoc conformant argument array containing element's arguments.
+    In other words: take a list of arguments and make them named arguments
+    for easier referencing."""
+
+    if len(names) != len(cmd_args):
+        log('invalid args: %s, args: %s'
+            % (names, cmd_args), 'ERROR')
+        raise ValueError("Warning: Expected different number of args: {}"
+                         .format(cmd_args))
+
+    ret = []
+    for idx, name in enumerate(names):
+        ret.append([name, cmd_args[idx]])
 
     return ret

@@ -290,13 +290,16 @@ class Commands():
 
     ###########################################################################
     # Exercises
+
     def handle_mlquestion(self, cmd_args, elem):
         r"""Handle exercises defined by ``\MLQuestion`` command"""
-        return Exercise(cmd_args, mintmod_class='MLQuestion')
+        return Exercise(cmd_args, mintmod_class='MLQuestion',
+                        oktypes=elem.parent.content.oktypes)
 
     def handle_mlparsedquestion(self, cmd_args, elem):
         r"""Handle exercises defined by ``\MLParsedQuestion`` command"""
-        return Exercise(cmd_args, mintmod_class='MLParsedQuestion')
+        return Exercise(cmd_args, mintmod_class='MLParsedQuestion',
+                        oktypes=elem.parent.content.oktypes)
 
     def handle_mlfunctionquestion(self, cmd_args, elem):
         r"""Handle exercises defined by ``\MLFunctionQuestion`` command"""
@@ -307,6 +310,18 @@ class Commands():
         r"""Handle exercises defined by ``\MLSpecialquestion`` command"""
         return Exercise(cmd_args, mintmod_class='MLSpecialQuestion',
                         oktypes=elem.parent.content.oktypes)
+
+    def handle_mlsimplifyquestion(self, cmd_args, elem):
+        r"""Handle exercises defined by ``\MLSimplifyQuestion`` command"""
+        return Exercise(cmd_args, mintmod_class='MLSimplifyQuestion',
+                        oktypes=elem.parent.content.oktypes)
+
+    def handle_mlcheckbox(self, cmd_args, elem):
+        r"""Handle exercises defined by ``\MLCheckbox`` command"""
+        return Exercise(cmd_args, mintmod_class='MLCheckbox',
+                        oktypes=elem.parent.content.oktypes)
+
+    ##TODO MLIntervalQuestion, MGroupButton (chapter4)
 
     ###########################################################################
     # Misc elements
