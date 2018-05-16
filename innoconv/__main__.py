@@ -78,6 +78,11 @@ def parse_cli_args():
                                     action='store_true',
                                     help=rem_exercises_help)
 
+    split_sections_help = "split sections"
+    innoconv_argparser.add_argument('-s', '--split-sections',
+                                    action='store_true',
+                                    help=split_sections_help)
+
     return vars(innoconv_argparser.parse_args())
 
 
@@ -85,19 +90,20 @@ def main():
     """innoConv main entry point."""
     args = parse_cli_args()
 
-    if args['debug'] and args['output_format'] != 'html5':
-        debug("Warning: Setting output format to 'html5' in debug mode.")
-        args['output_format'] = 'html5'
-
     if args['remove_exercises'] and not args['ignore_exercises']:
         debug(
             "Warning: Setting --remove-exercises implies --ignore-exercises.")
         args['ignore_exercises'] = True
 
+    if args['split_sections'] and args['output_format'] != 'json':
+        debug("Warning: Setting output format to 'json' when splitting.")
+        args['output_format'] = 'json'
+
     runner = InnoconvRunner(
         args['source'], args['output_dir_base'], args['language_code'],
         ignore_exercises=args['ignore_exercises'],
         remove_exercises=args['remove_exercises'],
+        split_sections=args['split_sections'],
         output_format=args['output_format'], debug=args['debug'])
     filename_out = runner.run()
     debug('Build finished: {}'.format(filename_out))

@@ -10,15 +10,18 @@ from innoconv.constants import (PANZER_SUPPORT_DIR, PANZER_TIMEOUT,
 class InnoconvRunner():
     """innoConv runner that spawns a panzer instance."""
 
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, source, output_dir_base, language_code,
                  ignore_exercises=False, remove_exercises=False,
-                 output_format='json', debug=False):
+                 split_sections=False, output_format='json', debug=False):
         # pylint: disable=too-many-arguments
         self.source = source
         self.output_dir_base = output_dir_base
         self.language_code = language_code
         self.ignore_exercises = ignore_exercises
         self.remove_exercises = remove_exercises
+        self.split_sections = split_sections
         self.output_format = output_format
         self.debug = debug
 
@@ -51,9 +54,14 @@ class InnoconvRunner():
 
         # set debug mode
         env = os.environ.copy()
-        if self.debug:
+        if self.debug and self.split_sections:
+            env['INNOCONV_DEBUG'] = '1'
+            style = 'innoconv-debug-split'
+        elif self.debug:
             env['INNOCONV_DEBUG'] = '1'
             style = 'innoconv-debug'
+        elif self.split_sections:
+            style = 'innoconv-split'
         else:
             style = 'innoconv'
 

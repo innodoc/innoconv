@@ -15,18 +15,22 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.join(SCRIPT_DIR, '..', '..')
 
 
-def get_doc_from_markup(markup):
+def get_doc_from_markup(markup, style='innoconv-debug', output=None,
+                        lang='de'):
     """Run panzer on markup and return Doc."""
 
     cmd = [
         'panzer',
         '---panzer-support', PANZER_SUPPORT_DIR,
-        '--metadata=style:innoconv-debug',
-        '--metadata=lang:de',
+        '--metadata=style:{}'.format(style),
+        '--metadata=lang:{}'.format(lang),
         '--from=latex+raw_tex',
         '--to=json',
         '--standalone',
     ]
+
+    if output:
+        cmd.append('--output={}'.format(output))
 
     env = os.environ.copy()
     proc = subprocess.Popen(
