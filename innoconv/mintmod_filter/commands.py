@@ -136,7 +136,6 @@ class Commands():
         This command translates to ``\vref``.
         """
         url = '#%s' % cmd_args[0]
-        # TODO: insert referenced number (e.g. '1.2')
         return block_wrap(pf.Link(pf.Str('PLACEHOLDER'), url=url), elem)
 
     def handle_msref(self, cmd_args, elem):
