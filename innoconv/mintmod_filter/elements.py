@@ -2,7 +2,7 @@
 
 from textwrap import shorten
 import panflute as pf
-from innoconv.constants import ELEMENT_CLASSES
+from innoconv.constants import ELEMENT_CLASSES, QUESTION_TYPES
 from innoconv.utils import (destringify, parse_fragment, extract_identifier,
                             remember_element, log)
 
@@ -32,12 +32,15 @@ class Exercise(pf.Element):
             classes = ['exercise', 'text']
             attributes = parse_ex_args(
                 cmd_args, 'length', 'solution', 'uxid')
+            attributes.append(['questionType', QUESTION_TYPES['EXACT']])
 
         elif mintmod_class == 'MLParsedQuestion':
             classes = ['exercise', 'text']
             attributes = parse_ex_args(cmd_args, 'length', 'solution',
                                        'precision', 'uxid')
-            attributes.append(['validator', 'math'])
+            attributes.append(
+                ['questionType', QUESTION_TYPES['MATH_EXPRESSION']]
+            )
 
         elif mintmod_class == 'MLFunctionQuestion':
             classes = ['exercise', 'text']
@@ -50,7 +53,7 @@ class Exercise(pf.Element):
                 'precision',
                 'uxid'
             )
-            attributes.append(['validator', 'function'])
+            attributes.append(['questionType', QUESTION_TYPES['MATH_FORMULA']])
 
         elif mintmod_class == 'MLSpecialQuestion':
             classes = ['exercise', 'text']
@@ -64,6 +67,7 @@ class Exercise(pf.Element):
                 'special-type',
                 'uxid'
             )
+            attributes.append(['questionType', QUESTION_TYPES['SPECIAL']])
 
         elif mintmod_class == 'MLSimplifyQuestion':
             classes = ['exercise', 'text']
@@ -77,6 +81,9 @@ class Exercise(pf.Element):
                 'simplification-code',
                 'uxid'
             )
+            attributes.append(
+                ['questionType', QUESTION_TYPES['MATH_SIMPLIFY']]
+            )
 
         elif mintmod_class == 'MLCheckbox':
             classes = ['exercise', 'checkbox']
@@ -85,6 +92,7 @@ class Exercise(pf.Element):
                 'solution',
                 'uxid'
             )
+            attributes.append(['questionType', QUESTION_TYPES['BOOLEAN']])
 
         elif mintmod_class == 'MLIntervalQuestion':
             classes = ['exercise', 'text']
@@ -94,6 +102,9 @@ class Exercise(pf.Element):
                 'solution',
                 'precision',
                 'uxid'
+            )
+            attributes.append(
+                ['questionType', QUESTION_TYPES['MATH_INTERVAL']]
             )
 
         if oktypes == pf.Block:

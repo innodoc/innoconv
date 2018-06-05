@@ -16,6 +16,18 @@ EXERCISE_CMDS_ENVS = (
     'MQuestionGroup', 'MLSpecialQuestion',
 )
 
+# These values mirror the values set in
+# https://gitlab.tu-berlin.de/innodoc/innodoc-webapp/blob/master/lib/questionTypes.js
+QUESTION_TYPES = {
+    'EXACT': 'exact',
+    'MATH_EXPRESSION': 'mathExpression',
+    'MATH_FORMULA': 'mathFormula',
+    'MATH_SIMPLIFY': 'mathSimplify',
+    'SPECIAL': 'special',
+    'BOOLEAN': 'boolean',
+    'MATH_INTERVAL': 'mathInterval'
+}
+
 #: Simple Regex substitutions for math
 MATH_SUBSTITUTIONS = (
     # leave \Rightarrow, ... intact

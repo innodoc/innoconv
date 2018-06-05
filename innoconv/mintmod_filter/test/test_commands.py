@@ -3,7 +3,8 @@
 import unittest
 import panflute as pf
 
-from innoconv.constants import ELEMENT_CLASSES, INDEX_LABEL_PREFIX
+from innoconv.constants import (ELEMENT_CLASSES, INDEX_LABEL_PREFIX,
+                                QUESTION_TYPES)
 from innoconv.mintmod_filter.commands import Commands
 from innoconv.utils import remember_element
 
@@ -418,4 +419,6 @@ class TestExercises(unittest.TestCase):
         self.assertEqual(ret.attributes['solution'], '5')
         self.assertEqual(ret.attributes['precision'], '3')
         self.assertEqual(ret.attributes['uxid'], 'ER1')
-        self.assertEqual(ret.attributes['validator'], 'math')
+        self.assertEqual(
+            ret.attributes['questionType'], QUESTION_TYPES['MATH_EXPRESSION']
+        )

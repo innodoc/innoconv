@@ -326,7 +326,7 @@ class Commands():
         return Exercise(cmd_args, mintmod_class='MLIntervalQuestion',
                         oktypes=elem.parent.content.oktypes)
 
-    ##TODO MGroupButton (chapter4)
+    # TODO MGroupButton (chapter4)
 
     ###########################################################################
     # Misc elements
