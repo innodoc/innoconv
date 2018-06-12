@@ -75,6 +75,10 @@ class Environments():
         r"""Handle ``\MExercises`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISES'])
 
+    def handle_mexercisecollection(self, elem_content, env_args, elem):
+        r"""Handle ``\MExerciseCollection`` environment."""
+        return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISES'])
+
     def handle_mexercise(self, elem_content, env_args, elem):
         r"""Handle ``\MExercise`` environment."""
         return create_content_box(elem_content, ELEMENT_CLASSES['MEXERCISE'])
@@ -94,7 +98,6 @@ class Environments():
         the group.
         This function just returns a div with a class, in order to leave the
         validation logic, to client scripts"""
-        print(env_args)
         return create_content_box(
             elem_content,
             ELEMENT_CLASSES['MQUESTIONGROUP']

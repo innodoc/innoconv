@@ -325,7 +325,18 @@ class Commands():
         return Exercise(cmd_args, mintmod_class='MLIntervalQuestion',
                         oktypes=elem.parent.content.oktypes)
 
-    # TODO MGroupButton (chapter4)
+    # TODO MGroupButton
+    #      should render a button that shows correct answers
+
+    # TODO MSetPoints: seems to be used per exercise, should probably be passed
+    #      up to exercise env and encoded as class property or similar
+
+    # TODO: MDirectRouletteExercises
+    # filename.rtex is a pool of MExercise envs. In the content
+    # one exercise of these should appear randomly. There is a button
+    # saying 'next exercise' that gives another randomly chosen exercise.
+    # Tasks: open .rtex file, get array of MExercises, parse each exercise env
+    #  output some roulette exercise div including the complete exercise pool
 
     ###########################################################################
     # Misc elements
@@ -414,6 +425,10 @@ class Commands():
 
     def handle_quad(self, cmd_args, elem):
         r"""Handle ``\quad`` command."""
+        return pf.Space()
+
+    def handle_mblank(self, cmd_args, elem):
+        r"""Handle ``\MBlank`` command."""
         return pf.Space()
 
     ###########################################################################
@@ -570,6 +585,22 @@ class Commands():
 
     def handle_noindent(self, cmd_args, elem):
         r"""Handle ``\noindent`` command."""
+        return self._noop()
+
+    def handle_mcopyrightcollection(self, cmd_args, elem):
+        r"""Handle ``\MCopyrightCollection`` command."""
+        return self._noop()
+
+    def handle_mformelzoomhint(self, cmd_args, elem):
+        r"""Handle ``\MFormelZoomHint`` command."""
+        return self._noop()
+
+    def handle_jhtmlhinweiseingabefunktionen(self, cmd_args, elem):
+        r"""Handle ``\jHTMLHinweisEingabeFunktionen`` command."""
+        return self._noop()
+
+    def handle_jhtmlhinweiseingabefunktionenexp(self, cmd_args, elem):
+        r"""Handle ``\jHTMLHinweisEingabeFunktionenExp`` command."""
         return self._noop()
 
     @staticmethod
