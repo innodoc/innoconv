@@ -325,8 +325,16 @@ class Commands():
         return Exercise(cmd_args, mintmod_class='MLIntervalQuestion',
                         oktypes=elem.parent.content.oktypes)
 
-    # TODO MGroupButton
-    #      should render a button that shows correct answers
+    def handle_mgroupbutton(self, cmd_args, elem):
+        r"""Handle ``\MGroupButton`` command"""
+        if isinstance(elem, pf.Inline):
+            raise ValueError(
+                r'\MGroupButton should be block element!: {}'.format(
+                    cmd_args))
+
+        text = pf.Plain(*destringify(cmd_args[0]))
+        div = pf.Div(text, classes=ELEMENT_CLASSES['MGROUPBUTTON'])
+        return div
 
     # TODO MSetPoints: seems to be used per exercise, should probably be passed
     #      up to exercise env and encoded as class property or similar

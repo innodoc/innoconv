@@ -177,6 +177,7 @@ ELEMENT_CLASSES = {
     'MEXAMPLE': ['example'],
     'MEXERCISE': ['exercise'],
     'MEXERCISES': ['exercises'],
+    'MGROUPBUTTON': ['verify-input-button'],
     'MQUESTIONGROUP': ['question-group'],
     'MEXPERIMENT': ['experiment'],
     'MHINT': ['hint'],
