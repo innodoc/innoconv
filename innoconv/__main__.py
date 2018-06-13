@@ -7,7 +7,8 @@ from panflute import debug
 
 from innoconv.utils import get_panzer_bin
 from innoconv.constants import (DEFAULT_OUTPUT_DIR_BASE, DEFAULT_OUTPUT_FORMAT,
-                                OUTPUT_FORMAT_CHOICES, DEFAULT_LANGUAGE_CODE,
+                                OUTPUT_FORMAT_CHOICES, DEFAULT_INPUT_FORMAT,
+                                INPUT_FORMAT_CHOICES, DEFAULT_LANGUAGE_CODE,
                                 LANGUAGE_CODES)
 import innoconv.metadata as metadata
 from innoconv.runner import InnoconvRunner
@@ -48,6 +49,13 @@ def parse_cli_args():
     innoconv_argparser.add_argument('-o', '--output-dir-base',
                                     default=DEFAULT_OUTPUT_DIR_BASE,
                                     help=output_help)
+
+    input_format_help = 'input format'
+    innoconv_argparser.add_argument('-f', '--from',
+                                    dest='input_format',
+                                    choices=INPUT_FORMAT_CHOICES,
+                                    default=DEFAULT_INPUT_FORMAT,
+                                    help=input_format_help)
 
     output_format_help = 'output format'
     innoconv_argparser.add_argument('-t', '--to',
@@ -104,7 +112,9 @@ def main():
         ignore_exercises=args['ignore_exercises'],
         remove_exercises=args['remove_exercises'],
         split_sections=args['split_sections'],
-        output_format=args['output_format'], debug=args['debug'])
+        input_format=args['input_format'],
+        output_format=args['output_format'],
+        debug=args['debug'])
     filename_out = runner.run()
     debug('Build finished: {}'.format(filename_out))
 

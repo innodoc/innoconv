@@ -4,7 +4,8 @@ import os
 import subprocess
 
 from innoconv.constants import (PANZER_SUPPORT_DIR, PANZER_TIMEOUT,
-                                OUTPUT_FORMAT_EXT_MAP)
+                                DEFAULT_OUTPUT_FORMAT, OUTPUT_FORMAT_EXT_MAP,
+                                DEFAULT_INPUT_FORMAT)
 
 
 class InnoconvRunner():
@@ -14,7 +15,8 @@ class InnoconvRunner():
 
     def __init__(self, source, output_dir_base, language_code,
                  ignore_exercises=False, remove_exercises=False,
-                 split_sections=False, output_format='json', debug=False):
+                 split_sections=False, input_format=DEFAULT_INPUT_FORMAT,
+                 output_format=DEFAULT_OUTPUT_FORMAT, debug=False):
         # pylint: disable=too-many-arguments
         self.source = source
         self.output_dir_base = output_dir_base
@@ -22,6 +24,7 @@ class InnoconvRunner():
         self.ignore_exercises = ignore_exercises
         self.remove_exercises = remove_exercises
         self.split_sections = split_sections
+        self.input_format = input_format
         self.output_format = output_format
         self.debug = debug
 
@@ -76,7 +79,7 @@ class InnoconvRunner():
             '---panzer-support', PANZER_SUPPORT_DIR,
             '--metadata=style:{}'.format(style),
             '--metadata=lang:{}'.format(self.language_code),
-            '--from=latex+raw_tex',
+            '--from={}'.format(self.input_format),
             '--to={}'.format(self.output_format),
             '--standalone',
             '--output={}'.format(filename_path),

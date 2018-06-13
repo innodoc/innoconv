@@ -226,6 +226,15 @@ OUTPUT_FORMAT_EXT_MAP = {
 #: Output format choices
 OUTPUT_FORMAT_CHOICES = list(OUTPUT_FORMAT_EXT_MAP.keys())
 
+#: Default innoconv input format
+DEFAULT_INPUT_FORMAT = 'latex+raw_tex'
+
+#: Output format choices
+INPUT_FORMAT_CHOICES = (
+    'latex+raw_tex',
+    'markdown',
+)
+
 #: project root dir
 ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
