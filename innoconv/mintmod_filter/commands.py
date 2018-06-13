@@ -604,10 +604,12 @@ class Commands():
         return self._noop()
 
     def handle_jhtmlhinweiseingabefunktionen(self, cmd_args, elem):
+        # pylint: disable=invalid-name
         r"""Handle ``\jHTMLHinweisEingabeFunktionen`` command."""
         return self._noop()
 
     def handle_jhtmlhinweiseingabefunktionenexp(self, cmd_args, elem):
+        # pylint: disable=invalid-name
         r"""Handle ``\jHTMLHinweisEingabeFunktionenExp`` command."""
         return self._noop()
 
