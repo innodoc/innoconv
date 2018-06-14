@@ -1,6 +1,10 @@
-# innoConv
+# innoConv (for mintmod)
 
 Converter for interactive educational content.
+
+**This program converts mintmod source.**
+
+**If you don't know what mintmod is you probably don't need it.**
 
 ## Installation
 
