@@ -108,9 +108,9 @@ class Exercise(pf.Element):
             )
 
         if oktypes == pf.Block:
-            return pf.CodeBlock('', '', classes, attributes)
+            return pf.Div(classes=classes, attributes=attributes)
 
-        return pf.Code('', '', classes, attributes)
+        return pf.Span(classes=classes, attributes=attributes)
 
     def _slots_to_json(self):
         return [self._ica_to_json()]
