@@ -66,10 +66,10 @@ def main():
     args = parse_cli_args()
 
     source_dir = os.path.abspath(args['source_dir'])
+    output_dir_base = os.path.abspath(args['output_dir_base'])
 
     runner = InnoconvRunner(
-        source_dir, args['output_dir_base'], args['languages'],
-        debug=args['debug'])
+        source_dir, output_dir_base, args['languages'], debug=args['debug'])
     runner.run()
 
     log('Build finished!')
