@@ -109,7 +109,7 @@ class CleanCommand(clean, BaseCommand):
 
 def setup_package():
     setup(
-        name='innoconv',
+        name='innoconv-mintmod',
         version=METADATA['version'],
         author=METADATA['author'],
         author_email=METADATA['author_email'],
@@ -125,7 +125,7 @@ def setup_package():
         ],
         entry_points={
             'console_scripts': [
-                'innoconv = innoconv.__main__:main',
+                'innoconv-mintmod = innoconv.__main__:main',
             ],
         },
         include_package_data=True,
