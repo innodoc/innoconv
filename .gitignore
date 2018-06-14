@@ -1,0 +1,16 @@
+*.pyc
+__pycache__
+.DS_Store
+venv
+.eggs
+
+# build
+content
+build
+innoconv.egg-info
+__panzer*
+
+# coverage
+.coverage
+.coverage.*
+htmlcov
