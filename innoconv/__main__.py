@@ -3,6 +3,7 @@
 """Main entry for the innoconv document converter."""
 
 import argparse
+import os
 
 from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES
 import innoconv.metadata as metadata
@@ -36,7 +37,7 @@ def parse_cli_args():
                                     action='help',
                                     help="show this help message and exit")
 
-    innoconv_argparser.add_argument('source',
+    innoconv_argparser.add_argument('source_dir',
                                     help="content directory or file")
 
     languages_help = 'languages to convert (default: "{}")'.format(
@@ -64,10 +65,13 @@ def main():
     """innoConv main entry point."""
     args = parse_cli_args()
 
+    source_dir = os.path.abspath(args['source_dir'])
+
     runner = InnoconvRunner(
-        args['source'], args['output_dir_base'], args['languages'],
+        source_dir, args['output_dir_base'], args['languages'],
         debug=args['debug'])
     runner.run()
+
     log('Build finished!')
 
 
