@@ -9,8 +9,9 @@ from innoconv.utils import to_ast, log
 # TODO: write toc.json
 
 # TODO: create post-process module system
-#        - copy static files
-#        - concatenate Str and Space
+#  - copy static files
+#  - generate TIK images
+#  - concatenate Str and Space
 
 class InnoconvRunner():
     """innoConv runner.
@@ -30,14 +31,17 @@ class InnoconvRunner():
         Iterates over the language folders.
         """
         for language in self.languages:
-            self._convert_language(language)
+            log("Writing language {} to {}".format(
+                language, self.output_dir_base))
+            self._convert_folder(language)
 
-    def _convert_language(self, language):
+    def _convert_folder(self, language):
         """Convert a language folder."""
         path = os.path.join(self.source_dir, language)
 
         if not os.path.isdir(path):
-            log("Warning: Could not find language dir {}".format(language))
+            raise RuntimeError(
+                "Warning: Could not find language dir {}".format(language))
 
         for root, dirs, files in os.walk(path):
             rel_dir = root[len(self.source_dir):].lstrip('/')

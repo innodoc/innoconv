@@ -37,13 +37,11 @@ def parse_cli_args():
                                     action='help',
                                     help="show this help message and exit")
 
-    innoconv_argparser.add_argument('source_dir',
-                                    help="content directory or file")
-
+    argparse_default_languages = ','.join(DEFAULT_LANGUAGES)
     languages_help = 'languages to convert (default: "{}")'.format(
-        DEFAULT_LANGUAGES)
-    innoconv_argparser.add_argument('-l', '--languages', nargs='+',
-                                    default=DEFAULT_LANGUAGES,
+        argparse_default_languages)
+    innoconv_argparser.add_argument('-l', '--languages',
+                                    default=argparse_default_languages,
                                     help=languages_help)
 
     output_help = 'output base directory (default: "{}")'.format(
@@ -58,6 +56,9 @@ def parse_cli_args():
                                     default=False,
                                     help=debug_help)
 
+    innoconv_argparser.add_argument('source_dir',
+                                    help="content directory or file")
+
     return vars(innoconv_argparser.parse_args())
 
 
@@ -67,12 +68,16 @@ def main():
 
     source_dir = os.path.abspath(args['source_dir'])
     output_dir_base = os.path.abspath(args['output_dir_base'])
+    languages = args['languages'].split(',')
 
     runner = InnoconvRunner(
-        source_dir, output_dir_base, args['languages'], debug=args['debug'])
-    runner.run()
+        source_dir, output_dir_base, languages, debug=args['debug'])
 
-    log('Build finished!')
+    try:
+        runner.run()
+        log('Build finished!')
+    except RuntimeError as error:
+        log('Something went wrong: {}'.format(error))
 
 
 if __name__ == '__main__':
