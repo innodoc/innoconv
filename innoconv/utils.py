@@ -43,4 +43,12 @@ def to_ast(filepath):
         log(err)
         raise RuntimeError("pandoc process exited with non-zero return code.")
 
-    return json.loads(out)['blocks']
+    loaded = json.loads(out)
+    blocks = loaded['blocks']
+    title = "TITLE"
+    try:
+        title = loaded['meta']['title']['c']
+    except KeyError:
+        log("Missing title block in {}".format(filepath))
+
+    return (blocks, title)
