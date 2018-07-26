@@ -2,7 +2,6 @@
 
 import json
 import os
-import yaml
 
 from innoconv.utils import to_ast, log
 
@@ -63,7 +62,7 @@ class InnoconvRunner():
         for key in sorted(tree.keys()):
             value = tree[key]
             tree_object = {
-                'title': [{'t': 'Str', 'c': value[1]}],
+                'title': value[1],
                 'id': key
             }
             if value[0]:
@@ -79,7 +78,7 @@ class InnoconvRunner():
 
     def _process_file(self, rel_path, content_filename, tree):
 
-        def add_to_tree(tree, rel_path, full_path):
+        def _add_to_tree(tree, rel_path, title):
             """Add a folder to the fodler tree
 
             :param tree: The Object tree representign the File tree
@@ -92,11 +91,6 @@ class InnoconvRunner():
             :type full_path: str
 
             """
-            with open(full_path) as f_yaml:
-                for doc in yaml.safe_load_all(f_yaml):
-                    if doc and 'title' in doc:
-                        title = doc['title']
-                        break
 
             folders = rel_path[3:].split(os.sep)
             current = tree
@@ -107,10 +101,11 @@ class InnoconvRunner():
                     current = current[folder][0]
 
         full_path = os.path.join(self.source_dir, rel_path, content_filename)
-        add_to_tree(tree, rel_path, full_path)
         if os.path.isfile(full_path):
             log('processing {}'.format(full_path))
-            ast = to_ast(full_path)
+            ast, title = to_ast(full_path)
+
+            _add_to_tree(tree, rel_path, title)
 
             out_path = os.path.join(self.output_dir_base, rel_path)
             out_path_filename = os.path.join(out_path, 'content.json')
