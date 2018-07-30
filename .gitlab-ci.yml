@@ -1,0 +1,44 @@
+image: python:3.6-alpine
+
+stages:
+  - setup
+  - test
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - .cache/
+  - venv/
+  - .local/
+
+# pip cache directory inside project since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
+
+before_script:
+  - python -V
+  - python -m venv venv
+  - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
+  - source venv/bin/activate
+
+install:
+  stage: setup
+  script:
+    - apk add git
+    - mkdir -p .local
+    - "[ -x .local/bin/pandoc ] || wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xzf - --strip-components 1 -C .local"
+    - pandoc --version
+    - pip install -r requirements.txt
+    - ./setup.py install
+
+lint:
+  stage: test
+  script: ./setup.py pylint flake8
+
+coverage:
+  stage: test
+  script:
+    - mkdir -p ~/.panzer
+    - ./setup.py test
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
