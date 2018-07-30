@@ -1,0 +1,3 @@
+[console_scripts]
+innoconv-mintmod = innoconv.__main__:main
+
