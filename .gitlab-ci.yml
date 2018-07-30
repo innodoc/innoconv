@@ -1,0 +1,36 @@
+image: python:latest
+
+stages:
+  - setup
+  - test
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - .cache/
+  - venv/
+
+# pip cache directory inside project since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
+
+before_script:
+  - python -V
+  - python -m venv venv
+  - source venv/bin/activate
+  - ./setup.py develop
+
+install_packages:
+  stage: setup
+  script:
+    - pip install -r requirements.txt
+
+lint:
+  stage: test
+  script: ./setup.py run pylint
+
+coverage:
+  stage: test
+  script: ./setup.py coverage
+  coverage: '/\d+\%\s*$/'
