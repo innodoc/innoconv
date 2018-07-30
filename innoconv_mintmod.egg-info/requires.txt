@@ -1,0 +1,3 @@
+panflute
+panzer
+python-slugify
