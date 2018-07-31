@@ -24,9 +24,9 @@ before_script:
 install:
   stage: setup
   script:
-    - "which git || apk add git"
+    - apk add git
     - mkdir -p .local
-    - "which pandoc || wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
+    - wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
     - pip install --upgrade pip
     - pip install -r requirements.txt
     - ./setup.py install
@@ -34,10 +34,10 @@ install:
 lint:
   stage: test
   script: ./setup.py lint
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - venv/
+  # cache:
+  #   key: ${CI_COMMIT_REF_SLUG}
+  #   paths:
+  #     - venv/
 # TODO: Add this when GitLab is upgraded!
 #    policy: pull  ADD when GitLab is upgraded!
 
@@ -49,11 +49,11 @@ coverage:
     - ls -la
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - venv/
-      - .local/
+  # cache:
+  #   key: ${CI_COMMIT_REF_SLUG}
+  #   paths:
+  #     - venv/
+  #     - .local/
 # TODO: Add this when GitLab is upgraded!
 #  cache:
 #    policy: pull
