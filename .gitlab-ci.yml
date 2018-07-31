@@ -34,7 +34,7 @@ install:
 
 lint:
   stage: test
-  script: ./setup.py pylint flake8
+  script: ./setup.py lint
 
 coverage:
   stage: test
