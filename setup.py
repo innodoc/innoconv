@@ -80,7 +80,7 @@ class TestCommand(BaseCommand):
         self.test_target = os.path.join(ROOT_DIR, 'innoconv')
 
     def run(self):
-        self._run(['green', '-r', self.test_target])
+        self._run(['green', '-vv', '-r', self.test_target])
 
 
 class CoverageCommand(BaseCommand):
