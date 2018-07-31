@@ -31,10 +31,17 @@ install:
     - pandoc --version
     - pip install -r requirements.txt
     - ./setup.py install
+    - echo 'was ist in .cache'
+    - find .cache
 
 lint:
   stage: test
-  script: ./setup.py pylint flake8
+  script: ./setup.py lint
+  cache:
+    paths:
+      - .cache/
+      - venv/
+    policy: pull
 
 coverage:
   stage: test
@@ -42,3 +49,9 @@ coverage:
     - mkdir -p ~/.panzer
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+  cache:
+    paths:
+      - .cache/
+      - venv/
+      - .local/
+    policy: pull
