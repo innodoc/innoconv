@@ -17,7 +17,6 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
 before_script:
-  - python -V
   - python -m venv venv
   - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
   - source venv/bin/activate
@@ -31,10 +30,19 @@ install:
     - pandoc --version
     - pip install -r requirements.txt
     - ./setup.py install
+    - echo 'was ist in .cache'
+    - find .cache
 
 lint:
   stage: test
-  script: ./setup.py pylint flake8
+  script: ./setup.py lint
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .cache/
+      - venv/
+# Add this when GitLab is upgraded:
+#    policy: pull  ADD when GitLab is upgraded!
 
 coverage:
   stage: test
@@ -42,3 +50,6 @@ coverage:
     - mkdir -p ~/.panzer
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+# Add this when GitLab is upgraded:
+#  cache:
+#    policy: pull
