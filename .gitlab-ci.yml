@@ -4,13 +4,6 @@ stages:
   - setup
   - test
 
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-  - .cache/
-  - venv/
-  - .local/
-
 # pip cache directory inside project since we can
 # only cache local items.
 variables:
@@ -31,10 +24,16 @@ install:
     - pandoc --version
     - pip install -r requirements.txt
     - ./setup.py install
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+    - .cache/
+    - venv/
+    - .local/
 
 lint:
   stage: test
-  script: ./setup.py pylint flake8
+  script: ./setup.py lint
 
 coverage:
   stage: test
