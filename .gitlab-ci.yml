@@ -7,9 +7,9 @@ stages:
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-  - .pip-cache/
-  - venv/
-  - .local/
+    - .pip-cache/
+    - venv/
+    - .local/
 
 # pip cache directory inside project since we can
 # only cache local items.
@@ -46,7 +46,6 @@ coverage:
   script:
     - mkdir -p ~/.panzer
     - echo $PATH
-    - find .local
     - ls -la
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
