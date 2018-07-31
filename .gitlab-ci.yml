@@ -17,7 +17,6 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
 before_script:
-  - python -V
   - python -m venv venv
   - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
   - source venv/bin/activate
@@ -25,20 +24,32 @@ before_script:
 install:
   stage: setup
   script:
-    - apk add git
+    - "which git || apk add git"
     - mkdir -p .local
-    - "[ -x .local/bin/pandoc ] || wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xzf - --strip-components 1 -C .local"
-    - pandoc --version
+    - "which pandoc || wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xzf - --strip-components 1 -C .local"
+    - pip
     - pip install -r requirements.txt
     - ./setup.py install
 
 lint:
   stage: test
-  script: ./setup.py pylint flake8
+  script: ./setup.py lint
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .cache/
+      - venv/
+# TODO: Add this when GitLab is upgraded!
+#    policy: pull  ADD when GitLab is upgraded!
 
 coverage:
   stage: test
   script:
     - mkdir -p ~/.panzer
+    - echo $PATH
+    - find .local
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+# TODO: Add this when GitLab is upgraded!
+#  cache:
+#    policy: pull
