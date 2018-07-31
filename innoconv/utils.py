@@ -13,12 +13,7 @@ def log(msg_string):
     :param msg_string: Message that is logged
     :type msg_string: str
     """
-    msg_string = "{}\n".format(msg_string)
-    if hasattr(sys.stderr, 'buffer'):
-        outgoing_bytes = msg_string.encode(ENCODING)
-        sys.stderr.buffer.write(outgoing_bytes)
-    else:
-        sys.stderr.write(msg_string)
+    sys.stderr.write("{}\n".format(msg_string))
     sys.stderr.flush()
 
 
