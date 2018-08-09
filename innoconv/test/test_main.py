@@ -26,7 +26,7 @@ class TestMain(unittest.TestCase):
         arg_parser_mock = mock.Mock()
         attrs = {
             'parse_args.return_value': Namespace(
-                debug=False,
+                debug=True,
                 source_dir='/tmp/foo_source',
                 output_dir_base='/tmp/bar_output',
                 languages='ar,it',
@@ -54,7 +54,7 @@ class TestMain(unittest.TestCase):
         args, kwargs = self.runner_init_mock.call_args
         self.assertEqual(
             args, ('/tmp/foo_source', '/tmp/bar_output', ['ar', 'it']))
-        self.assertEqual(kwargs, {'debug': False})
+        self.assertEqual(kwargs, {'debug': True})
         self.assertTrue(self.runner_run_mock.called)
         args, _ = self.log_mock.call_args
         self.assertEqual(return_value, 0)

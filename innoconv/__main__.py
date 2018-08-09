@@ -64,13 +64,15 @@ def main():
     source_dir = os.path.abspath(args['source_dir'])
     output_dir_base = os.path.abspath(args['output_dir_base'])
     languages = args['languages'].split(',')
+    debug = args['debug']
 
     runner = InnoconvRunner(
-        source_dir, output_dir_base, languages, debug=args['debug'])
+        source_dir, output_dir_base, languages, debug=debug)
 
     try:
         runner.run()
-        log('Build finished!')
+        if debug:
+            log('Build finished!')
         return 0
     except RuntimeError as error:
         log('Something went wrong: {}'.format(error))

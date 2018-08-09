@@ -11,3 +11,9 @@ innoconv.constants
 
 .. autodata:: ENCODING
   :annotation:
+
+.. autodata:: CONTENT_FILENAME
+  :annotation:
+
+.. autodata:: TOC_FILENAME
+  :annotation:
