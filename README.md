@@ -1,32 +1,19 @@
-[![build status](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/badges/master/build.svg)](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/commits/master) [![coverage report](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/badges/master/coverage.svg)](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/commits/master)
+[![build status](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/badges/master/build.svg)](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/commits/master) [![coverage report](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/badges/master/coverage.svg)](https://gitlab.tubit.tu-berlin.de/innodoc/innoconv/commits/master) [![Documentation Status](https://readthedocs.org/projects/innoconv/badge/?version=latest)](https://innoconv.readthedocs.io/en/latest/?badge=latest)
 
 # innoConv
 
 Converter for interactive educational content.
 
-## Installation
+Please refer to the [documentation](https://innoconv.readthedocs.io/) for installation and usage.
 
-It is recommended to install innoConv in a [virtual environment](https://docs.python.org/3/library/venv.html).
+## Quickstart
 
 ```sh
-# Create a virtual environment in a place of your choice
-$ python3 -m venv /path/to/virtual/environment
-# Activate venv
-$ source /path/to/virtual/environment/bin/activate
-# Install into venv using pip
-$ pip install --process-dependency-links -e git+https://gitlab.tubit.tu-berlin.de/innodoc/innoconv.git#egg=innoconv
+# Install innoconv locally using pip
+$ python3 -m pip install --user innoconv
+# Convert some content
+$ innoconv .
 ```
-
-The ``innoconv`` command is now available.
-
-You can add ``source /path/to/virtual/environment/bin/activate`` to your
-``.bashrc`` (or similar file) to make ``innoconv`` available automatically.
-
-## Usage
-
-*TODO: update later*
-
-Please [build the documentation](#documentation) and read the section *Usage*.
 
 ## Development
 
@@ -41,7 +28,7 @@ $ ./setup.py develop
 
 ### Commands
 
-#### Build tub_base
+#### Build example content
 
 ##### JSON
 
@@ -52,16 +39,9 @@ $ git clone -b innoconv git@gitlab.tubit.tu-berlin.de:innodoc/tub_base
 $ innoconv tub_base
 ```
 
-##### HTML (for debugging/development)
-
-```
-$ innoconv -d tub_base
-```
-
 #### Linting
 
-Adhere to [PEP8](https://www.python.org/dev/peps/pep-0008/). Before pushing
-code please run lint and fix **all** problems.
+Adhere to [PEP8](https://www.python.org/dev/peps/pep-0008/).
 
 ```sh
 $ ./setup.py lint

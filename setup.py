@@ -28,6 +28,10 @@ with open(METADATA_PATH, 'r') as metadata_file:
                    metadata_file.read()))
 
 
+with open('README.md', 'r') as fh:
+    LONG_DESCRIPTION = fh.read()
+
+
 def get_logger():
     return logging.getLogger('setup.py')
 
@@ -113,6 +117,7 @@ def setup_package():
             'pylint': PylintCommand,
             'test': TestCommand,
         },
+        description='Converter for interactive educational content.',
         entry_points={
             'console_scripts': [
                 'innoconv = innoconv.__main__:main',
@@ -127,9 +132,21 @@ def setup_package():
         ],
         keywords=['pandoc'],
         license=METADATA['license'],
-        long_description=open('README.md').read(),
+        long_description=LONG_DESCRIPTION,
+        long_description_content_type='text/markdown',
         url=METADATA['url'],
         zip_safe=False,
+        classifiers=(
+            "Programming Language :: Python :: 3.6",
+            "License :: OSI Approved :: " +
+            "GNU General Public License v3 or later (GPLv3+)",
+            "Operating System :: POSIX :: Linux",
+            "Development Status :: 3 - Alpha",
+            "Environment :: Console",
+            "Intended Audience :: Education",
+            "Topic :: Education",
+            "Topic :: Text Processing :: Markup",
+        ),
     )
 
 

@@ -25,8 +25,8 @@ warranty, not even for merchantability or fitness for a particular purpose.
 '''.format(metadata.__author__, metadata.__url__)
 
 
-def parse_cli_args():
-    """Parse command line arguments."""
+def get_arg_parser():
+    """Get argument parser."""
     innoconv_argparser = argparse.ArgumentParser(
         description=INNOCONV_DESCRIPTION,
         epilog=INNOCONV_EPILOG,
@@ -58,13 +58,12 @@ def parse_cli_args():
 
     innoconv_argparser.add_argument('source_dir',
                                     help="content directory or file")
-
-    return vars(innoconv_argparser.parse_args())
+    return innoconv_argparser
 
 
 def main():
     """innoConv main entry point."""
-    args = parse_cli_args()
+    args = vars(get_arg_parser().parse_args())
 
     source_dir = os.path.abspath(args['source_dir'])
     output_dir_base = os.path.abspath(args['output_dir_base'])
