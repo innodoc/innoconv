@@ -4,6 +4,7 @@
 
 import argparse
 import os
+import sys
 
 from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES
 from innoconv.metadata import __author__, __url__
@@ -72,6 +73,7 @@ def main():
         log('Build finished!')
     except RuntimeError as error:
         log('Something went wrong: {}'.format(error))
+        sys.exit(1)
 
 
 if __name__ == '__main__':

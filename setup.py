@@ -97,6 +97,20 @@ class CoverageCommand(BaseCommand):
         self._run(['coverage', 'html'])
 
 
+class IntegrationTestCommand(BaseCommand):
+    description = 'Run integration test suite'
+
+    user_options = [
+        ('test-target=', 't', 'Test target (module or path)'),
+    ]
+
+    def initialize_options(self):
+        self.test_target = os.path.join(ROOT_DIR, 'integration-test')
+
+    def run(self):
+        self._run(['green', '-vv', self.test_target])
+
+
 class CleanCommand(clean, BaseCommand):
     def run(self):
         super().run()
@@ -114,6 +128,7 @@ def setup_package():
             'clean': CleanCommand,
             'coverage': CoverageCommand,
             'flake8': Flake8Command,
+            'integration_test': IntegrationTestCommand,
             'pylint': PylintCommand,
             'test': TestCommand,
         },
