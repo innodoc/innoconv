@@ -124,18 +124,19 @@ def setup_package():
             ],
         },
         include_package_data=True,
-        install_requires=[
-            'python-slugify',
-        ],
-        packages=[
-            'innoconv',
-        ],
-        keywords=['pandoc'],
+        install_requires=[],
+        packages=['innoconv'],
+        python_requires='>=3',
+        keywords=['innodoc', 'pandoc', 'markdown', 'education'],
         license=METADATA['license'],
         long_description=LONG_DESCRIPTION,
         long_description_content_type='text/markdown',
         url=METADATA['url'],
         zip_safe=False,
+        project_urls={
+            'Documentation': 'https://readthedocs.org/projects/innoconv/',
+            'Source': 'https://gitlab.tu-berlin.de/innodoc/innoconv',
+        },
         classifiers=(
             "Programming Language :: Python :: 3.6",
             "License :: OSI Approved :: " +
