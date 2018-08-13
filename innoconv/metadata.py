@@ -1,6 +1,6 @@
 """Project metadata"""
 
-__author__ = "Mirko Dietrich"
+__author__ = "Mirko Dietrich, innoCampus, TU Berlin"
 __author_email__ = "dietrich@math.tu-berlin.de"
 __version__ = "0.0.1"
 __license__ = "GPLv3"

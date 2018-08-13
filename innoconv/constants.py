@@ -1,10 +1,10 @@
-"""Project constants are defined here."""
+"""Project constants"""
 
 import os
 
 
 #: Default innoconv output directory
-DEFAULT_OUTPUT_DIR_BASE = os.path.join(os.getcwd(), 'innoconv_output')
+DEFAULT_OUTPUT_DIR_BASE = os.path.join('.', 'innoconv_output')
 
 #: Default languages
 DEFAULT_LANGUAGES = ('de', 'en')

@@ -4,17 +4,15 @@
 
 import unittest
 
-# supress linting until tests are implemented
-# pylint: disable=W0611
-from innoconv.__main__ import parse_cli_args, main  # noqa: F401
+# from innoconv.__main__ import get_arg_parser, main
 
 
 class TestMain(unittest.TestCase):
 
-    @unittest.skip("TBD")
-    def test_parse_cli_args(self):
+    @unittest.skip("TODO")
+    def test_get_arg_parser(self):
         pass
 
-    @unittest.skip("TBD")
+    @unittest.skip("TODO")
     def test_main(self):
         pass

@@ -6,7 +6,7 @@ import argparse
 import os
 
 from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES
-import innoconv.metadata as metadata
+from innoconv.metadata import __author__, __url__
 from innoconv.utils import log
 from innoconv.runner import InnoconvRunner
 
@@ -22,7 +22,7 @@ Web: {}
 
 This is free software; see the source for copying conditions. There is no
 warranty, not even for merchantability or fitness for a particular purpose.
-'''.format(metadata.__author__, metadata.__url__)
+'''.format(__author__, __url__)
 
 
 def get_arg_parser():
@@ -38,23 +38,18 @@ def get_arg_parser():
                                     help="show this help message and exit")
 
     argparse_default_languages = ','.join(DEFAULT_LANGUAGES)
-    languages_help = 'languages to convert (default: "{}")'.format(
-        argparse_default_languages)
     innoconv_argparser.add_argument('-l', '--languages',
                                     default=argparse_default_languages,
-                                    help=languages_help)
+                                    help='Languages to convert')
 
-    output_help = 'output base directory (default: "{}")'.format(
-        DEFAULT_OUTPUT_DIR_BASE)
     innoconv_argparser.add_argument('-o', '--output-dir-base',
                                     default=DEFAULT_OUTPUT_DIR_BASE,
-                                    help=output_help)
+                                    help='Output base directory')
 
-    debug_help = 'debug mode'
     innoconv_argparser.add_argument('-d', '--debug',
                                     action='store_true',
                                     default=False,
-                                    help=debug_help)
+                                    help='Enable debug mode')
 
     innoconv_argparser.add_argument('source_dir',
                                     help="content directory or file")
