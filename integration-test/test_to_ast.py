@@ -14,7 +14,7 @@ FIXTURES_DIR = '{}/fixtures'.format(
 class TestToAst(unittest.TestCase):
 
     def test_to_ast(self):
-        """to_ast() returns AST if given test Markdown document"""
+        """to_ast() returns AST if given Markdown document"""
 
         blocks, title = to_ast('{}/test_valid.md'.format(FIXTURES_DIR))
 
