@@ -71,10 +71,16 @@ def main():
     try:
         runner.run()
         log('Build finished!')
+        return 0
     except RuntimeError as error:
         log('Something went wrong: {}'.format(error))
-        sys.exit(1)
+        return 1
 
 
-if __name__ == '__main__':
-    main()
+def init():
+    """Module init function."""
+    if __name__ == '__main__':
+        sys.exit(main())
+
+
+init()
