@@ -39,12 +39,27 @@ def walk_side_effect(path):
     ])
 
 
+TITLE = [
+    {
+        't': 'Str',
+        'c': 'Section',
+    },
+    {
+        't': 'Space',
+    },
+    {
+        't': 'Str',
+        'c': 'title',
+    },
+]
+
+
 class TestInnoconvRunner(unittest.TestCase):
 
     def setUp(self):
         runner_to_ast_patcher = mock.patch('innoconv.runner.to_ast')
         self.runner_to_ast_mock = runner_to_ast_patcher.start()
-        self.runner_to_ast_mock.return_value = ['content_ast'], 'Section title'
+        self.runner_to_ast_mock.return_value = ['content_ast'], TITLE
 
         json_dump_patcher = mock.patch('json.dump')
         self.json_dump_mock = json_dump_patcher.start()
@@ -98,33 +113,21 @@ class TestInnoconvRunner(unittest.TestCase):
             self.assertEqual(toc, [
                 {
                     'id': 'section-1',
-                    'title': {
-                        't': 'Str',
-                        'c': 'Section title',
-                    },
+                    'title': TITLE,
                     'children': [
                         {
                             'id': 'section-1.1',
-                            'title': {
-                                't': 'Str',
-                                'c': 'Section title',
-                            },
+                            'title': TITLE,
                         },
                         {
                             'id': 'section-1.2',
-                            'title': {
-                                't': 'Str',
-                                'c': 'Section title',
-                            },
+                            'title': TITLE,
                         },
                     ],
                 },
                 {
                     'id': 'section-2',
-                    'title': {
-                        't': 'Str',
-                        'c': 'Section title',
-                    },
+                    'title': TITLE,
                 },
             ])
 

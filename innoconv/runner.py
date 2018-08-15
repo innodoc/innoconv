@@ -93,10 +93,7 @@ class InnoconvRunner():
                 if not found:
                     children.append({
                         'id': section_id,
-                        'title': {
-                            't': 'Str',
-                            'c': title,
-                        },
+                        'title': title,
                     })
 
         ast, title = to_ast(filepath)

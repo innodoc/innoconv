@@ -23,8 +23,8 @@ def to_ast(filepath):
     :param filepath: Path of file
     :type filepath: str
 
-    :rtype: list of dicts (pandoc elements)
-    :returns: parsed elements
+    :rtype: (list of dicts, str)
+    :returns: (Pandoc AST, title)
 
     :raises RuntimeError: if pandoc exits with an error
     """
