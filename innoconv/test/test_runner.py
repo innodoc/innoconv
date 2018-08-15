@@ -101,14 +101,13 @@ class TestInnoconvRunner(unittest.TestCase):
             args, _ = self.os_makedirs_mock.call_args_list[i]
             self.assertEqual(args[0], path)
 
-        # called 10 times for content files
-        self.assertEqual(self.json_dump_mock.call_count, 12)
-        for i in (0, 1, 2, 3, 4, 6, 7, 8, 9, 10):
+        # called 12 times for content files
+        for i in (0, 1, 2, 3, 4, 7, 8, 9, 10, 11):
             args, _ = self.json_dump_mock.call_args_list[i]
             self.assertEqual(args[0], ['content_ast'])
 
         # called twice for TOCs
-        for i in (5, 11):
+        for i in (5, 12):
             toc = self.json_dump_mock.call_args_list[i][0][0]
             self.assertEqual(toc, [
                 {
@@ -130,6 +129,13 @@ class TestInnoconvRunner(unittest.TestCase):
                     'title': TITLE,
                 },
             ])
+
+        # called twice for manifests
+        for i in (6, 13):
+            toc = self.json_dump_mock.call_args_list[i][0][0]
+            self.assertEqual(toc, {
+                'title': TITLE,
+            })
 
     def test_run_no_folder(self):
         """Language folders do not exist"""

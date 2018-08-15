@@ -18,5 +18,8 @@ CONTENT_FILENAME = 'content.md'
 #: Output content filename for a section folder
 OUTPUT_CONTENT_FILENAME = 'content.json'
 
+#: Manifest filename
+MANIFEST_FILENAME = 'manifest.json'
+
 #: TOC filename
 TOC_FILENAME = 'toc.json'

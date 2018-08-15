@@ -24,6 +24,9 @@ class TestConversion(unittest.TestCase):
         """A conversion should run without problems."""
         command = ['innoconv', '-o', self.output_dir, self.repo_dir.name]
         job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
+        if job.returncode != 0:
+            print(job.stdout)
+            print(job.stderr)
         self.assertEqual(job.returncode, 0)
         for lang in ('de', 'en'):
             self.assertTrue(isdir(join(self.output_dir, lang)))
