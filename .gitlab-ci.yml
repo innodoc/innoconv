@@ -8,7 +8,7 @@ cache: &cache
   key: innoconv-default
   paths:
     - .pip-cache/
-    - .venv/
+    - venv/
     - .local/
 
 variables:
