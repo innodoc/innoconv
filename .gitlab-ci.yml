@@ -5,7 +5,11 @@ stages:
   - test
 
 cache: &cache
-  untracked: true
+  key: innoconv-default
+  paths:
+    - .pip-cache/
+    - .venv/
+    - .local/
 
 variables:
   PANDOC_VERSION: "2.3"
