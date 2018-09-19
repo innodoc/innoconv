@@ -34,7 +34,7 @@ install:
     - ls -la venv || true
     - ls -la venv/bin || true
 
-linting:
+.linting:
   stage: test
   script:
     - ls -la || true
@@ -53,7 +53,7 @@ unit tests:
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
 
-integration tests:
+.integration tests:
   stage: test
   script:
     - ls -la || true
