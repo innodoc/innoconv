@@ -1,51 +1,68 @@
-# TODO: add cache.policy, when GitLab is upgraded
-
 image: python:3.6-alpine
 
 stages:
   - setup
   - test
 
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
+cache: &cache
+  key: default-innoconv
   paths:
     - .pip-cache/
     - venv/
     - .local/
 
-# pip cache directory inside project since we can
-# only cache local items.
 variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+  PANDOC_VERSION: "2.3"
+  # pip cache directory inside project since we can only cache local items
+  PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
 
 before_script:
-  - apk add git
-  - python -m venv venv
-  - pip install --upgrade pip setuptools
-  - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
-  - source venv/bin/activate
+  - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
 
 install:
   stage: setup
   script:
     - apk add build-base
     - mkdir -p .local
-    - wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
+    - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip setuptools
     - pip install -r requirements.txt
     - ./setup.py install
 
-lint:
-  stage: test
-  script: ./setup.py lint
-
-coverage:
+linting:
   stage: test
   script:
-    - mkdir -p ~/.panzer
+    - source venv/bin/activate
+    - ./setup.py lint
+  cache:
+    <<: *cache
+    paths:
+      - venv/
+    policy: pull
+
+unit tests:
+  stage: test
+  script:
+    - source venv/bin/activate
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+  cache:
+    <<: *cache
+    paths:
+      - venv/
+    policy: pull
 
-integration-test:
+integration tests:
   stage: test
   script:
+    - apk add git
+    - source venv/bin/activate
     - ./setup.py integration_test
+  cache:
+    <<: *cache
+    paths:
+      - venv/
+      - .local/
+    policy: pull
