@@ -1,12 +1,10 @@
-# TODO: add cache.policy, when GitLab is upgraded
-
 image: python:3.6-alpine
 
 stages:
   - setup
   - test
 
-cache:
+cache: &cache
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - .pip-cache/
@@ -21,9 +19,9 @@ variables:
 before_script:
   - apk add git
   - python -m venv venv
+  - source venv/bin/activate
   - pip install --upgrade pip setuptools
   - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
-  - source venv/bin/activate
 
 install:
   stage: setup
@@ -37,6 +35,9 @@ install:
 lint:
   stage: test
   script: ./setup.py lint
+  cache:
+    <<: *cache
+    policy: pull
 
 coverage:
   stage: test
@@ -44,8 +45,14 @@ coverage:
     - mkdir -p ~/.panzer
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+  cache:
+    <<: *cache
+    policy: pull
 
 integration-test:
   stage: test
   script:
     - ./setup.py integration_test
+  cache:
+    <<: *cache
+    policy: pull
