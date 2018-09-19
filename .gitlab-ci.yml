@@ -34,7 +34,7 @@ install:
     - ls -la venv || true
     - ls -la venv/bin || true
 
-.linting:
+linting:
   stage: test
   script:
     - ls -la || true
@@ -67,7 +67,7 @@ unit tests:
       - .local/
     policy: pull
 
-.integration tests:
+integration tests:
   stage: test
   script:
     - ls -la || true
