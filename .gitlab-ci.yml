@@ -14,17 +14,16 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
 
 before_script:
+  - mkdir -p .local
   - python -m venv venv
   - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
   - source venv/bin/activate
+  - pip install --upgrade pip setuptools
 
 install:
   stage: setup
   script:
-    - apk add build-base
-    - mkdir -p .local
     - wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
-    - pip install --upgrade pip setuptools
     - pip install -r requirements.txt
     - ./setup.py install
 
