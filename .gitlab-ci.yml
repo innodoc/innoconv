@@ -31,7 +31,6 @@ install:
     - pip install -r requirements.txt
     - ./setup.py install
 
-
 linting:
   stage: test
   script:
@@ -50,6 +49,7 @@ unit tests:
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
+    <<: *cache
     paths:
       - venv/
     policy: pull
@@ -61,7 +61,7 @@ integration tests:
     - source venv/bin/activate
     - ./setup.py integration_test
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    <<: *cache
     paths:
       - venv/
       - .local/
