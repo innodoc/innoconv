@@ -4,7 +4,7 @@ stages:
   - setup
   - test
 
-cache: &cache
+cache:
   key: innoconv-default
   paths:
     - .pip-cache/
@@ -37,9 +37,6 @@ linting:
   script:
     - ./setup.py lint
     - ls -l venv/bin/green
-  cache:
-    <<: *cache
-    policy: pull
 
 unit tests:
   stage: test
@@ -47,15 +44,9 @@ unit tests:
     - ls -l venv/bin/green
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
-  cache:
-    <<: *cache
-    policy: pull
 
 integration tests:
   stage: test
   script:
     - ls -l venv/bin/green
     - ./setup.py integration_test
-  cache:
-    <<: *cache
-    policy: pull
