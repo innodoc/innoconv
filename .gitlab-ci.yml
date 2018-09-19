@@ -5,7 +5,6 @@ stages:
   - test
 
 cache: &cache
-  key: "$CI_COMMIT_REF_SLUG"
   untracked: true
 
 variables:
