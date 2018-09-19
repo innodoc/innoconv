@@ -57,7 +57,7 @@ unit tests:
 integration tests:
   stage: test
   script:
-    - apk install git
+    - apk add git
     - source venv/bin/activate
     - ./setup.py integration_test
   cache:
