@@ -35,18 +35,18 @@ install:
 linting:
   stage: test
   script:
+    - ls -la
+    - ls -la venv/bin/green
     - ./setup.py lint
-    - ls -l venv/bin/green
 
 unit tests:
   stage: test
   script:
-    - ls -l venv/bin/green
+    - ls -la
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
 
 integration tests:
   stage: test
   script:
-    - ls -l venv/bin/green
     - ./setup.py integration_test
