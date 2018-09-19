@@ -5,54 +5,50 @@ stages:
   - test
 
 cache: &cache
-  key: ${CI_COMMIT_REF_SLUG}
+  key: ${CI_PROJECT_NAME}-${CI_PIPELINE_IID}
   paths:
     - .pip-cache/
     - venv/
     - .local/
 
-# pip cache directory inside project since we can
-# only cache local items.
 variables:
+  PANDOC_VERSION: "2.3"
+  # pip cache directory inside project since we can only cache local items
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
 
 before_script:
-  - apk add git
   - python -m venv venv
-  - source venv/bin/activate
-  - pip install --upgrade pip setuptools
   - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
+  - source venv/bin/activate
 
 install:
   stage: setup
   script:
     - apk add build-base
     - mkdir -p .local
-    - wget -qO- https://github.com/jgm/pandoc/releases/download/2.2.2.1/pandoc-2.2.2.1-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
+    - wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
+    - pip install --upgrade pip setuptools
     - pip install -r requirements.txt
     - ./setup.py install
 
-lint:
+linting:
   stage: test
   script: ./setup.py lint
   cache:
     <<: *cache
     policy: pull
 
-coverage:
+unit tests:
   stage: test
-  script:
-    - mkdir -p ~/.panzer
-    - ./setup.py test
+  script: ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
     <<: *cache
     policy: pull
 
-integration-test:
+integration tests:
   stage: test
-  script:
-    - ./setup.py integration_test
+  script: ./setup.py integration_test
   cache:
     <<: *cache
     policy: pull
