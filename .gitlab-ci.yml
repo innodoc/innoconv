@@ -5,7 +5,7 @@ stages:
   - test
 
 cache:
-  key: innoconv-default
+  key: ${CI_COMMIT_REF_SLUG}
   paths:
     - .pip-cache/
     - venv/
@@ -14,10 +14,10 @@ cache:
 variables:
   PANDOC_VERSION: "2.3"
   # pip cache directory inside project since we can only cache local items
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+  PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
 
 before_script:
-  - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
+  - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
 
 install:
   stage: setup
@@ -42,6 +42,13 @@ install:
     - ls -la venv/bin || true
     - source venv/bin/activate
     - ./setup.py lint
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .pip-cache/
+      - venv/
+      - .local/
+    policy: pull
 
 unit tests:
   stage: test
@@ -52,6 +59,13 @@ unit tests:
     - source venv/bin/activate
     - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .pip-cache/
+      - venv/
+      - .local/
+    policy: pull
 
 .integration tests:
   stage: test
@@ -61,3 +75,10 @@ unit tests:
     - ls -la venv/bin || true
     - source venv/bin/activate
     - ./setup.py integration_test
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .pip-cache/
+      - venv/
+      - .local/
+    policy: pull
