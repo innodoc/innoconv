@@ -21,26 +21,31 @@ before_script:
   - python -m venv venv
   - export PATH="$CI_PROJECT_DIR/.local/bin:$PATH"
   - source venv/bin/activate
-  - pip install --upgrade pip setuptools
 
 install:
   stage: setup
   script:
     - apk add build-base
     - wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
+    - pip install --upgrade pip setuptools
     - pip install -r requirements.txt
     - ./setup.py install
+    - ls -l venv/bin/green
 
 linting:
   stage: test
-  script: ./setup.py lint
+  script:
+    - ./setup.py lint
+    - ls -l venv/bin/green
   cache:
     <<: *cache
     policy: pull
 
 unit tests:
   stage: test
-  script: ./setup.py test
+  script:
+    - ./setup.py test
+    - ls -l venv/bin/green
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
     <<: *cache
@@ -48,7 +53,9 @@ unit tests:
 
 integration tests:
   stage: test
-  script: ./setup.py integration_test
+  script:
+    - ./setup.py integration_test
+    - ls -l venv/bin/green
   cache:
     <<: *cache
     policy: pull
