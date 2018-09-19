@@ -44,8 +44,8 @@ linting:
 unit tests:
   stage: test
   script:
-    - ./setup.py test
     - ls -l venv/bin/green
+    - ./setup.py test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
     <<: *cache
@@ -54,8 +54,8 @@ unit tests:
 integration tests:
   stage: test
   script:
-    - ./setup.py integration_test
     - ls -l venv/bin/green
+    - ./setup.py integration_test
   cache:
     <<: *cache
     policy: pull
