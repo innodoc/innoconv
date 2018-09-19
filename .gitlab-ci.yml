@@ -5,11 +5,8 @@ stages:
   - test
 
 cache: &cache
-  key: ${CI_PROJECT_NAME}-${CI_PIPELINE_IID}
-  paths:
-    - .pip-cache/
-    - venv/
-    - .local/
+  key: "$CI_COMMIT_REF_SLUG"
+  untracked: true
 
 variables:
   PANDOC_VERSION: "2.3"
