@@ -4,8 +4,7 @@
 
 import unittest
 import unittest.mock
-import io
-from subprocess import call, PIPE
+from subprocess import run, PIPE
 from os.path import isdir, join
 import tempfile
 from git import Repo
@@ -22,16 +21,14 @@ class TestConversionTubBase(unittest.TestCase):
             REPO_URL, self.repo_dir.name, branch=REPO_BRANCH)
         self.output_dir = join(self.repo_dir.name, 'output_dir_base')
 
-    @unittest.mock.patch('sys.stderr', stederr_mock=io.StringIO)
-    @unittest.mock.patch('sys.stdout', stedout_mock=io.StringIO)
-    def test_conversion(self, stederr_mock, stedout_mock):
+    def test_conversion(self):
         """A conversion should run without problems."""
         command = ['innoconv', '-o', self.output_dir, self.repo_dir.name]
-        returncode = call(command, timeout=60, stdout=PIPE, stderr=PIPE)
-        if returncode != 0:
-            print(stederr_mock.getvalue())
-            print(stedout_mock.getvalue())
-        self.assertEqual(returncode, 0)
+        process = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
+        if process.returncode != 0:
+            print(process.stdout)
+            print(process.stderr)
+        self.assertEqual(process.returncode, 0)
         for lang in ('de', 'en'):
             self.assertTrue(isdir(join(self.output_dir, lang)))
             self.assertTrue(isdir(join(self.output_dir, lang, '01-project')))
@@ -42,8 +39,8 @@ class TestConversionTubBase(unittest.TestCase):
         """A conversion should fail on non-existent directory."""
         non_existent_dir = join('dir', 'does', 'not', 'exist')
         command = ['innoconv', '-o', self.output_dir, non_existent_dir]
-        returncode = call(command, timeout=60, stdout=PIPE, stderr=PIPE)
-        self.assertNotEqual(returncode, 0)
+        process = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
+        self.assertNotEqual(process.returncode, 0)
 
     @unittest.skip('TODO')
     def test_conversion_fail_langs_not_identical(self):
