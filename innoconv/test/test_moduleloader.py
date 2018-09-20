@@ -11,7 +11,8 @@ import innoconv.modloader as ml
 
 MODLIST = ['cpystatic',
            'demo',
-           'maketoc']
+           'maketoc',
+           'squish']
 
 
 class TestMod(ml.AbstractModule):
