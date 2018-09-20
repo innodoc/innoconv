@@ -2,11 +2,13 @@
 
 import json
 from os import makedirs, walk
-from os.path import abspath, dirname, isdir, join, sep, split
+from os.path import abspath, dirname, isdir, join, sep, split, isfile
 
 from innoconv.constants import (
-    CONTENT_FILENAME, OUTPUT_CONTENT_FILENAME, MANIFEST_FILENAME, TOC_FILENAME)
+    CONTENT_FILENAME, OUTPUT_CONTENT_FILENAME)
 from innoconv.utils import to_ast, log
+
+from innoconv.modloader import run_mods
 
 
 def splitall(path):
@@ -29,12 +31,16 @@ class InnoconvRunner():
     It walks over a directory tree and converts content files to JSON.
     """
 
-    def __init__(self, source_dir, output_dir_base, languages, debug=False):
+    def __init__(self, source_dir,
+                 output_dir_base, languages,
+                 modules, debug=False):
         self.source_dir = source_dir
         self.output_dir_base = output_dir_base
         self.languages = languages
-        self._manifest = {}
-        self._toc = None
+
+        self.debug = debug
+        self.modules = modules
+
         if debug:
             self._log = log
         else:
@@ -45,88 +51,79 @@ class InnoconvRunner():
 
         Iterate over language folders.
         """
+
+        run_mods(self.modules, 'pre_conversion',
+                 base_dirs={
+                     "output": self.output_dir_base,
+                     "source": self.source_dir
+                 })
+
         for language in self.languages:
             self._convert_folder(language)
+
+        run_mods(self.modules, 'post_conversion')
 
     def _convert_folder(self, language):
         """Convert a language folder."""
         path = abspath(join(self.source_dir, language))
 
+        run_mods(self.modules, 'pre_language',
+                 language=language)
+
         if not isdir(path):
             raise RuntimeError(
                 "Error: Directory {} does not exist".format(path))
 
-        self._toc = []
         for root, dirs, files in walk(path):
+
+            rel_dir = root[len(self.source_dir):].lstrip(sep)
+
             # note: all dirs manipulation must happen in-place!
             for i, directory in enumerate(dirs):
                 if directory.startswith('_'):
                     del dirs[i]  # skip meta directories like '_static'
             dirs.sort()  # sort section names
 
-            # process content file
-            if CONTENT_FILENAME in files:
+            veto = run_mods(self.modules, 'pre_processing_veto',
+                            dir=rel_dir,
+                            filename=CONTENT_FILENAME)
+
+            if CONTENT_FILENAME in files and not veto:
+
                 filepath = join(root, CONTENT_FILENAME)
                 self._process_file(filepath)
-            else:
-                raise RuntimeError(
-                    "Found section without content file: {}".format(root))
+            # else:
+            #    raise RuntimeError(
+            #        "Found section without content file: {}".format(root))
+            # commented out because this is necessary for copystatic
 
-        self._write_toc(language)
-        self._write_manifest(language)
-
-    def _write_toc(self, language):
-        filepath = join(self.output_dir_base, language, TOC_FILENAME)
-        self._write_json_file(
-            filepath, self._toc, "Wrote TOC: {}".format(filepath))
-
-    def _write_manifest(self, language):
-        filepath = join(self.output_dir_base, language, MANIFEST_FILENAME)
-        self._write_json_file(
-            filepath, self._manifest, "Wrote manifest: {}".format(filepath))
-
-    def _add_to_toc(self, dirpath, title):
-        path_components = splitall(dirpath)
-        path_components.pop(0)  # language
-        if not path_components:
-            # this is the root section
-            self._manifest['title'] = title
-            return
-        children = self._toc
-        while path_components:
-            section_id = path_components.pop(0)
-            # find/create child leaf
-            found = None
-            for child in children:
-                if child['id'] == section_id:
-                    found = child
-                    try:
-                        children = child['children']
-                    except KeyError:
-                        children = child['children'] = []
-                        break
-            # arrived at leaf -> add section
-            if not found:
-                children.append({
-                    'id': section_id,
-                    'title': title,
-                })
+        run_mods(self.modules, 'post_language')
 
     def _process_file(self, filepath):
-        ast, title = to_ast(filepath)
 
-        # save content file
-        rel_path = dirname(filepath.replace(self.source_dir, '').lstrip(sep))
-        filepath_out = join(
-            self.output_dir_base, rel_path, OUTPUT_CONTENT_FILENAME)
-        makedirs(dirname(filepath_out), exist_ok=True)
-        self._write_json_file(
-            filepath_out, ast, "Wrote {}".format(filepath_out))
+        if isfile(filepath):
+            rel_path = dirname(
+                filepath.replace(self.source_dir, '').lstrip(sep))
+            run_mods(self.modules, 'pre_content_file',
+                     rel_path=rel_path,
+                     full_path=filepath)
 
-        # add to TOC
-        self._add_to_toc(rel_path, title)
+            ast = to_ast(filepath)
 
-        return title
+            run_mods(self.modules, 'process_ast',
+                     ast=ast)
+
+            ast = ast['blocks']
+
+            filepath_out = join(
+                self.output_dir_base, rel_path, OUTPUT_CONTENT_FILENAME)
+            makedirs(dirname(filepath_out), exist_ok=True)
+
+            self._write_json_file(
+                filepath_out, ast, "Wrote {}".format(filepath_out))
+
+            run_mods(self.modules, 'post_content_file')
+            self._log('Wrote {}'.format(filepath_out))
 
     def _write_json_file(self, filepath, data, msg):
         with open(filepath, 'w') as out_file:

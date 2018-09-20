@@ -7,13 +7,15 @@ import sys
 from innoconv.constants import ENCODING
 
 
-def log(msg_string):
+def log(msg_string, *args):
     """Log message to stderr.
 
     :param msg_string: Message that is logged
     :type msg_string: str
     """
     sys.stderr.write("{}\n".format(msg_string))
+    for arg in args:
+        sys.stderr.write("{}\n".format(arg))
     sys.stderr.flush()
 
 
@@ -39,10 +41,5 @@ def to_ast(filepath):
         raise RuntimeError("pandoc process exited with non-zero return code.")
 
     loaded = json.loads(out)
-    blocks = loaded['blocks']
-    try:
-        title = loaded['meta']['title']['c']
-    except KeyError:
-        raise ValueError("Missing title in meta block in {}".format(filepath))
 
-    return blocks, title
+    return loaded

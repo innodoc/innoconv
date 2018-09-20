@@ -34,26 +34,28 @@ class TestToAst(unittest.TestCase):
         process_mock.configure_mock(**attrs)
         popen_mock.return_value = process_mock
 
-        blocks, title = to_ast('/some/document.md')
+        ast = to_ast('/some/document.md')
+        blocks = ast['blocks']
+        title = ast['meta']['title']['c']
 
         self.assertTrue(popen_mock.called)
         self.assertEqual(blocks, [{'t': 'Para', 'c': []}])
         self.assertEqual(title, [{'t': 'Str', 'c': 'Test'}])
 
-    @mock.patch('innoconv.utils.Popen')
-    def test_to_ast_fails_without_title(self, popen_mock):
-        """to_ast() fails without a title"""
-        pandoc_output = ('{"blocks":[{"t":"Para","c":[]}],"meta":{}}')
-        process_mock = mock.Mock()
-        attrs = {
-            'returncode': 0,
-            'communicate.return_value': (pandoc_output.encode(), ''.encode()),
-        }
-        process_mock.configure_mock(**attrs)
-        popen_mock.return_value = process_mock
-
-        with self.assertRaises(ValueError):
-            to_ast('/some/document.md')
+#    @mock.patch('innoconv.utils.Popen')
+#    def test_to_ast_fails_without_title(self, popen_mock):
+#        """to_ast() fails without a title"""
+#        pandoc_output = ('{"blocks":[{"t":"Para","c":[]}],"meta":{}}')
+#        process_mock = mock.Mock()
+#        attrs = {
+#            'returncode': 0,
+#            'communicate.return_value': (pandoc_output.encode(), ''.encode()),
+#        }
+#        process_mock.configure_mock(**attrs)
+#        popen_mock.return_value = process_mock
+#
+#        with self.assertRaises(ValueError):
+#            to_ast('/some/document.md')
 
     @mock.patch('innoconv.utils.Popen')
     def test_to_ast_fails(self, popen_mock):
