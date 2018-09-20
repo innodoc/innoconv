@@ -12,7 +12,8 @@ import innoconv.modloader as ml
 MODLIST = ['cpystatic',
            'demo',
            'maketoc',
-           'squish']
+           'squish',
+           'makemanifest']
 
 
 class TestMod(ml.AbstractModule):
