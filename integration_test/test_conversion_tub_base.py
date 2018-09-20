@@ -4,7 +4,30 @@
 
 import unittest
 import unittest.mock
-from subprocess import run, PIPE
+try:
+    from subprocess import run, PIPE
+except ImportError:
+    # Handle python < 3.6
+    from subprocess import call, PIPE
+    import io
+
+    class ReturnValue():
+        def __init__(self):
+            self.returncode = 0
+            self.stdout = ""
+            self.stderr = ""
+
+    def run(command, timeout, stdout, stderr):
+        ret_val = ReturnValue()
+        with unittest.mock.patch(
+                'sys.stderr', new_callable=io.StringIO) as stderr_mock:
+            with unittest.mock.patch(
+                    'sys.stdout', new_callable=io.StringIO) as stdout_mock:
+                ret_val.returncode = call(
+                    command, timeout=timeout, stdout=stdout, stderr=stderr)
+                ret_val.stdout = stdout_mock.getvalue()
+                ret_val.stderr = stderr_mock.getvalue()
+        return ret_val
 from os.path import isdir, join
 import tempfile
 from git import Repo
