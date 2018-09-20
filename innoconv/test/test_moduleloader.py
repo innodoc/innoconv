@@ -9,7 +9,8 @@ import unittest
 
 import innoconv.modloader as ml
 
-MODLIST = ['demo',
+MODLIST = ['cpystatic',
+           'demo',
            'maketoc']
 
 
