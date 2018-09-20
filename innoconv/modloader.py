@@ -18,6 +18,9 @@ def mod_list():
     owndir = os.path.dirname(os.path.abspath(__file__))
     modules_dir = os.path.join(owndir, 'modules')
     modules = []
+    if not os.path.isdir(modules_dir):
+        raise RuntimeError(
+            "Module Director {} not present".format(modules_dir))
     for _f in os.listdir(modules_dir):
         modules.append(_f)
     return modules
