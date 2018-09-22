@@ -1,7 +1,14 @@
 """loads modules for innoconv"""
 
 import importlib
-import os
+
+MODULES = [
+    'cpystatic',
+    'demo',
+    'makemanifest',
+    'maketoc',
+    'squish'
+]
 
 
 def run_mods(modlist, event, **kwargs):
@@ -15,15 +22,8 @@ def run_mods(modlist, event, **kwargs):
 
 def mod_list():
     """Returns a list of available modules"""
-    owndir = os.path.dirname(os.path.abspath(__file__))
-    modules_dir = os.path.join(owndir, 'modules')
-    modules = []
-    if not os.path.isdir(modules_dir):
-        raise RuntimeError(
-            "Module Director {} not present".format(modules_dir))
-    for _f in os.listdir(modules_dir):
-        modules.append(_f)
-    return modules
+    # return [mod.split('.')[-1] for mod in MODULES]
+    return MODULES
 
 
 def load_module(name):

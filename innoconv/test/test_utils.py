@@ -5,7 +5,7 @@
 import unittest
 import mock
 
-from innoconv.utils import to_ast, log
+from innoconv.utils import to_ast, log, set_debug
 
 
 class TestLog(unittest.TestCase):
@@ -13,10 +13,17 @@ class TestLog(unittest.TestCase):
     @mock.patch('sys.stderr.write')
     @mock.patch('sys.stderr.flush')
     def test_log(self, stderr_flush_mock, stderr_write_mock):
+        set_debug(True)
         log('Foo bar')
         self.assertEqual(stderr_write_mock.call_count, 1)
         self.assertEqual(stderr_write_mock.call_args, (('Foo bar\n',),))
         self.assertEqual(stderr_flush_mock.call_count, 1)
+        stderr_write_mock.reset_mock()
+        stderr_flush_mock.reset_mock()
+        set_debug(False)
+        log('Foo bar')
+        self.assertFalse(stderr_write_mock.called)
+        self.assertFalse(stderr_flush_mock.called)
 
 
 class TestToAst(unittest.TestCase):

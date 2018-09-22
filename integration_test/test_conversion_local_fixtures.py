@@ -47,6 +47,7 @@ class TestConversionLocalFixtures(unittest.TestCase):
     def test_conversion_fail2(self, mock_stderr):
         """A conversion can fail."""
         self.assertEqual(1, main(['-l', 'en',
+                                  '-d',
                                   '-m', 'maketoc',
                                   '-m', 'squish',
                                   '-m', 'cpystatic',

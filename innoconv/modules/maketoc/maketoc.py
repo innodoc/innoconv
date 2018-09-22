@@ -1,9 +1,8 @@
 """creates the toc.json file"""
 
-import json
 import os
 
-from innoconv.utils import log
+from innoconv.utils import write_json_file
 from innoconv.modloader import AbstractModule
 from innoconv.constants import TOC_FILENAME
 
@@ -71,9 +70,7 @@ class Maketoc(AbstractModule):
 
     def post_language(self):
         """format and write the toc"""
-        # self.tree = self._folder_to_json_tree()
-        log("Writing toc for {} to {}".format(
-            self.language, self.output_dir_base))
+
         self._write_toc()
 
     def _add_to_tree(self):
@@ -105,5 +102,6 @@ class Maketoc(AbstractModule):
     def _write_toc(self):
         out_path = os.path.join(self.output_dir_base, self.language)
         out_path_filename = os.path.join(out_path, TOC_FILENAME)
-        with open(out_path_filename, 'w') as out_file:
-            json.dump(self.tree, out_file)
+        write_json_file(out_path_filename, self.tree,
+                        "Writing toc for {} to {}".format(
+                            self.language, self.output_dir_base))

@@ -1,11 +1,10 @@
 """creates the manifest.json file"""
 
 import os
-import json
 
 from innoconv.modloader import AbstractModule
 from innoconv.modules.maketoc.maketoc import splitall
-from innoconv.utils import to_ast, log
+from innoconv.utils import to_ast, write_json_file
 from innoconv.constants import (MANIFEST_FILENAME,
                                 STATIC_FOLDER,
                                 LICENSE_FOLDER,
@@ -56,9 +55,9 @@ class Makemanifest(AbstractModule):
 
     def write_manifest(self):
         """Writes the manifest file"""
-        with open(self.output_filname, 'w') as out_file:
-            json.dump(self.manifest, out_file)
-            log("Wrote manifest: {}".format(self.output_filname))
+
+        write_json_file(self.output_filname, self.manifest,
+                        "Wrote manifest: {}".format(self.output_filname))
 
     def pre_conversion(self, base_dirs):
         """ Initialize new manifest """

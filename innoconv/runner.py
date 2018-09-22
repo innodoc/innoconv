@@ -1,28 +1,13 @@
 """Runner module"""
 
-import json
 from os import makedirs, walk
-from os.path import abspath, dirname, isdir, join, sep, split, isfile
+from os.path import abspath, dirname, isdir, join, sep, isfile
 
 from innoconv.constants import (
     CONTENT_FILENAME, OUTPUT_CONTENT_FILENAME)
-from innoconv.utils import to_ast, log
+from innoconv.utils import to_ast, log, set_debug, write_json_file
 
 from innoconv.modloader import run_mods
-
-
-def splitall(path):
-    """Split path into directory components."""
-    all_parts = []
-    while 1:
-        parts = split(path)
-        if parts[1] == path:
-            all_parts.insert(0, parts[1])
-            break
-        else:
-            path = parts[0]
-            all_parts.insert(0, parts[1])
-    return all_parts
 
 
 class InnoconvRunner():
@@ -41,10 +26,7 @@ class InnoconvRunner():
         self.debug = debug
         self.modules = modules
 
-        if debug:
-            self._log = log
-        else:
-            self._log = lambda *args: None
+        set_debug(debug)
 
     def run(self):
         """Start the conversion.
@@ -119,13 +101,8 @@ class InnoconvRunner():
                 self.output_dir_base, rel_path, OUTPUT_CONTENT_FILENAME)
             makedirs(dirname(filepath_out), exist_ok=True)
 
-            self._write_json_file(
+            write_json_file(
                 filepath_out, ast, "Wrote {}".format(filepath_out))
 
             run_mods(self.modules, 'post_content_file')
-            self._log('Wrote {}'.format(filepath_out))
-
-    def _write_json_file(self, filepath, data, msg):
-        with open(filepath, 'w') as out_file:
-            json.dump(data, out_file)
-        self._log(msg)
+            log('Wrote {}'.format(filepath_out))
