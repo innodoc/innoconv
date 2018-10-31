@@ -1,22 +1,14 @@
 """creates the manifest.json file"""
 
 import os
+from yaml import load
 
 from innoconv.modloader import AbstractModule
 from innoconv.modules.maketoc.maketoc import splitall
-from innoconv.utils import to_ast, write_json_file
+from innoconv.utils import write_json_file
 from innoconv.constants import (MANIFEST_FILENAME,
                                 STATIC_FOLDER,
-                                LICENSE_FOLDER,
-                                LICENSE_FILENAME,
-                                ABOUT_FOLDER,
-                                ABOUT_FILENAME,
-                                PAGES_FOLDER,
-                                INSTITUTION_FOLDER,
-                                INSTITUTION_FILENAME,
-                                LOGO_FILENAME,
-                                FAVICON_FILENAME,
-                                GENERATE_PDF_FILENAME)
+                                MANIFEST_YAML_FILENAME)
 
 
 class Makemanifest(AbstractModule):
@@ -27,7 +19,6 @@ class Makemanifest(AbstractModule):
 
         self.events.extend([
             'pre_conversion',
-            'pre_language',
             'pre_content_file',
             'process_ast',
             'post_content_file',
@@ -37,14 +28,7 @@ class Makemanifest(AbstractModule):
         self.manifest = {
             'languages': [],
             'title': {},
-            'logo': False,
-            'favicon': False,
-            'toc': [],
-            'generate_pdf': False,
-            'license': False,
-            'about': False,
-            'institution': False,
-            'pages': {}
+            'toc': []
         }
         self.output_path = ""
         self.output_filname = ""
@@ -64,18 +48,6 @@ class Makemanifest(AbstractModule):
         self.output_path = base_dirs["output"]
         self.output_filname = os.path.join(self.output_path, MANIFEST_FILENAME)
         self.static_folder = os.path.join(base_dirs["source"], STATIC_FOLDER)
-
-    def has_about(self):
-        """Checks if about folder is present and has all necessary languages"""
-        return self._has_folder(ABOUT_FOLDER, ABOUT_FILENAME)
-
-    def has_license(self):
-        """Checks if license folder is present"""
-        return self._has_folder(LICENSE_FOLDER, LICENSE_FILENAME)
-
-    def has_institution(self):
-        """Checks if institution folder is present"""
-        return self._has_folder(INSTITUTION_FOLDER, INSTITUTION_FILENAME)
 
     def _has_folder(self, folder_name, file_name):
         folder = os.path.join(self.static_folder, folder_name)
@@ -135,6 +107,13 @@ class Makemanifest(AbstractModule):
         if found:
             found['title'][lang] = self.current_title
 
+    def load_manifest_yaml(self):
+        """"Loads the manifest.yaml file"""
+        manifest_file = load(open(MANIFEST_YAML_FILENAME))
+        self.manifest['languages'] = manifest_file['languages']
+        for lang in self.manifest['languages']:
+            self.manifest['title'][lang] = manifest_file['title'][lang]
+
     def get_toc(self):
         """Retrives the Tree of Contents"""
         return self.manifest['toc']
@@ -147,26 +126,9 @@ class Makemanifest(AbstractModule):
         """Retrives the Languages"""
         return self.manifest['languages']
 
-    def pre_language(self, language):
-        """Adds a language"""
-        self.manifest['languages'].append(language)
-
     def post_conversion(self):
         """concludes everything"""
-        self.finalze()
         self.write_manifest()
-
-    def has_logo(self):
-        """Checks if there is a Logo"""
-        return self._has_file(LOGO_FILENAME)
-
-    def has_favicon(self):
-        """Checks if there is a Favicon"""
-        return self._has_file(FAVICON_FILENAME)
-
-    def has_generate_pdf(self):
-        """Checks if there is a Generate Pdf File"""
-        return self._has_file(GENERATE_PDF_FILENAME)
 
     def _has_file(self, file_name):
         file_path = os.path.join(self.static_folder, file_name)
@@ -174,40 +136,12 @@ class Makemanifest(AbstractModule):
             return False
         return True
 
-    def has_pages(self):
-        """Checks if there is a Generate Pdf File"""
-        folder = os.path.join(self.static_folder, PAGES_FOLDER)
-        if not os.path.isdir(folder):
-            return False
-        return True
-
     def get_pages(self):
         """Retrives the pages"""
         return self.manifest['pages']
 
-    def process_pages(self):
-        """populate the Pages"""
-        folder = os.path.join(self.static_folder, PAGES_FOLDER)
-        for lang in self.get_languages():
-            self.manifest['pages'][lang] = {}
-            path = os.path.join(folder, lang)
-            for file in os.listdir(path):
-                ast = to_ast(os.path.join(path, file))
-                self.manifest['pages'][lang][file] = ast['meta']['title']['c']
-
-    def finalze(self):
-        """Finalize the rest of the static handling"""
-        if self.has_logo():
-            self.manifest['logo'] = True
-        if self.has_about():
-            self.manifest['about'] = True
-        if self.has_license():
-            self.manifest['license'] = True
-        if self.has_institution():
-            self.manifest['institution'] = True
-        if self.has_favicon():
-            self.manifest['favicon'] = True
-        if self.has_generate_pdf():
-            self.manifest['generate_pdf'] = True
-        if self.has_pages():
-            self.process_pages()
+    def load_languages(self, languages):
+        """Replace the languages with the ones defined by the manifest"""
+        self.load_manifest_yaml()
+        languages.clear()
+        languages.extend(self.get_languages())

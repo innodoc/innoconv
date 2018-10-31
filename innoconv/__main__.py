@@ -6,7 +6,7 @@ import argparse
 import os
 import sys
 
-from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES
+from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE
 from innoconv.metadata import __author__, __url__
 from innoconv.utils import log
 from innoconv.runner import InnoconvRunner
@@ -39,11 +39,6 @@ def get_arg_parser():
                                     action='help',
                                     help="show this help message and exit")
 
-    argparse_default_languages = ','.join(DEFAULT_LANGUAGES)
-    innoconv_argparser.add_argument('-l', '--languages',
-                                    default=argparse_default_languages,
-                                    help='Languages to convert')
-
     innoconv_argparser.add_argument('-o', '--output-dir-base',
                                     default=DEFAULT_OUTPUT_DIR_BASE,
                                     help='Output base directory')
@@ -74,7 +69,6 @@ def main(args=None):
 
     source_dir = os.path.abspath(args['source_dir'])
     output_dir_base = os.path.abspath(args['output_dir_base'])
-    languages = args['languages'].split(',')
     debug = args['debug']
 
     mods = []
@@ -84,7 +78,7 @@ def main(args=None):
             mods.append(load_module(mod))
 
         runner = InnoconvRunner(
-            source_dir, output_dir_base, languages, mods, debug=debug)
+            source_dir, output_dir_base, mods, debug=debug)
 
         runner.run()
         if debug:

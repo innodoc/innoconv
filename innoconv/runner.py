@@ -4,7 +4,7 @@ from os import makedirs, walk
 from os.path import abspath, dirname, isdir, join, sep, isfile
 
 from innoconv.constants import (
-    CONTENT_FILENAME, OUTPUT_CONTENT_FILENAME)
+    CONTENT_FILENAME, OUTPUT_CONTENT_FILENAME, DEFAULT_LANGUAGES)
 from innoconv.utils import to_ast, log, set_debug, write_json_file
 
 from innoconv.modloader import run_mods
@@ -17,11 +17,14 @@ class InnoconvRunner():
     """
 
     def __init__(self, source_dir,
-                 output_dir_base, languages,
-                 modules, debug=False):
+                 output_dir_base,
+                 modules, debug=False, languages=None):
         self.source_dir = source_dir
         self.output_dir_base = output_dir_base
-        self.languages = languages
+        if languages is None:
+            self.languages = DEFAULT_LANGUAGES[:]
+        else:
+            self.languages = languages
 
         self.debug = debug
         self.modules = modules
@@ -33,6 +36,10 @@ class InnoconvRunner():
 
         Iterate over language folders.
         """
+
+        run_mods(self.modules, 'load_languages',
+                 languages=self.languages
+                 )
 
         run_mods(self.modules, 'pre_conversion',
                  base_dirs={

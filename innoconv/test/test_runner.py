@@ -95,8 +95,8 @@ class TestInnoconvRunner1(unittest.TestCase):
         self.runner = InnoconvRunner(
             '/source_dir',
             '/output_dir',
-            ['de', 'en'],
-            [load_module('maketoc')])
+            [load_module('maketoc')],
+            languages=['de', 'en'])
 
     def test_run(self):
         self.runner.run()

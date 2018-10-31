@@ -22,6 +22,7 @@ class VerboseMod(ml.AbstractModule):
     def __init__(self):
         super(VerboseMod, self).__init__()
         self.events.extend([
+            'load_languages',
             'pre_conversion',
             'pre_language',
             'pre_processing_veto',
@@ -89,9 +90,9 @@ class TestEvents(unittest.TestCase):
         mod = VerboseMod()
         runner = InnoconvRunner(source_dir=SOURCE,
                                 output_dir_base=TARGET,
-                                languages=['de'],
                                 modules=[mod])
         runner.run()
+        self.assertTrue('load_languages' in mock_stdout.getvalue())
         self.assertTrue('pre_conversion' in mock_stdout.getvalue())
         self.assertTrue('pre_language' in mock_stdout.getvalue())
         self.assertTrue('pre_processing_veto' in mock_stdout.getvalue())

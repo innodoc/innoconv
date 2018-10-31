@@ -8,3 +8,4 @@ pylint==2.1.1
 sphinx-argparse==0.2.2
 sphinx-rtd-theme==0.4.1
 Sphinx==1.7.6
+pyyaml==3.13

@@ -10,7 +10,6 @@ from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE
 from innoconv.__main__ import get_arg_parser, main  # noqa: F401
 
 DEFAULT_PARSED_ARGUMENTS = {
-    'languages': 'de,en',
     'debug': False,
     'output_dir_base': DEFAULT_OUTPUT_DIR_BASE,
     'module': [],
@@ -35,16 +34,6 @@ class TestMain2(unittest.TestCase):
     def test_parse_only_output_folder(self):
         arguments = ['test']
         expected = {'source_dir': 'test'}
-        self._test(arguments, expected)
-
-    def test_parse_language(self):
-        arguments = ['-l', 'de', 'test']
-        expected = {
-            'source_dir': 'test',
-            'languages': 'de'
-        }
-        self._test(arguments, expected)
-        arguments = ['--languages', 'de', 'test']
         self._test(arguments, expected)
 
     def test_parse_output(self):
@@ -90,9 +79,6 @@ class TestMain2(unittest.TestCase):
     def test_main_noarg(self):
         with self.assertRaises(SystemExit):
             main([])
-
-    def test_main_nolang(self):
-        self.assertEqual(1, main(['-l', '', 'test']))
 
     def test_main_mod_error(self):
         self.assertEqual(1, main(['-m', 'blubb', 'test']))

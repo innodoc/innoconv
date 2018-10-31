@@ -1,3 +1,4 @@
+
 """creates the toc.json file"""
 
 import os

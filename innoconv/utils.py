@@ -22,11 +22,6 @@ class Logger():
     def __init__(self):
         self.debug = False
 
-    def set_debug(self, value):
-        """Enables debugging"""
-
-        self.debug = value
-
     def log(self, msg_string, args):
         """Log message to stderr.
 
@@ -44,7 +39,7 @@ class Logger():
 def set_debug(value=True):
     """Enables debugging
     """
-    Logger.get_logger().set_debug(value)
+    Logger.get_logger().debug = value
 
 
 def log(msg_string, *args):
