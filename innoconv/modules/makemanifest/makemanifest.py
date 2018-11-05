@@ -7,7 +7,6 @@ from innoconv.modloader import AbstractModule
 from innoconv.modules.maketoc.maketoc import splitall
 from innoconv.utils import write_json_file
 from innoconv.constants import (MANIFEST_FILENAME,
-                                STATIC_FOLDER,
                                 MANIFEST_YAML_FILENAME)
 
 
@@ -30,9 +29,14 @@ class Makemanifest(AbstractModule):
             'title': {},
             'toc': []
         }
-        self.output_path = ""
-        self.output_filname = ""
-        self.static_folder = ""
+        self.paths = {
+            'output': '',
+            'source': ''
+        }
+        self.files = {
+            'output': '',
+            'source': ''
+        }
         self.current_rel_path = ""
         self.current_full_path = ""
         self.current_title = ""
@@ -40,25 +44,17 @@ class Makemanifest(AbstractModule):
     def write_manifest(self):
         """Writes the manifest file"""
 
-        write_json_file(self.output_filname, self.manifest,
-                        "Wrote manifest: {}".format(self.output_filname))
+        write_json_file(self.files["output"], self.manifest,
+                        "Wrote manifest: {}".format(self.files["output"]))
 
     def pre_conversion(self, base_dirs):
         """ Initialize new manifest """
-        self.output_path = base_dirs["output"]
-        self.output_filname = os.path.join(self.output_path, MANIFEST_FILENAME)
-        self.static_folder = os.path.join(base_dirs["source"], STATIC_FOLDER)
-
-    def _has_folder(self, folder_name, file_name):
-        folder = os.path.join(self.static_folder, folder_name)
-        if not os.path.isdir(folder):
-            return False
-        for lang in self.manifest['languages']:
-            filename = lang + "_" + file_name
-            file_path = os.path.join(folder, filename)
-            if not os.path.isfile(file_path):
-                return False
-        return True
+        self.paths["output"] = base_dirs["output"]
+        self.paths["source"] = base_dirs["source"]
+        self.files["output"] = os.path.join(self.paths["output"],
+                                            MANIFEST_FILENAME)
+        self.files["source"] = os.path.join(self.paths["source"],
+                                            MANIFEST_YAML_FILENAME)
 
     def pre_content_file(self, rel_path, full_path):
         """sets the path for the current files"""
@@ -80,7 +76,6 @@ class Makemanifest(AbstractModule):
         lang = path_components.pop(0)  # language
         if not path_components:
             # this is the root section
-            self.manifest['title'][lang] = self.current_title
             return
         children = self.manifest['toc']
         found = None
@@ -109,9 +104,25 @@ class Makemanifest(AbstractModule):
 
     def load_manifest_yaml(self):
         """"Loads the manifest.yaml file"""
-        manifest_file = load(open(MANIFEST_YAML_FILENAME))
+        if not os.path.isfile(self.files["source"]):
+            raise RuntimeError(
+                "Error: Missing manifest.yaml")
+        manifest_file = load(open(self.files["source"]))
+        if not manifest_file:
+            raise RuntimeError(
+                "Error: Empty manifest.yaml")
+        if 'languages' not in manifest_file:
+            raise RuntimeError(
+                "Error: Languages not defined in manifest.yaml")
         self.manifest['languages'] = manifest_file['languages']
+        if 'title' not in manifest_file:
+            raise RuntimeError(
+                "Error: Title not defined in manifest.yaml")
         for lang in self.manifest['languages']:
+            if lang not in manifest_file['title']:
+                raise RuntimeError(
+                    "Error: Title not defined for"
+                    " language {} in manifest.yaml".format(lang))
             self.manifest['title'][lang] = manifest_file['title'][lang]
 
     def get_toc(self):
@@ -129,16 +140,6 @@ class Makemanifest(AbstractModule):
     def post_conversion(self):
         """concludes everything"""
         self.write_manifest()
-
-    def _has_file(self, file_name):
-        file_path = os.path.join(self.static_folder, file_name)
-        if not os.path.isfile(file_path):
-            return False
-        return True
-
-    def get_pages(self):
-        """Retrives the pages"""
-        return self.manifest['pages']
 
     def load_languages(self, languages):
         """Replace the languages with the ones defined by the manifest"""

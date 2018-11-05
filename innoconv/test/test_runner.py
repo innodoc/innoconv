@@ -21,7 +21,7 @@ def walk_side_effect(path):
         ),
         (
             '/source_dir/{}/section-1'.format(lang),
-            ['section-1.1', 'section-1.2'],
+            ['section-1.1', 'section-1.2', '_static'],
             ['content.md'],
         ),
         (
