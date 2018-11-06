@@ -30,6 +30,7 @@ class TestMain(unittest.TestCase):
                 source_dir='/tmp/foo_source',
                 output_dir_base='/tmp/bar_output',
                 languages='ar,it',
+                module=['demo']
             ),
         }
         arg_parser_mock.configure_mock(**attrs)
@@ -39,6 +40,11 @@ class TestMain(unittest.TestCase):
             'innoconv.__main__.InnoconvRunner.__init__')
         self.runner_init_mock = runner_init_patcher.start()
         self.runner_init_mock.return_value = None
+
+        load_module_patcher = mock.patch(
+            'innoconv.__main__.load_module')
+        self.load_module_patcher = load_module_patcher.start()
+        self.load_module_patcher.return_value = 'loadedDemo'
 
         runner_run_patcher = mock.patch(
             'innoconv.__main__.InnoconvRunner.run')
@@ -53,7 +59,11 @@ class TestMain(unittest.TestCase):
         return_value = innoconv.__main__.main()
         args, kwargs = self.runner_init_mock.call_args
         self.assertEqual(
-            args, ('/tmp/foo_source', '/tmp/bar_output', ['ar', 'it']))
+            args,
+            ('/tmp/foo_source',
+             '/tmp/bar_output',
+             ['ar', 'it'],
+             ['loadedDemo']))
         self.assertEqual(kwargs, {'debug': True})
         self.assertTrue(self.runner_run_mock.called)
         args, _ = self.log_mock.call_args

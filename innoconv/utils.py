@@ -7,14 +7,48 @@ import sys
 from innoconv.constants import ENCODING
 
 
-def log(msg_string):
+class Logger():
+    """Logs message to stderr"""
+
+    @classmethod
+    def get_logger(cls):
+        """Gets the current Logger"""
+        try:
+            return cls.logger
+        except AttributeError:
+            cls.logger = Logger()
+            return cls.logger
+
+    def __init__(self):
+        self.debug = False
+
+    def log(self, msg_string, args):
+        """Log message to stderr.
+
+        :param msg_string: Message that is logged
+        :type msg_string: str
+        """
+
+        if self.debug:
+            sys.stderr.write("{}\n".format(msg_string))
+            for arg in args:
+                sys.stderr.write("{}\n".format(arg))
+            sys.stderr.flush()
+
+
+def set_debug(value=True):
+    """Enables debugging
+    """
+    Logger.get_logger().debug = value
+
+
+def log(msg_string, *args):
     """Log message to stderr.
 
     :param msg_string: Message that is logged
     :type msg_string: str
     """
-    sys.stderr.write("{}\n".format(msg_string))
-    sys.stderr.flush()
+    Logger.get_logger().log(msg_string, args)
 
 
 def to_ast(filepath):
@@ -46,3 +80,11 @@ def to_ast(filepath):
         raise ValueError("Missing title in meta block in {}".format(filepath))
 
     return blocks, title
+
+
+def write_json_file(filepath, data, msg):
+    """ Writes JSON to file
+    """
+    with open(filepath, 'w') as out_file:
+        json.dump(data, out_file)
+    log(msg)
