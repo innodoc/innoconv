@@ -59,7 +59,11 @@ class TestMain(unittest.TestCase):
         return_value = innoconv.__main__.main()
         args, kwargs = self.runner_init_mock.call_args
         self.assertEqual(
-            args, ('/tmp/foo_source', '/tmp/bar_output', ['ar', 'it'], ['loadedDemo']))
+            args,
+            ('/tmp/foo_source',
+             '/tmp/bar_output',
+             ['ar', 'it'],
+             ['loadedDemo']))
         self.assertEqual(kwargs, {'debug': True})
         self.assertTrue(self.runner_run_mock.called)
         args, _ = self.log_mock.call_args

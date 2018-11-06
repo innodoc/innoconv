@@ -1,6 +1,5 @@
 """ Demo for A module"""
 
-from innoconv.utils import log
 from innoconv.modloader import AbstractModule
 
 

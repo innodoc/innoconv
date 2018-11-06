@@ -27,7 +27,7 @@ class TestLog(unittest.TestCase):
         stderr_write_mock.reset_mock()
         stderr_flush_mock.reset_mock()
         set_debug(True)
-        log('Foo','bar')
+        log('Foo', 'bar')
         self.assertEqual(stderr_write_mock.call_count, 2)
         self.assertEqual(stderr_write_mock.call_args, (('bar\n',),))
         self.assertEqual(stderr_flush_mock.call_count, 1)

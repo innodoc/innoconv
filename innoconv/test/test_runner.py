@@ -49,6 +49,7 @@ def walk_side_effect_error(path):
         )
     ])
 
+
 TITLE = [
     {
         't': 'Str',
@@ -152,10 +153,8 @@ class TestInnoconvRunner(unittest.TestCase):
         self.os_path_isdir_mock.return_value = False
         self.assertRaises(RuntimeError, self.runner.run)
 
-
     def test_run_content_file_missing(self):
 
         self.os_walk_mock.side_effect = walk_side_effect_error
         with self.assertRaises(RuntimeError):
             self.runner.run()
-
