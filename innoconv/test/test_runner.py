@@ -18,7 +18,7 @@ def walk_side_effect(path):
         ),
         (
             '/source_dir/{}/section-1'.format(lang),
-            ['section-1.1', 'section-1.2'],
+            ['section-1.1', 'section-1.2', '_static'],
             ['content.md'],
         ),
         (
@@ -36,6 +36,17 @@ def walk_side_effect(path):
             [],
             ['content.md'],
         ),
+    ])
+
+
+def walk_side_effect_error(path):
+    lang = path[-2:]
+    return iter([
+        (
+            '/source_dir/{}'.format(lang),
+            ['section-1', 'section-2'],
+            [],
+        )
     ])
 
 
@@ -81,7 +92,7 @@ class TestInnoconvRunner(unittest.TestCase):
         self.addCleanup(mock.patch.stopall)
 
         self.runner = InnoconvRunner(
-            '/source_dir', '/output_dir', ['de', 'en'])
+            '/source_dir', '/output_dir', ['de', 'en'], [])
 
     def test_run(self):
         self.runner.run()
@@ -141,3 +152,9 @@ class TestInnoconvRunner(unittest.TestCase):
         """Language folders do not exist"""
         self.os_path_isdir_mock.return_value = False
         self.assertRaises(RuntimeError, self.runner.run)
+
+    def test_run_content_file_missing(self):
+
+        self.os_walk_mock.side_effect = walk_side_effect_error
+        with self.assertRaises(RuntimeError):
+            self.runner.run()
