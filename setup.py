@@ -11,7 +11,7 @@ import logging
 import re
 import subprocess
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 LINT_DIRS = [
@@ -140,7 +140,7 @@ def setup_package():
         },
         include_package_data=True,
         install_requires=[],
-        packages=['innoconv'],
+        packages=find_packages(exclude=["*.test.*", "*.test"]),
         python_requires='>=3',
         keywords=['innodoc', 'pandoc', 'markdown', 'education'],
         license=METADATA['license'],

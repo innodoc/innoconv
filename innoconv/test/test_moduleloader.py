@@ -8,11 +8,10 @@ import unittest
 # pylint: disable=W0611
 
 import innoconv.modloader as ml
+from innoconv.modules import AbstractModule
 
-MODLIST = ['demo']
 
-
-class TestMod(ml.AbstractModule):
+class TestMod(AbstractModule):
     """a Test Module"""
 
     def __init__(self):
@@ -42,4 +41,4 @@ class TestModLoad(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             ml.load_module('blubb')
         demo = ml.load_module('demo')
-        self.assertTrue(issubclass(type(demo), ml.AbstractModule))
+        self.assertTrue(issubclass(type(demo), AbstractModule))

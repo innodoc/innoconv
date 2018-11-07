@@ -20,7 +20,7 @@ class Logger():
             return cls.logger
 
     def __init__(self):
-        self.debug = False
+        self.debug = True
 
     def log(self, msg_string, args):
         """Log message to stderr.

@@ -23,3 +23,6 @@ MANIFEST_FILENAME = 'manifest.json'
 
 #: TOC filename
 TOC_FILENAME = 'toc.json'
+
+#: Static Folder Name
+STATIC_FOLDER = '_static'

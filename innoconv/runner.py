@@ -39,7 +39,6 @@ class InnoconvRunner():
         self._manifest = {}
         self._toc = None
 
-        self.debug = debug
         self.modules = modules
 
         set_debug(debug)
@@ -51,8 +50,7 @@ class InnoconvRunner():
         """
 
         run_mods(self.modules, 'load_languages',
-                 languages=self.languages
-                 )
+                 languages=self.languages)
 
         run_mods(self.modules, 'pre_conversion',
                  base_dirs={

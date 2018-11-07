@@ -1,14 +1,8 @@
 """loads modules for innoconv"""
 
-import importlib
+from innoconv.modules import MODULES
 
-MODULES = [
-    'cpystatic',
-    'demo',
-    'makemanifest',
-    'maketoc',
-    'squish'
-]
+__all__ = ['MODULES', 'run_mods', 'load_module']
 
 
 def run_mods(modlist, event, **kwargs):
@@ -20,35 +14,10 @@ def run_mods(modlist, event, **kwargs):
     return False
 
 
-def mod_list():
-    """Returns a list of available modules"""
-    # return [mod.split('.')[-1] for mod in MODULES]
-    return MODULES
-
-
 def load_module(name):
     """Loads a module with the given name"""
-    classname = name.capitalize()
     try:
-        mod = importlib.import_module(
-            'innoconv.modules.{}.{}'.format(name, name))
-        modclass = getattr(mod, classname)
-        obj = modclass()
-    except ImportError as exc:
+        obj = MODULES[name]()
+    except (ImportError, KeyError) as exc:
         raise RuntimeError("module {} not found".format(name)) from exc
     return obj
-
-
-class AbstractModule():
-    """Abstract class for Modules"""
-
-    def __init__(self):
-        self.events = []
-
-    def handle(self, event, **kwargs):
-        """Handles any given event
-        by default calls a method named after the event"""
-        try:
-            return getattr(self, event)(**kwargs)
-        except AttributeError:
-            raise NotImplementedError

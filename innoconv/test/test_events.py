@@ -9,29 +9,19 @@ import unittest.mock
 # supress linting until tests are implemented
 # pylint: disable=W0611,invalid-name
 
-import innoconv.modloader as ml
+from innoconv.modules import AbstractModule, ALL_EVENTS
 from innoconv.runner import InnoconvRunner
 
 SOURCE = "SOURCE"
 TARGET = "TARGET"
 
 
-class VerboseMod(ml.AbstractModule):
+class VerboseMod(AbstractModule):
     """a Test Module"""
 
     def __init__(self):
         super(VerboseMod, self).__init__()
-        self.events.extend([
-            'load_languages',
-            'pre_conversion',
-            'pre_language',
-            'pre_processing_veto',
-            'pre_content_file',
-            'process_ast',
-            'post_content_file',
-            'post_language',
-            'post_conversion'
-        ])
+        self.events.extend(ALL_EVENTS)
         self.value = True
 
     def __getattr__(self, name):
@@ -83,12 +73,5 @@ class TestEvents(unittest.TestCase):
                                 languages=['de'],
                                 modules=[mod])
         runner.run()
-        self.assertTrue('load_languages' in mock_stdout.getvalue())
-        self.assertTrue('pre_conversion' in mock_stdout.getvalue())
-        self.assertTrue('pre_language' in mock_stdout.getvalue())
-        self.assertTrue('pre_processing_veto' in mock_stdout.getvalue())
-        self.assertTrue('pre_content_file' in mock_stdout.getvalue())
-        self.assertTrue('process_ast' in mock_stdout.getvalue())
-        self.assertTrue('post_content_file' in mock_stdout.getvalue())
-        self.assertTrue('post_language' in mock_stdout.getvalue())
-        self.assertTrue('post_conversion' in mock_stdout.getvalue())
+        for event in ALL_EVENTS:
+            self.assertTrue(event in mock_stdout.getvalue())
