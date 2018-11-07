@@ -51,8 +51,7 @@ class InnoconvRunner():
         """
 
         run_mods(self.modules, 'load_languages',
-                 languages=self.languages
-                 )
+                 languages=self.languages)
 
         run_mods(self.modules, 'pre_conversion',
                  base_dirs={

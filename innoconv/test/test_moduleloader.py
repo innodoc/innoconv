@@ -9,8 +9,6 @@ import unittest
 
 import innoconv.modloader as ml
 
-MODLIST = ['demo']
-
 
 class TestMod(ml.AbstractModule):
     """a Test Module"""

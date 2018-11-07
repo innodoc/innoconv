@@ -3,11 +3,8 @@
 import importlib
 
 MODULES = [
-    'cpystatic',
-    'demo',
-    'makemanifest',
-    'maketoc',
-    'squish'
+    'copystatic',
+    'demo'
 ]
 
 
@@ -18,12 +15,6 @@ def run_mods(modlist, event, **kwargs):
             if mod.handle(event, **kwargs):
                 return True
     return False
-
-
-def mod_list():
-    """Returns a list of available modules"""
-    # return [mod.split('.')[-1] for mod in MODULES]
-    return MODULES
 
 
 def load_module(name):
