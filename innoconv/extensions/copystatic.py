@@ -1,182 +1,179 @@
 """
-There is a global directory named ``_static`` to every content project. It
-holds static file content like images or videos. A file can be localized by
-creating a localized version of that file in the corresponding ``_static``
-directory within the language folder.
+Content can include figures, images and videos. Static files can be included
+in a special folder named ``_static``. The files will be copied to the
+output directory automatically.
 
-Example: ``en/_static/example.png`` takes precedence over
+===========
+Translation
+===========
+
+It's possible to have language-specific versions of a static file.
+
+For that to work you need to have a ``_static`` folder beneath the language
+folder. Files in this folder will take precedence over the common ``_static``
+folder for that language.
+
+**Example**: ``en/_static/example.png`` takes precedence over
 ``_static/example.png`` in the English version.
+
+===============================
+Relative and absolute reference
+===============================
+
+Files can be referenced using relative or absolute paths.
+
+*Absolute paths* are resolved to the root folder, either the common
+(``_static``) or language-specific (``en/_static``) folder.
+
+*Relative paths* are resolved to the root folder but have the chapters path
+fragment appended.
+
+**Example**:
+A reference to ``subdir/my_picture.png`` in ``/de/chapter01/content.md`` is
+resolved to ``/de/_static/chapter01/subdir/my_picture.png`` whereas
+``/subdir/my_picture.png`` (note the leading ``/``!) is resolved to
+``/de/_static/subdir/my_picture.png``.
 """
 
 import os.path
 import os
 import shutil
+from urllib import parse
 
 from innoconv.utils import log
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER
 
+ACCEPTED_LINK_CLASSES = (
+    'video-static',
+)
+
 
 class CopyStatic(AbstractExtension):
     """This extension copies static files from the content source directory
-    to the output directory.
-    """
+    to the output directory."""
 
     _helptext = "Copies static files to the output folder."
 
     def __init__(self):
         super(CopyStatic, self).__init__()
-        self.root = ''
-        self.target = ''
-        self.language = ''
-        self.languages = set()
+        self.source_dir = None
+        self.output_dir_base = None
+        self.language = None
+        self.languages = None
         self.to_copy = set()
-        self.current_path = {
-            'rel_path': '',
-            'full_path': ''
-        }
-        self.events.extend([
-            'pre_language',
-            'pre_conversion',
-            'pre_content_file',
-            'process_ast',
-            'post_conversion'
-        ])
-        self.accepted_link_classes = [
-            'video-static'
-        ]
+        self.current_path = None
+
+    # content parsing
+
+    @staticmethod
+    def _link_is_video(link_element):
+        """Check if video is marked as local."""
+        for cssclass in ACCEPTED_LINK_CLASSES:
+            if cssclass in link_element['c'][0][1]:
+                return True
+        return False
 
     def _process_ast_array(self, ast_array):
+        """Search every element in an AST array."""
         if not isinstance(ast_array, list):
             return
         for element in ast_array:
             self._process_ast_element(element)
 
     def _process_ast_element(self, ast_element):
+        """Respond to elements that potentially reference static files."""
         if isinstance(ast_element, list):
             self._process_ast_array(ast_element)
-            return
-        if not isinstance(ast_element, dict):
-            return
-        if ast_element['t'] == 'Image':
-            self._process_image(ast_element)
-        elif ast_element['t'] == 'Link':
-            self._process_link(ast_element)
-        elif 'c' in ast_element:
-            self._process_ast_array(ast_element['c'])
+        elif isinstance(ast_element, dict):
+            if ast_element['t'] == 'Image':
+                self._process_image(ast_element)
+            elif ast_element['t'] == 'Link':
+                self._process_link(ast_element)
+            elif 'c' in ast_element:
+                self._process_ast_array(ast_element['c'])
 
     def _process_link(self, link_element):
+        """Links can reference local videos."""
         link = link_element['c'][2][0]
         content = link_element['c'][1]
         self._process_ast_array(content)
         if self._link_is_video(link_element):
             path = self._get_path(link)
-            if not path:
-                return
-            self._copy_file(path)
+            self.to_copy.add(path)
 
     def _process_image(self, image_element):
         link = image_element['c'][2][0]
-        path = self._get_path(link)
-        if not path:
-            return
-        self._copy_file(path)
-
-    def _link_is_video(self, link_element):
-        for cssclass in self.accepted_link_classes:
-            if cssclass in link_element['c'][0][1]:
-                return True
-        return False
+        try:
+            path = self._get_path(link)
+            self.to_copy.add(path)
+        except ValueError:
+            pass
 
     def _get_path(self, path):
-        if (path.startswith('http://') or
-                path.startswith('https://') or
-                path.startswith('ftp://')):
-            return ''
-        new_path = path.replace('/', os.path.sep)
-        if path.startswith('/'):
-            return new_path[1:]
+        """Check if a path linking to a remote ressource and for
+        relative/absolute path."""
+        if parse.urlparse(path).scheme:
+            raise ValueError()
+        if os.path.isabs(path):
+            return path[1:]
         return os.path.join(
-            self.current_path['rel_path_nolang'], new_path)
+            # remove language part from relative path
+            self.current_path.replace(self.language + os.path.sep, '', 1),
+            path)
 
-    def _copy_file(self, path):
-        localized_path = os.path.join(
-            self.root,
-            self.language,
-            STATIC_FOLDER,
-            path)
-        general_path = os.path.join(
-            self.root,
-            STATIC_FOLDER,
-            path)
-        if os.path.isfile(localized_path):
-            from_path = localized_path
-            to_path = os.path.join(
-                self.target,
-                self.language,
-                STATIC_FOLDER,
-                path)
-        elif os.path.isfile(general_path):
-            from_path = general_path
-            to_path = os.path.join(
-                self.target,
-                STATIC_FOLDER,
-                path)
-        else:
-            raise RuntimeError(
-                "Missing static file {} referenced in {}".format(
-                    path,
-                    self.current_path['rel_path']))
-        self.to_copy.add((from_path, to_path))
+    # file copying
+
+    def _copy_files(self):
+        log("Copying {} static files:".format(len(self.to_copy)))
+
+        def get_file_path(root_dir, path, lang=''):
+            """Generate static file path."""
+            return os.path.join(root_dir, lang, STATIC_FOLDER, path)
+
+        for path in self.to_copy:
+            for lang in self.languages:
+                # localized version of file
+                src = get_file_path(self.source_dir, path, lang)
+                dst = get_file_path(self.output_dir_base, path, lang)
+                if not os.path.isfile(src):
+                    # common version as fallback
+                    src = get_file_path(self.source_dir, path)
+                    dst = get_file_path(self.output_dir_base, path)
+                    if not os.path.isfile(src):
+                        raise RuntimeError(
+                            "Missing static file {}".format(path))
+                # create folders as needed
+                folder = os.path.dirname(dst)
+                if not os.path.lexists(folder):
+                    os.makedirs(folder)
+                log(" copying file {} to {}".format(src, dst))
+                shutil.copyfile(src, dst)
 
     # extension events
 
     def init(self, languages, output_dir_base, source_dir):
-        """Store languages and directories."""
+        """Remember languages and directories."""
         self.languages = languages
-        self.target = output_dir_base
-        self.root = source_dir
+        self.output_dir_base = output_dir_base
+        self.source_dir = source_dir
 
     def pre_conversion(self, language):
-        """Store current conversion language."""
+        """Remember current conversion language."""
         self.language = language
-        self.to_copy = set()
 
-    def pre_process_file(self, rel_path, filepath):
-        """Called before the parsing of a file"""
-        self.current_path['rel_path'] = rel_path
-        self.current_path['rel_path_nolang'] = rel_path.replace(
-            self.language + os.path.sep,
-            '',
-            1)
-        self.current_path['full_path'] = filepath
+    def pre_process_file(self, path):
+        """Remember file path."""
+        self.current_path = path
 
     def post_process_file(self, ast):
-        """Process the files content"""
+        """Generate list of files to copy."""
         self._process_ast_array(ast)
 
-    def post_conversion(self):
-        """Actually copy the files."""
-        log("Copying {} static files:".format(len(self.to_copy)))
-        static_folders = []
-        static_folders.append(os.path.join(
-            self.target,
-            STATIC_FOLDER))
-        for lang in self.languages:
-            static_folders.append(os.path.join(
-                self.target,
-                lang,
-                STATIC_FOLDER))
-        for folder in static_folders:
-            if os.path.lexists(folder):
-                shutil.rmtree(folder)
-        for file in self.to_copy:
-            log(" copying file {} to {}".format(file[0], file[1]))
-            folder = os.path.dirname(file[1])
-            if not os.path.lexists(folder):
-                os.makedirs(folder)
-            shutil.copyfile(file[0], file[1])
+    def post_conversion(self, language):
+        """Unused."""
+        pass
 
-    def finish(self, language):
-        """Conversion finished."""
-        raise NotImplementedError()
+    def finish(self):
+        """Finally copy the files."""
+        self._copy_files()

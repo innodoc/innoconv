@@ -10,7 +10,7 @@ from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES
 from innoconv.metadata import __author__, __url__
 from innoconv.utils import log
 from innoconv.runner import InnoconvRunner
-from innoconv.extensions import EXTENSIONS, add_extension
+from innoconv.extensions import EXTENSIONS
 
 INNOCONV_DESCRIPTION = '''
   Convert interactive educational content.
@@ -59,7 +59,7 @@ def get_arg_parser():
     extlist = ["- {} ({})".format(ext, EXTENSIONS[ext].helptext())
                for ext in EXTENSIONS]
     ext_help = "Available extensions:\n{}".format("\n".join(extlist))
-    innoconv_argparser.add_argument('-e', '--extension',
+    innoconv_argparser.add_argument('-e', '--extensions',
                                     action='append',
                                     default=[],
                                     help=ext_help)
@@ -81,12 +81,16 @@ def main(args=None):
     extensions = []
 
     try:
-        for extension in args['extension']:
-            extensions.append(add_extension(extension))
+        for ext_name in args['extensions']:
+            try:
+                ext = EXTENSIONS[ext_name]()
+            except (ImportError, KeyError) as exc:
+                raise RuntimeError(
+                    "Extension {} not found!".format(ext_name)) from exc
+            extensions.append(ext)
 
         runner = InnoconvRunner(
             source_dir, output_dir_base, languages, extensions, debug=debug)
-
         runner.run()
         if debug:
             log('Build finished!')

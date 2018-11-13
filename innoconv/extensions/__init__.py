@@ -9,16 +9,3 @@ from innoconv.extensions.copystatic import CopyStatic
 EXTENSIONS = {
     'copystatic': CopyStatic,
 }
-
-
-def add_extension(name):
-    """Instantiates an extension.
-
-    :param name: Extension name
-    :type name: str
-    """
-    try:
-        obj = EXTENSIONS[name]()
-    except (ImportError, KeyError) as exc:
-        raise RuntimeError("Extension {} not found".format(name)) from exc
-    return obj

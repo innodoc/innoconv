@@ -130,7 +130,7 @@ class InnoconvRunner():
         filepath_out = join(
             self.output_dir_base, rel_path, OUTPUT_CONTENT_FILENAME)
 
-        self._notify_extensions('pre_process_file', rel_path, filepath)
+        self._notify_extensions('pre_process_file', rel_path)
 
         # convert file using pandoc
         ast, title = to_ast(filepath)
@@ -148,7 +148,4 @@ class InnoconvRunner():
     def _notify_extensions(self, event_name, *args, **kwargs):
         for ext in self.extensions:
             func = getattr(ext, event_name)
-            try:
-                func(*args, **kwargs)
-            except NotImplementedError:
-                pass
+            func(*args, **kwargs)

@@ -5,14 +5,14 @@ class AbstractExtension():
     """Abstract class for extensions.
 
     The class all extensions inherit from. The to-be-implemented methods
-    document the available events. Sub-classes should implement all of these
-    methods even if they don't need to add functionality to each.
+    document the available events that are triggered during the conversion
+    process.
+
+    Extension classes should have a ``_helptext`` attribute. It is shown in the
+    CLI as a brief summary what the extension accomplishes.
     """
 
     _helptext = ''
-
-    def __init__(self):
-        self.events = []
 
     @classmethod
     def helptext(cls):
@@ -34,18 +34,16 @@ class AbstractExtension():
     def pre_conversion(self, language):
         """Conversion of a single language folder is about to start.
 
-        :param languages: List of languages that are being converted.
-        :type languages: List of str
+        :param language: Language that is currently being converted.
+        :type language: str
         """
         raise NotImplementedError()
 
-    def pre_process_file(self, rel_path, fullpath):
+    def pre_process_file(self, path):
         """Conversion of a single file is about to start.
 
-        :param rel_path: File path relative to project source directory
-        :type rel_path: str
-        :param fullpath: Absolute file path
-        :type fullpath: str
+        :param path: Output path
+        :type path: str
         """
         raise NotImplementedError()
 
@@ -60,11 +58,11 @@ class AbstractExtension():
     def post_conversion(self, language):
         """Conversion of a single language folder finished.
 
-        :param languages: List of languages that are being converted.
-        :type languages: List of str
+        :param language: Language that is currently being converted.
+        :type language: str
         """
         raise NotImplementedError()
 
-    def finish(self, language):
+    def finish(self):
         """Conversion finished."""
         raise NotImplementedError()

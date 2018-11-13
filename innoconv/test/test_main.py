@@ -41,11 +41,6 @@ class TestMain(unittest.TestCase):
         self.runner_init_mock = runner_init_patcher.start()
         self.runner_init_mock.return_value = None
 
-        load_module_patcher = mock.patch(
-            'innoconv.__main__.load_module')
-        self.load_module_patcher = load_module_patcher.start()
-        self.load_module_patcher.return_value = 'loadedDemo'
-
         runner_run_patcher = mock.patch(
             'innoconv.__main__.InnoconvRunner.run')
         self.runner_run_mock = runner_run_patcher.start()
