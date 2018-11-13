@@ -7,8 +7,6 @@ from innoconv.constants import (
     CONTENT_FILENAME, OUTPUT_CONTENT_FILENAME, MANIFEST_FILENAME, TOC_FILENAME)
 from innoconv.utils import to_ast, set_debug, write_json_file
 
-from innoconv.modloader import run_mods
-
 
 def splitall(path):
     """Split path into directory components."""
@@ -30,17 +28,14 @@ class InnoconvRunner():
     It walks over a directory tree and converts content files to JSON.
     """
 
-    def __init__(self, source_dir,
-                 output_dir_base, languages,
-                 modules, debug=False):
+    def __init__(self, source_dir, output_dir_base, languages, extensions,
+                 debug=False):
         self.source_dir = source_dir
         self.output_dir_base = output_dir_base
         self.languages = languages
+        self.extensions = extensions
         self._manifest = {}
         self._toc = None
-
-        self.modules = modules
-
         set_debug(debug)
 
     def run(self):
@@ -49,26 +44,24 @@ class InnoconvRunner():
         Iterate over language folders.
         """
 
-        run_mods(self.modules, 'load_languages',
-                 languages=self.languages)
-
-        run_mods(self.modules, 'pre_conversion',
-                 base_dirs={
-                     "output": self.output_dir_base,
-                     "source": self.source_dir
-                 })
+        self._notify_extensions('init', self.languages,
+                                self.output_dir_base, self.source_dir)
 
         for language in self.languages:
-            self._convert_folder(language)
+            self._notify_extensions('pre_conversion', language)
+            self._convert_language_folder(language)
+            self._notify_extensions('post_conversion', language)
 
-        run_mods(self.modules, 'post_conversion')
+        self._notify_extensions('finish')
 
-    def _convert_folder(self, language):
-        """Convert a language folder."""
+    def _convert_language_folder(self, language):
+        """Convert a language folder.
+
+        :param language: The language to convert and also the name of the
+                         directory containing the content.
+        :type language: Two character language code.
+        """
         path = abspath(join(self.source_dir, language))
-
-        run_mods(self.modules, 'pre_language',
-                 language=language)
 
         if not isdir(path):
             raise RuntimeError(
@@ -76,21 +69,14 @@ class InnoconvRunner():
 
         self._toc = []
         for root, dirs, files in walk(path):
-
-            rel_dir = root[len(self.source_dir):].lstrip(sep)
-
             # note: all dirs manipulation must happen in-place!
             for i, directory in enumerate(dirs):
                 if directory.startswith('_'):
                     del dirs[i]  # skip meta directories like '_static'
             dirs.sort()  # sort section names
 
-            veto = run_mods(self.modules, 'pre_processing_veto',
-                            dir=rel_dir,
-                            filename=CONTENT_FILENAME)
-
             # process content file
-            if CONTENT_FILENAME in files and not veto:
+            if CONTENT_FILENAME in files:
                 filepath = join(root, CONTENT_FILENAME)
                 self._process_file(filepath)
             else:
@@ -99,8 +85,6 @@ class InnoconvRunner():
 
         self._write_toc(language)
         self._write_manifest(language)
-
-        run_mods(self.modules, 'post_language')
 
     def _write_toc(self, language):
         filepath = join(self.output_dir_base, language, TOC_FILENAME)
@@ -140,28 +124,31 @@ class InnoconvRunner():
                 })
 
     def _process_file(self, filepath):
-
-        # save content file
+        # input file relative path
         rel_path = dirname(filepath.replace(self.source_dir, '').lstrip(sep))
-
-        run_mods(self.modules, 'pre_content_file',
-                 rel_path=rel_path,
-                 full_path=filepath)
-
-        ast, title = to_ast(filepath)
-
-        run_mods(self.modules, 'process_ast',
-                 ast=ast)
-
+        # input file full path
         filepath_out = join(
             self.output_dir_base, rel_path, OUTPUT_CONTENT_FILENAME)
-        makedirs(dirname(filepath_out), exist_ok=True)
-        write_json_file(
-            filepath_out, ast, "Wrote {}".format(filepath_out))
 
-        # add to TOC
+        self._notify_extensions('pre_process_file', rel_path, filepath)
+
+        # convert file using pandoc
+        ast, title = to_ast(filepath)
+
+        self._notify_extensions('post_process_file', ast)
+
+        # write file content
+        makedirs(dirname(filepath_out), exist_ok=True)
+        write_json_file(filepath_out, ast, "Wrote {}".format(filepath_out))
+
         self._add_to_toc(rel_path, title)
 
-        run_mods(self.modules, 'post_content_file')
-
         return title
+
+    def _notify_extensions(self, event_name, *args, **kwargs):
+        for ext in self.extensions:
+            func = getattr(ext, event_name)
+            try:
+                func(*args, **kwargs)
+            except NotImplementedError:
+                pass

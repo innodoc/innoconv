@@ -1,19 +1,31 @@
-""" Copies the statci subfolder """
+"""
+There is a global directory named ``_static`` to every content project. It
+holds static file content like images or videos. A file can be localized by
+creating a localized version of that file in the corresponding ``_static``
+directory within the language folder.
+
+Example: ``en/_static/example.png`` takes precedence over
+``_static/example.png`` in the English version.
+"""
 
 import os.path
 import os
 import shutil
 
 from innoconv.utils import log
-from innoconv.modules import AbstractModule
+from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER
 
 
-class Copystatic(AbstractModule):
-    """a Demo Module"""
+class CopyStatic(AbstractExtension):
+    """This extension copies static files from the content source directory
+    to the output directory.
+    """
+
+    _helptext = "Copies static files to the output folder."
 
     def __init__(self):
-        super(Copystatic, self).__init__()
+        super(CopyStatic, self).__init__()
         self.root = ''
         self.target = ''
         self.language = ''
@@ -25,60 +37,14 @@ class Copystatic(AbstractModule):
         }
         self.events.extend([
             'pre_language',
-            "pre_conversion",
-            "pre_content_file",
-            "process_ast",
-            "post_conversion"
+            'pre_conversion',
+            'pre_content_file',
+            'process_ast',
+            'post_conversion'
         ])
         self.accepted_link_classes = [
             'video-static'
         ]
-
-    def pre_language(self, language):
-        """store the current language"""
-        self.language = language
-        self.languages.add(language)
-
-    def pre_conversion(self, base_dirs):
-        """store the output directory"""
-        self.root = base_dirs["source"]
-        self.target = base_dirs["output"]
-        self.to_copy = set()
-
-    def pre_content_file(self, rel_path, full_path):
-        """Called before the parsing of a file"""
-        self.current_path['rel_path'] = rel_path
-        self.current_path['rel_path_nolang'] = rel_path.replace(
-            self.language + os.path.sep,
-            '',
-            1)
-        self.current_path['full_path'] = full_path
-
-    def process_ast(self, ast):
-        """Process the file's content"""
-        self._process_ast_array(ast)
-
-    def post_conversion(self):
-        """Actually copy the files"""
-        log('Copying {} static files:'.format(len(self.to_copy)))
-        static_folders = []
-        static_folders.append(os.path.join(
-            self.target,
-            STATIC_FOLDER))
-        for lang in self.languages:
-            static_folders.append(os.path.join(
-                self.target,
-                lang,
-                STATIC_FOLDER))
-        for folder in static_folders:
-            if os.path.lexists(folder):
-                shutil.rmtree(folder)
-        for file in self.to_copy:
-            log(' copying file {} to {}'.format(file[0], file[1]))
-            folder = os.path.dirname(file[1])
-            if not os.path.lexists(folder):
-                os.makedirs(folder)
-            shutil.copyfile(file[0], file[1])
 
     def _process_ast_array(self, ast_array):
         if not isinstance(ast_array, list):
@@ -162,3 +128,55 @@ class Copystatic(AbstractModule):
                     path,
                     self.current_path['rel_path']))
         self.to_copy.add((from_path, to_path))
+
+    # extension events
+
+    def init(self, languages, output_dir_base, source_dir):
+        """Store languages and directories."""
+        self.languages = languages
+        self.target = output_dir_base
+        self.root = source_dir
+
+    def pre_conversion(self, language):
+        """Store current conversion language."""
+        self.language = language
+        self.to_copy = set()
+
+    def pre_process_file(self, rel_path, filepath):
+        """Called before the parsing of a file"""
+        self.current_path['rel_path'] = rel_path
+        self.current_path['rel_path_nolang'] = rel_path.replace(
+            self.language + os.path.sep,
+            '',
+            1)
+        self.current_path['full_path'] = filepath
+
+    def post_process_file(self, ast):
+        """Process the files content"""
+        self._process_ast_array(ast)
+
+    def post_conversion(self):
+        """Actually copy the files."""
+        log("Copying {} static files:".format(len(self.to_copy)))
+        static_folders = []
+        static_folders.append(os.path.join(
+            self.target,
+            STATIC_FOLDER))
+        for lang in self.languages:
+            static_folders.append(os.path.join(
+                self.target,
+                lang,
+                STATIC_FOLDER))
+        for folder in static_folders:
+            if os.path.lexists(folder):
+                shutil.rmtree(folder)
+        for file in self.to_copy:
+            log(" copying file {} to {}".format(file[0], file[1]))
+            folder = os.path.dirname(file[1])
+            if not os.path.lexists(folder):
+                os.makedirs(folder)
+            shutil.copyfile(file[0], file[1])
+
+    def finish(self, language):
+        """Conversion finished."""
+        raise NotImplementedError()

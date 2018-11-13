@@ -6,4 +6,7 @@ Module overview
 
   innoconv.constants
   innoconv.runner
+  innoconv.extensions
+  innoconv.extensions.abstract
+  innoconv.extensions.copystatic
   innoconv.utils

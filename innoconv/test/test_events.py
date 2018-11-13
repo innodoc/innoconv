@@ -7,21 +7,21 @@ import unittest
 import unittest.mock
 
 # supress linting until tests are implemented
-# pylint: disable=W0611,invalid-name
+# ppylint: disable=W0611,invalid-name
 
-from innoconv.modules import AbstractModule, ALL_EVENTS
+from innoconv.extensions import AbstractExtension
 from innoconv.runner import InnoconvRunner
 
 SOURCE = "SOURCE"
 TARGET = "TARGET"
 
 
-class VerboseMod(AbstractModule):
+class VerboseMod(AbstractExtension):
     """a Test Module"""
 
     def __init__(self):
         super(VerboseMod, self).__init__()
-        self.events.extend(ALL_EVENTS)
+        self.events.extend(AbstractExtension.EVENTS)
         self.value = True
 
     def __getattr__(self, name):
@@ -73,5 +73,5 @@ class TestEvents(unittest.TestCase):
                                 languages=['de'],
                                 modules=[mod])
         runner.run()
-        for event in ALL_EVENTS:
+        for event in AbstractExtension.EVENTS:
             self.assertTrue(event in mock_stdout.getvalue())

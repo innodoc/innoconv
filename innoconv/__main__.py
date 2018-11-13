@@ -10,7 +10,7 @@ from innoconv.constants import DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES
 from innoconv.metadata import __author__, __url__
 from innoconv.utils import log
 from innoconv.runner import InnoconvRunner
-from innoconv.modloader import MODULES, load_module
+from innoconv.extensions import EXTENSIONS, add_extension
 
 INNOCONV_DESCRIPTION = '''
   Convert interactive educational content.
@@ -56,11 +56,13 @@ def get_arg_parser():
     innoconv_argparser.add_argument('source_dir',
                                     help="content directory or file")
 
-    modlist = "Available Modules: " + ", ".join(MODULES)
-    innoconv_argparser.add_argument('-m', '--module',
+    extlist = ["- {} ({})".format(ext, EXTENSIONS[ext].helptext())
+               for ext in EXTENSIONS]
+    ext_help = "Available extensions:\n{}".format("\n".join(extlist))
+    innoconv_argparser.add_argument('-e', '--extension',
                                     action='append',
                                     default=[],
-                                    help=modlist)
+                                    help=ext_help)
     return innoconv_argparser
 
 
@@ -76,14 +78,14 @@ def main(args=None):
     languages = args['languages'].split(',')
     debug = args['debug']
 
-    mods = []
+    extensions = []
 
     try:
-        for mod in args['module']:
-            mods.append(load_module(mod))
+        for extension in args['extension']:
+            extensions.append(add_extension(extension))
 
         runner = InnoconvRunner(
-            source_dir, output_dir_base, languages, mods, debug=debug)
+            source_dir, output_dir_base, languages, extensions, debug=debug)
 
         runner.run()
         if debug:
