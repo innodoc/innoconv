@@ -105,7 +105,7 @@ class IntegrationTestCommand(BaseCommand):
     ]
 
     def initialize_options(self):
-        self.test_target = os.path.join(ROOT_DIR, 'integration-test')
+        self.test_target = os.path.join(ROOT_DIR, 'integration_test')
 
     def run(self):
         self._run(['green', '-vv', self.test_target])

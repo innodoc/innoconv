@@ -1,6 +1,6 @@
 """Integration tests for conversion process using entry-point innoconv."""
 
-# pylint: disable=missing-docstring,invalid-name
+# pylint: disable=missing-docstring
 
 import unittest
 from subprocess import run, PIPE
@@ -36,18 +36,18 @@ class TestConversionTubBase(unittest.TestCase):
 
     def _test_each_folder_has_content(self):
         for lang in ('de', 'en'):
-            for dirName, _, fileList in walk(join(self.output_dir,
-                                                  lang)):
+            for dir_names, _, file_list in walk(join(self.output_dir, lang)):
                 skip = False
-                for d in dirName.split(sep):
-                    if d.startswith('_'):
+                for dir_name in dir_names.split(sep):
+                    if dir_name.startswith('_'):
                         skip = True
                 if not skip:
-                    self.assertIn(OUTPUT_CONTENT_FILENAME, fileList)
+                    self.assertIn(OUTPUT_CONTENT_FILENAME, file_list)
 
     def _test_content_is_json(self):
-        with open(join(self.output_dir, 'de', OUTPUT_CONTENT_FILENAME)) as f:
-            data = json.load(f)
+        filepath = join(self.output_dir, 'de', OUTPUT_CONTENT_FILENAME)
+        with open(filepath) as file:
+            data = json.load(file)
             paragraph = data[0]
             self.assertEqual(paragraph['t'], 'Para')
             content = paragraph['c'][0]
@@ -122,14 +122,12 @@ class TestConversionTubBase(unittest.TestCase):
     def test_conversion(self):
         """A conversion should run without problems."""
         self._prepare_test_copystatic()
-        command = ['innoconv',
-                   '-d',
-                   '-m', 'copystatic',
-                   '-o', self.output_dir,
-                   self.repo_dir.name]
+        command = [
+            'innoconv', '-d', '-e', 'copystatic', '-o', self.output_dir,
+            self.repo_dir.name]
         job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
-        stdout = job.stdout.decode("utf-8")
-        stderr = job.stderr.decode("utf-8")
+        stdout = job.stdout.decode('utf-8')
+        stderr = job.stderr.decode('utf-8')
         if job.returncode != 0:
             print(stdout)
             print(stderr)
@@ -139,19 +137,6 @@ class TestConversionTubBase(unittest.TestCase):
         self._test_content_is_json()
         self._test_debug_output(stderr)
         self._test_copystatic(stderr)
-
-    def test_conversion_fail_dir_does_not_exist(self):
-        """A conversion should fail on non-existent directory."""
-        non_existent_dir = join('dir', 'does', 'not', 'exist')
-        command = ['innoconv', '-o', self.output_dir, non_existent_dir]
-        job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
-        self.assertNotEqual(job.returncode, 0)
-
-    @unittest.skip('TODO')
-    def test_conversion_fail_langs_not_identical(self):
-        # a conversion should fail if folder tree for languages is not
-        # the same
-        pass
 
     def tearDown(self):
         self.repo_dir.cleanup()
