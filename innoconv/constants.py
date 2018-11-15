@@ -9,6 +9,9 @@ DEFAULT_OUTPUT_DIR_BASE = os.path.join('.', 'innoconv_output')
 #: Default languages
 DEFAULT_LANGUAGES = ('de', 'en')
 
+#: Default enabled extensions
+DEFAULT_EXTENSIONS = ('copystatic',)
+
 #: Encoding used in this project
 ENCODING = 'utf-8'
 
