@@ -22,7 +22,6 @@ TARGET = '/target'
 @mock.patch('os.path.isfile', return_value=True)
 @mock.patch('shutil.copyfile')
 class TestCopyStatic(unittest.TestCase):
-
     @staticmethod
     def _run(ast, languages=('en', )):
         cps = CopyStatic()
@@ -104,6 +103,10 @@ class TestCopyStatic(unittest.TestCase):
             with self.subTest(addr):
                 self._run([get_image_ast(addr)])
                 self.assertEqual(copyfile.call_count, 0)
+
+    def test_ignore_remote_static(self, copyfile, *_):
+        self._run([get_video_ast('https://www.example.com/video.ogv')])
+        self.assertEqual(copyfile.call_count, 0)
 
     def test_example(self, copyfile, *_):
         ast = [

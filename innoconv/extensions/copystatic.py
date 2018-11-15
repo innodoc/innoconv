@@ -99,8 +99,11 @@ class CopyStatic(AbstractExtension):
         content = link_element['c'][1]
         self._process_ast_array(content)
         if self._link_is_video(link_element):
-            path = self._get_path(link)
-            self.to_copy.add(path)
+            try:
+                path = self._get_path(link)
+                self.to_copy.add(path)
+            except ValueError:
+                pass
 
     def _process_image(self, image_element):
         link = image_element['c'][2][0]
