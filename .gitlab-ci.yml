@@ -15,6 +15,7 @@ variables:
   PANDOC_VERSION: "2.3"
   # pip cache directory inside project since we can only cache local items
   PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
+  GIT_SUBMODULE_STRATEGY: "normal"
 
 before_script:
   - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
@@ -57,7 +58,6 @@ unit tests:
 integration tests:
   stage: test
   script:
-    - apk add git
     - source venv/bin/activate
     - ./setup.py integration_test
   cache:

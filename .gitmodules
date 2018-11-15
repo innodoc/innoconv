@@ -1,0 +1,3 @@
+[submodule "integration_test/tub_base"]
+	path = integration_test/tub_base
+	url = https://gitlab.tubit.tu-berlin.de/innodoc/tub_base.git

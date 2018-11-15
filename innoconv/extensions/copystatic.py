@@ -128,12 +128,11 @@ class CopyStatic(AbstractExtension):
     # file copying
 
     def _copy_files(self):
-        log("Copying {} static files:".format(len(self.to_copy)))
-
         def get_file_path(root_dir, path, lang=''):
             """Generate static file path."""
             return os.path.join(root_dir, lang, STATIC_FOLDER, path)
 
+        log("Copying {} static files:".format(len(self.to_copy)))
         for path in self.to_copy:
             for lang in self.languages:
                 # localized version of file
@@ -150,8 +149,9 @@ class CopyStatic(AbstractExtension):
                 folder = os.path.dirname(dst)
                 if not os.path.lexists(folder):
                     os.makedirs(folder)
-                log(" copying file {} to {}".format(src, dst))
-                shutil.copyfile(src, dst)
+                if not os.path.isfile(dst):
+                    log(" copying file {} to {}".format(src, dst))
+                    shutil.copyfile(src, dst)
 
     # extension events
 

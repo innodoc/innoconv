@@ -19,7 +19,7 @@ TARGET = '/target'
 
 @mock.patch('os.makedirs', return_value=True)
 @mock.patch('os.path.lexists', return_value=True)
-@mock.patch('os.path.isfile', return_value=True)
+@mock.patch('os.path.isfile', side_effect=itertools.cycle((True, False)))
 @mock.patch('shutil.copyfile')
 class TestCopyStatic(unittest.TestCase):
     @staticmethod
@@ -149,7 +149,7 @@ class TestCopyStatic(unittest.TestCase):
 
     def test_file_does_not_exist(self, *args):
         _, isfile, _, _ = args
-        isfile.return_value = False
+        isfile.side_effect = itertools.cycle((False, ))
         tests = (
             ('/not-present.png', [get_image_ast('/not-present.png')]),
             ('/not-present.mp4', [get_video_ast('/not-present.mp4')]),
@@ -161,7 +161,7 @@ class TestCopyStatic(unittest.TestCase):
                     self._run(ast)
 
     def test_only_en_present(self, copyfile, isfile, *_):
-        isfile.side_effect = itertools.cycle((True, False))
+        isfile.side_effect = itertools.cycle((True, False, False, True, False))
         self._run([get_image_ast('localizable.gif')], languages=('en', 'la'))
         self.assertEqual(copyfile.call_count, 2)
         src = os.path.join(
