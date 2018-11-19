@@ -92,7 +92,7 @@ class TestConversionTubBase(unittest.TestCase):
                                     'de',
                                     STATIC_FOLDER,
                                     '02-elements',
-                                    '06-images',
+                                    '06-media',
                                     'TU_Logo.png')))
         self.assertFalse(
             isfile(join(self.output_dir, STATIC_FOLDER, 'flag.png')))
@@ -105,7 +105,7 @@ class TestConversionTubBase(unittest.TestCase):
                 'de',
                 STATIC_FOLDER,
                 '02-elements',
-                '06-images',
+                '06-media',
                 'TU_Logo.png'),
             stderr)
 
