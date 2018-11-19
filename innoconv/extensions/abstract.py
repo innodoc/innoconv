@@ -47,11 +47,13 @@ class AbstractExtension():
         """
         raise NotImplementedError()
 
-    def post_process_file(self, ast):
+    def post_process_file(self, ast, title):
         """Conversion of a single file finished. The AST can be modified.
 
         :param ast: File content as parsed by pandoc.
         :type ast: List of content nodes
+        :param title: Section title (localized)
+        :type title: str
         """
         raise NotImplementedError()
 

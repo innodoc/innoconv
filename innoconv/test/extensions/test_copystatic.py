@@ -30,7 +30,7 @@ class TestCopyStatic(unittest.TestCase):
             cps.pre_conversion(language)
             relpath = os.path.join(language, 'path', 'to')
             cps.pre_process_file(relpath)
-            cps.post_process_file(ast)
+            cps.post_process_file(ast, "Foo title")
             cps.post_conversion(language)
         cps.finish()
 

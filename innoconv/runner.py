@@ -135,7 +135,7 @@ class InnoconvRunner():
         # convert file using pandoc
         ast, title = to_ast(filepath)
 
-        self._notify_extensions('post_process_file', ast)
+        self._notify_extensions('post_process_file', ast, title)
 
         # write file content
         makedirs(dirname(filepath_out), exist_ok=True)

@@ -169,7 +169,7 @@ class CopyStatic(AbstractExtension):
         """Remember file path."""
         self.current_path = path
 
-    def post_process_file(self, ast):
+    def post_process_file(self, ast, _):
         """Generate list of files to copy."""
         self._process_ast_array(ast)
 

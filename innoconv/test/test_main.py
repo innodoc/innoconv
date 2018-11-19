@@ -3,50 +3,35 @@
 # pylint: disable=missing-docstring
 
 import unittest
-from argparse import Namespace
+from argparse import ArgumentParser, Namespace
+from copy import deepcopy
 import mock
 
 import innoconv.__main__
 from innoconv.extensions.abstract import AbstractExtension
 
+DEFAULT_ARGS = {
+    'debug': True,
+    'source_dir': '/tmp/foo_source',
+    'output_dir': '/tmp/bar_output',
+    'languages': 'ar,it',
+    'extensions': 'copystatic',
+}
+
 
 class TestGetArgs(unittest.TestCase):
-
-    @mock.patch('innoconv.__main__.argparse.ArgumentParser.parse_args')
-    def test_get_arg_parser(self, parse_args):
-        parse_args.return_value = Namespace(
-            debug=True,
-            source_dir='foo',
-            output_dir='bar',
-            languages='de,en',
-            extensions='dummy',
-        )
-        args = innoconv.__main__.get_args()
-        self.assertIsInstance(args, dict)
-        self.assertEqual(args, {
-            'debug': True,
-            'source_dir': 'foo',
-            'output_dir': 'bar',
-            'languages': 'de,en',
-            'extensions': 'dummy',
-        })
+    def test_get_arg_parser(self):
+        args = innoconv.__main__.get_arg_parser()
+        self.assertIsInstance(args, ArgumentParser)
 
 
-@mock.patch('innoconv.__main__.get_args')
+@mock.patch('argparse.ArgumentParser.parse_args',
+            return_value=Namespace(**DEFAULT_ARGS))
 @mock.patch('innoconv.__main__.InnoconvRunner.__init__', return_value=None)
 @mock.patch('innoconv.__main__.InnoconvRunner.run')
 @mock.patch('innoconv.__main__.log')
 class TestMain(unittest.TestCase):
-    DEFAULT_ARGS = {
-        'debug': True,
-        'source_dir': '/tmp/foo_source',
-        'output_dir': '/tmp/bar_output',
-        'languages': 'ar,it',
-        'extensions': 'copystatic',
-    }
-
-    def test_main(self, log, runner_run, runner_init, get_args):
-        get_args.return_value = TestMain.DEFAULT_ARGS
+    def test_main(self, log, runner_run, runner_init, _):
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 0)
         args, kwargs = runner_init.call_args
@@ -60,10 +45,10 @@ class TestMain(unittest.TestCase):
         self.assertTrue(runner_run.called)
         self.assertEqual(log.call_args, mock.call('Build finished!'))
 
-    def test_main_invalid_ext(self, log, runner_run, runner_init, get_args):
-        get_args.return_value = {**TestMain.DEFAULT_ARGS, **{
-            'extensions': 'extension_does_not_exist',
-        }}
+    def test_main_invalid_ext(self, log, runner_run, runner_init, parse_args):
+        args = deepcopy(DEFAULT_ARGS)
+        args['extensions'] = 'copystatic,extension_does_not_exist'
+        parse_args.return_value = Namespace(**args)
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 1)
         self.assertFalse(runner_init.called)
@@ -72,8 +57,7 @@ class TestMain(unittest.TestCase):
                "Extension extension_does_not_exist not found!")
         self.assertEqual(log.call_args, mock.call(err))
 
-    def test_main_logs_error(self, log, runner_run, runner_init, get_args):
-        get_args.return_value = TestMain.DEFAULT_ARGS
+    def test_main_logs_error(self, log, runner_run, runner_init, _):
         runner_run.side_effect = RuntimeError('Oooops')
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 1)
