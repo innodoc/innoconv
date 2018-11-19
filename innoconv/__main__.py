@@ -44,9 +44,9 @@ def get_args():
                                     default=','.join(DEFAULT_LANGUAGES),
                                     help="Languages to convert")
 
-    innoconv_argparser.add_argument('-o', '--output-dir-base',
+    innoconv_argparser.add_argument('-o', '--output-dir',
                                     default=DEFAULT_OUTPUT_DIR_BASE,
-                                    help="Output base directory")
+                                    help="Output directory")
 
     innoconv_argparser.add_argument('-d', '--debug',
                                     action='store_true',
@@ -69,7 +69,7 @@ def main(args=None):
     """innoConv main entry point."""
     args = get_args()
     source_dir = os.path.abspath(args['source_dir'])
-    output_dir_base = os.path.abspath(args['output_dir_base'])
+    output_dir = os.path.abspath(args['output_dir'])
     languages = args['languages'].split(',')
     debug = args['debug']
     extensions = []
@@ -83,7 +83,7 @@ def main(args=None):
             extensions.append(ext)
 
         runner = InnoconvRunner(
-            source_dir, output_dir_base, languages, extensions, debug=debug)
+            source_dir, output_dir, languages, extensions, debug=debug)
         runner.run()
         if debug:
             log("Build finished!")

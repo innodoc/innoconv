@@ -17,7 +17,7 @@ class TestGetArgs(unittest.TestCase):
         parse_args.return_value = Namespace(
             debug=True,
             source_dir='foo',
-            output_dir_base='bar',
+            output_dir='bar',
             languages='de,en',
             extensions='dummy',
         )
@@ -26,7 +26,7 @@ class TestGetArgs(unittest.TestCase):
         self.assertEqual(args, {
             'debug': True,
             'source_dir': 'foo',
-            'output_dir_base': 'bar',
+            'output_dir': 'bar',
             'languages': 'de,en',
             'extensions': 'dummy',
         })
@@ -40,7 +40,7 @@ class TestMain(unittest.TestCase):
     DEFAULT_ARGS = {
         'debug': True,
         'source_dir': '/tmp/foo_source',
-        'output_dir_base': '/tmp/bar_output',
+        'output_dir': '/tmp/bar_output',
         'languages': 'ar,it',
         'extensions': 'copystatic',
     }
@@ -50,9 +50,9 @@ class TestMain(unittest.TestCase):
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 0)
         args, kwargs = runner_init.call_args
-        [source_dir, output_dir_base, [lang_0, lang_1], [extensions]] = args
+        [source_dir, output_dir, [lang_0, lang_1], [extensions]] = args
         self.assertEqual(source_dir, '/tmp/foo_source')
-        self.assertEqual(output_dir_base, '/tmp/bar_output')
+        self.assertEqual(output_dir, '/tmp/bar_output')
         self.assertEqual(lang_0, 'ar')
         self.assertEqual(lang_1, 'it')
         self.assertIsInstance(extensions, AbstractExtension)
