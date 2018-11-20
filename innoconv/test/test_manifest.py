@@ -34,7 +34,14 @@ TITLES = {
     os.path.join('en', '01 A', '02 A2'): 'gluten-free',
     os.path.join('en', '01 A', '02 A2', '01 A1I'): 'tumblr',
     os.path.join('en', '01 A', '03 A3'): 'mixtape',
-    os.path.join('en', '02 B'): 'artisan'
+    os.path.join('en', '02 B'): 'artisan',
+
+    os.path.join('la', '01 Parent_no_content'): 'Parent no content title',
+    os.path.join('la', '01 Parent_no_content', '02 Middle'): 'Middle Title',
+    os.path.join('la', '01 Parent_no_content', '02 Middle', '01 Child'):
+        'Child Title',
+    os.path.join('la', '02 Parent2'): 'Parent 2 Title',
+
 }
 
 COMPELTE_MANIFEST_STRUCTURE = {
@@ -139,6 +146,19 @@ def walk_side_effect_content(path):
          [CONTENT_FILENAME]),
         (os.path.join(lang, '01 A', '03 A3'), [], [CONTENT_FILENAME]),
         (os.path.join(lang, '02 B'), [], [CONTENT_FILENAME])
+    ])
+
+
+def walk_side_effect_sonderfall(path):
+    lang = path[-2:]
+    return iter([
+        (lang, ['01 Parent_no_content', '02 Parent2'], [CONTENT_FILENAME]),
+        (os.path.join(lang, '01 Parent_no_content'), ['02 Middle'], []),
+        (os.path.join(lang, '01 Parent_no_content', '02 Middle'),
+         ['01 Child'], [CONTENT_FILENAME]),
+        (os.path.join(lang, '01 Parent_no_content', '02 Middle', '01 Child'),
+         [], [CONTENT_FILENAME]),
+        (os.path.join(lang, '02 Parent2'), [], [CONTENT_FILENAME])
     ])
 
 

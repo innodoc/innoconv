@@ -112,4 +112,3 @@ class InnoconvRunner():
                 filepath_out, ast, "Wrote {}".format(filepath_out))
 
             run_mods(self.modules, 'post_content_file')
-            log('Wrote {}'.format(filepath_out))

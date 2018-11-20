@@ -10,6 +10,7 @@ class Demo(AbstractModule):
     def __init__(self):
         super(Demo, self).__init__()
         self.events.extend([
+            'load_languages',
             'pre_conversion',
             'pre_language',
             'pre_processing_veto',

@@ -33,7 +33,7 @@ import tempfile
 from git import Repo
 
 REPO_URL = 'https://gitlab.tubit.tu-berlin.de/innodoc/tub_base.git'
-REPO_BRANCH = 'innoconv'
+REPO_BRANCH = 'master'
 
 
 class TestConversionTubBase(unittest.TestCase):
