@@ -32,7 +32,7 @@ class TestConversionTubBase(unittest.TestCase):
         command = [
             'innoconv',
             '--debug',
-            '--extensions', 'copystatic',
+            '--extensions', 'copystatic,join_strings',
             '--output-dir', self.output_dir,
             REPO_DIR]
         job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
@@ -76,7 +76,7 @@ class TestConversionTubBase(unittest.TestCase):
             self.assertEqual(paragraph['t'], 'Para')
             content = paragraph['c'][0]
             self.assertEqual(content['t'], 'Str')
-            self.assertIn('Dies', content['c'])
+            self.assertIn('Dies ist ein Beispiel-Kurs', content['c'])
 
     def _test_copystatic(self, stderr):
         self.assertTrue(isdir(join(self.output_dir, STATIC_FOLDER)))
