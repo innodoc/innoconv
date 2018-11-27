@@ -8,10 +8,11 @@ from os import walk, sep, remove
 from os.path import isdir, join, isfile, realpath, dirname
 import json
 from tempfile import TemporaryDirectory
-from innoconv.constants import OUTPUT_CONTENT_FILENAME, STATIC_FOLDER
+from innoconv.constants import CONTENT_BASENAME, STATIC_FOLDER
 
 REPO_DIR = join(dirname(realpath(__file__)), 'tub_base')
 EXTRA_FILE = join(REPO_DIR, 'de', STATIC_FOLDER, 'TESTFILE.txt')
+OUTPUT_CONTENT_FILENAME = '{}.json'.format(CONTENT_BASENAME)
 
 
 class TestConversionTubBase(unittest.TestCase):
@@ -32,7 +33,6 @@ class TestConversionTubBase(unittest.TestCase):
         command = [
             'innoconv',
             '--debug',
-            '--extensions', 'copystatic,join_strings',
             '--output-dir', self.output_dir,
             REPO_DIR]
         job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
@@ -46,7 +46,7 @@ class TestConversionTubBase(unittest.TestCase):
         self._test_each_folder_has_content()
         self._test_content()
         self._test_debug_output(stderr)
-        self._test_copystatic(stderr)
+        self._test_copy_static(stderr)
 
     def _test_converted_folders_present(self):
         for lang in ('de', 'en'):
@@ -78,7 +78,7 @@ class TestConversionTubBase(unittest.TestCase):
             self.assertEqual(content['t'], 'Str')
             self.assertIn('Dies ist ein Beispiel-Kurs', content['c'])
 
-    def _test_copystatic(self, stderr):
+    def _test_copy_static(self, stderr):
         self.assertTrue(isdir(join(self.output_dir, STATIC_FOLDER)))
         self.assertTrue(isdir(join(self.output_dir, 'de', STATIC_FOLDER)))
         self.assertTrue(isfile(join(self.output_dir,
