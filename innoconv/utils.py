@@ -61,6 +61,7 @@ def to_ast(filepath):
     :returns: (Pandoc AST, title)
 
     :raises RuntimeError: if pandoc exits with an error
+    :raises ValueError: if no title was found
     """
     pandoc_cmd = ['pandoc', '--to=json', filepath]
     proc = Popen(pandoc_cmd, stdout=PIPE, stderr=PIPE)
@@ -80,11 +81,3 @@ def to_ast(filepath):
         raise ValueError("Missing title in meta block in {}".format(filepath))
 
     return blocks, title
-
-
-def write_json_file(filepath, data, msg):
-    """ Writes JSON to file
-    """
-    with open(filepath, 'w') as out_file:
-        json.dump(data, out_file)
-    log(msg)

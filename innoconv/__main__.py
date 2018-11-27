@@ -7,11 +7,12 @@ import os
 import sys
 
 from innoconv.constants import (
-    DEFAULT_OUTPUT_DIR_BASE, DEFAULT_LANGUAGES, DEFAULT_EXTENSIONS)
-from innoconv.metadata import __author__, __url__
-from innoconv.utils import log
-from innoconv.runner import InnoconvRunner
+    DEFAULT_OUTPUT_DIR_BASE, DEFAULT_EXTENSIONS, MANIFEST_BASENAME)
 from innoconv.extensions import EXTENSIONS
+from innoconv.manifest import Manifest
+from innoconv.metadata import __author__, __url__
+from innoconv.runner import InnoconvRunner
+from innoconv.utils import log, set_debug
 
 INNOCONV_DESCRIPTION = """
   Convert interactive educational content.
@@ -19,49 +20,52 @@ INNOCONV_DESCRIPTION = """
 """
 
 INNOCONV_EPILOG = """
+{}
+
 Copyright (C) 2018 innoCampus, TU Berlin
 Authors: {}
 Web: {}
 
 This is free software; see the source for copying conditions. There is no
 warranty, not even for merchantability or fitness for a particular purpose.
-""".format(__author__, __url__)
+"""
 
 
 def get_arg_parser():
     """Get CLI arguments."""
+    def _format_default(val):
+        return " (default: {})".format(val)
+
+    extlist = ["  {} - {}".format(ext, EXTENSIONS[ext].helptext())
+               for ext in EXTENSIONS]
+    ext_help = "available extensions:\n{}".format("\n".join(extlist))
+
     innoconv_argparser = argparse.ArgumentParser(
         description=INNOCONV_DESCRIPTION,
-        epilog=INNOCONV_EPILOG,
-        formatter_class=argparse.RawTextHelpFormatter,
-        add_help=False)
+        epilog=INNOCONV_EPILOG.format(ext_help, __author__, __url__),
+        formatter_class=argparse.RawTextHelpFormatter)
 
-    innoconv_argparser.add_argument('-h', '--help',
-                                    action='help',
-                                    help="show this help message and exit")
-
-    innoconv_argparser.add_argument('-l', '--languages',
-                                    default=','.join(DEFAULT_LANGUAGES),
-                                    help="Languages to convert")
-
+    output_dir_help = "Output directory{}".format(
+        _format_default(DEFAULT_OUTPUT_DIR_BASE))
     innoconv_argparser.add_argument('-o', '--output-dir',
                                     default=DEFAULT_OUTPUT_DIR_BASE,
-                                    help="Output directory")
+                                    help=output_dir_help)
 
+    debug_help = "Enable debug mode{}".format(_format_default(False))
     innoconv_argparser.add_argument('-d', '--debug',
                                     action='store_true',
                                     default=False,
-                                    help="Enable debug mode")
+                                    help=debug_help)
 
-    innoconv_argparser.add_argument('source_dir',
-                                    help="content directory or file")
-
-    extlist = ["- {} ({})".format(ext, EXTENSIONS[ext].helptext())
-               for ext in EXTENSIONS]
-    ext_help = "Available extensions:\n{}".format("\n".join(extlist))
+    extensions_help = "Enabled extensions{}".format(
+        _format_default(','.join(DEFAULT_EXTENSIONS)))
     innoconv_argparser.add_argument('-e', '--extensions',
                                     default=','.join(DEFAULT_EXTENSIONS),
-                                    help=ext_help)
+                                    help=extensions_help)
+
+    innoconv_argparser.add_argument('source_dir',
+                                    help="Content source directory")
+
     return innoconv_argparser
 
 
@@ -70,23 +74,24 @@ def main(args=None):
     args = vars(get_arg_parser().parse_args())
     source_dir = os.path.abspath(args['source_dir'])
     output_dir = os.path.abspath(args['output_dir'])
-    languages = args['languages'].split(',')
-    debug = args['debug']
-    extensions = []
-    try:
-        for ext_name in args['extensions'].split(','):
-            try:
-                ext = EXTENSIONS[ext_name]()
-            except (ImportError, KeyError) as exc:
-                raise RuntimeError(
-                    "Extension {} not found!".format(ext_name)) from exc
-            extensions.append(ext)
+    extensions = args['extensions'].split(',')
+    set_debug(args['debug'])
 
-        runner = InnoconvRunner(
-            source_dir, output_dir, languages, extensions, debug=debug)
+    # read course manifest
+    filename = '{}.yml'.format(MANIFEST_BASENAME)
+    filepath = os.path.join(source_dir, filename)
+    try:
+        with open(filepath, 'r') as file:
+            manifest = Manifest.from_yaml(file.read())
+    except FileNotFoundError as exc:
+        log(exc)
+        return -2
+
+    try:
+        # conversion
+        runner = InnoconvRunner(source_dir, output_dir, manifest, extensions)
         runner.run()
-        if debug:
-            log("Build finished!")
+        log("Build finished!")
         return 0
     except RuntimeError as error:
         log("Something went wrong: {}".format(error))
