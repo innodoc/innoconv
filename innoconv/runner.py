@@ -1,12 +1,13 @@
 """Runner module"""
 
 import json
+import logging
 from os import makedirs, walk
 from os.path import abspath, dirname, isdir, join, sep
 
 from innoconv.constants import CONTENT_BASENAME
 from innoconv.extensions import EXTENSIONS
-from innoconv.utils import log, to_ast
+from innoconv.utils import to_ast
 
 
 class InnoconvRunner():
@@ -69,18 +70,16 @@ class InnoconvRunner():
         output_filename = '{}.json'.format(CONTENT_BASENAME)
         filepath_out = join(self._output_dir, rel_path, output_filename)
 
-        self._notify_extensions('pre_process_file', rel_path)
-
         # convert file using pandoc
+        self._notify_extensions('pre_process_file', rel_path)
         ast, title = to_ast(filepath)
-
         self._notify_extensions('post_process_file', ast, title)
 
         # write file content
         makedirs(dirname(filepath_out), exist_ok=True)
         with open(filepath_out, 'w') as out_file:
             json.dump(ast, out_file)
-        log("Wrote {}".format(filepath_out))
+        logging.info("Wrote %s", filepath_out)
 
         return title
 

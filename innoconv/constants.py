@@ -18,5 +18,8 @@ CONTENT_BASENAME = 'content'
 #: Manifest filename
 MANIFEST_BASENAME = 'manifest'
 
+#: Format for logger messages
+LOG_FORMAT = '%(levelname)s:%(filename)s %(message)s'
+
 #: Static folder name
 STATIC_FOLDER = '_static'

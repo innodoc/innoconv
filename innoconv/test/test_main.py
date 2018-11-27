@@ -10,7 +10,7 @@ import innoconv.__main__
 from innoconv.test.utils import get_manifest
 
 DEFAULT_ARGS = {
-    'debug': True,
+    'verbose': True,
     'source_dir': '/tmp/foo_source',
     'output_dir': '/tmp/bar_output',
     'languages': 'ar,it',
@@ -32,9 +32,10 @@ class TestGetArgs(unittest.TestCase):
             return_value=Namespace(**DEFAULT_ARGS))
 @mock.patch('innoconv.__main__.InnoconvRunner.__init__', return_value=None)
 @mock.patch('innoconv.__main__.InnoconvRunner.run')
-@mock.patch('innoconv.__main__.log')
+@mock.patch.multiple('logging', info=mock.DEFAULT, critical=mock.DEFAULT)
 class TestMain(unittest.TestCase):
-    def test_main(self, log, runner_run, runner_init, *_):
+    def test_main(self, runner_run, runner_init, *_, **logging):
+        log = logging['info']
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 0)
         args, _ = runner_init.call_args
@@ -46,7 +47,8 @@ class TestMain(unittest.TestCase):
         self.assertTrue(runner_run.called)
         self.assertEqual(log.call_args, mock.call('Build finished!'))
 
-    def test_main_logs_error(self, log, runner_run, runner_init, *_):
+    def test_main_logs_error(self, runner_run, runner_init, *_, **logging):
+        log = logging['critical']
         runner_run.side_effect = RuntimeError('Oooops')
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 1)
@@ -54,8 +56,8 @@ class TestMain(unittest.TestCase):
         err = 'Something went wrong: Oooops'
         self.assertEqual(log.call_args, mock.call(err))
 
-    def test_main_no_manifest(self, *args):
-        _, _, _, _, _, mock_open = args
+    def test_main_no_manifest(self, *args, **_):
+        _, _, _, _, mock_open = args
         mock_open.side_effect = FileNotFoundError()
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, -2)

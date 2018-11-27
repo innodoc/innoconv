@@ -7,12 +7,12 @@ of contents and a glossary.
 """
 
 import json
+import logging
 from os.path import join
 
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import MANIFEST_BASENAME
 from innoconv.manifest import ManifestEncoder
-from innoconv.utils import log
 
 
 class WriteManifest(AbstractExtension):
@@ -28,7 +28,7 @@ class WriteManifest(AbstractExtension):
         filepath = join(self._output_dir, filename)
         with open(filepath, 'w') as out_file:
             json.dump(self._manifest, out_file, cls=ManifestEncoder)
-        log("Wrote manifest: {}".format(filepath))
+        logging.info("Wrote manifest %s", filepath)
 
     # extension events
 

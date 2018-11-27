@@ -35,12 +35,12 @@ resolved to ``/de/_static/chapter01/subdir/my_picture.png`` whereas
 ``/de/_static/subdir/my_picture.png``.
 """
 
+import logging
 import os.path
 import os
 import shutil
 from urllib import parse
 
-from innoconv.utils import log
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER
 
@@ -133,7 +133,7 @@ class CopyStatic(AbstractExtension):
             """Generate static file path."""
             return os.path.join(root_dir, lang, STATIC_FOLDER, path)
 
-        log("Copying {} static files:".format(len(self._to_copy)))
+        logging.info("%d files found.", len(self._to_copy))
         for path in self._to_copy:
             for lang in self._manifest.languages:
                 # localized version of file
@@ -144,15 +144,14 @@ class CopyStatic(AbstractExtension):
                     src = get_file_path(self._source_dir, path)
                     dst = get_file_path(self._output_dir, path)
                     if not os.path.isfile(src):
-                        raise RuntimeError(
-                            "Missing static file {}".format(path))
+                        msg = "Missing static file {}".format(path)
+                        raise RuntimeError(msg)
                 # create folders as needed
                 folder = os.path.dirname(dst)
                 if not os.path.lexists(folder):
                     os.makedirs(folder)
-                if not os.path.isfile(dst):
-                    log(" copying file {} to {}".format(src, dst))
-                    shutil.copyfile(src, dst)
+                logging.info(" %s -> %s", src, dst)
+                shutil.copyfile(src, dst)
 
     # extension events
 

@@ -32,7 +32,7 @@ class TestConversionTubBase(unittest.TestCase):
         """A conversion should run without problems."""
         command = [
             'innoconv',
-            '--debug',
+            '--verbose',
             '--output-dir', self.output_dir,
             REPO_DIR]
         job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
@@ -45,7 +45,7 @@ class TestConversionTubBase(unittest.TestCase):
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
         self._test_content()
-        self._test_debug_output(stderr)
+        self._test_verbose_output(stderr)
         self._test_copy_static(stderr)
 
     def _test_converted_folders_present(self):
@@ -98,7 +98,7 @@ class TestConversionTubBase(unittest.TestCase):
             isfile(join(self.output_dir, STATIC_FOLDER, 'flag.png')))
         self.assertFalse(
             isfile(join(self.output_dir, 'de', STATIC_FOLDER, 'TESTFILE.txt')))
-        self.assertIn(' copying file ', stderr)
+        self.assertIn('6 files found', stderr)
         self.assertIn(
             join(
                 self.output_dir,
@@ -109,7 +109,7 @@ class TestConversionTubBase(unittest.TestCase):
                 'TU_Logo.png'),
             stderr)
 
-    def _test_debug_output(self, stderr):
+    def _test_verbose_output(self, stderr):
         self.assertIn(
             join(
                 'de',
