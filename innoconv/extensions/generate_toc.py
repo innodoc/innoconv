@@ -1,6 +1,6 @@
 """
 A table of contents is generated from the course sections and added to the
-:class:`innoconv.manifest.Manifest`.
+:class:`Manifest <innoconv.manifest.Manifest>`.
 """
 
 from os.path import split

@@ -1,4 +1,14 @@
-"""Runner module"""
+"""
+The innoConv runner is the core of the conversion process.
+
+It traverses the source directory recursively and finds all content files.
+These are converted one-by-one to JSON. Under the hood is uses
+`Pandoc <https://pandoc.org/>`_.
+
+It receives a list of extensions that are instantiated and notified upon
+certain events. The events are documented in
+:class:`AbstractExtension <innoconv.extensions.abstract.AbstractExtension>`.
+"""
 
 import json
 import logging
@@ -11,11 +21,7 @@ from innoconv.utils import to_ast
 
 
 class InnoconvRunner():
-    """innoConv runner.
-
-    Walks over the content directory tree and converts content files to JSON.
-    Uses pandoc under the hood.
-    """
+    """Convert content files in a directory tree."""
 
     def __init__(self, source_dir, output_dir, manifest, extensions):
         self._source_dir = source_dir
@@ -26,10 +32,7 @@ class InnoconvRunner():
         self._toc = None
 
     def run(self):
-        """Start the conversion.
-
-        Iterate over language folders.
-        """
+        """Start the conversion by iterating over language folders."""
 
         self._notify_extensions('start', self._output_dir, self._source_dir)
 
