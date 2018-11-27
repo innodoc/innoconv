@@ -2,6 +2,8 @@
 
 # pylint: disable=missing-docstring
 
+from innoconv.manifest import Manifest
+
 
 def get_filler_content():
     return {
@@ -86,3 +88,12 @@ def get_generic_link_ast(content, link, title='', classes=None):
             ]
         ]
     }
+
+
+def get_manifest():
+    return Manifest({
+        'title': {
+            'en': 'Foo Course Title',
+        },
+        'languages': ('en', ),
+    })

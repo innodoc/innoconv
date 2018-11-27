@@ -4,19 +4,20 @@
 
 import unittest
 from argparse import ArgumentParser, Namespace
-from copy import deepcopy
 import mock
 
 import innoconv.__main__
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.test.utils import get_manifest
 
 DEFAULT_ARGS = {
     'debug': True,
     'source_dir': '/tmp/foo_source',
     'output_dir': '/tmp/bar_output',
     'languages': 'ar,it',
-    'extensions': 'copystatic',
+    'extensions': 'copy_static',
 }
+
+MANIFEST = get_manifest()
 
 
 class TestGetArgs(unittest.TestCase):
@@ -25,39 +26,27 @@ class TestGetArgs(unittest.TestCase):
         self.assertIsInstance(args, ArgumentParser)
 
 
+@mock.patch('builtins.open', new_callable=mock.mock_open)
+@mock.patch('innoconv.__main__.Manifest.from_yaml', return_value=MANIFEST)
 @mock.patch('argparse.ArgumentParser.parse_args',
             return_value=Namespace(**DEFAULT_ARGS))
 @mock.patch('innoconv.__main__.InnoconvRunner.__init__', return_value=None)
 @mock.patch('innoconv.__main__.InnoconvRunner.run')
 @mock.patch('innoconv.__main__.log')
 class TestMain(unittest.TestCase):
-    def test_main(self, log, runner_run, runner_init, _):
+    def test_main(self, log, runner_run, runner_init, *_):
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 0)
-        args, kwargs = runner_init.call_args
-        [source_dir, output_dir, [lang_0, lang_1], [extensions]] = args
+        args, _ = runner_init.call_args
+        source_dir, output_dir, manifest, (extension,) = args
         self.assertEqual(source_dir, '/tmp/foo_source')
         self.assertEqual(output_dir, '/tmp/bar_output')
-        self.assertEqual(lang_0, 'ar')
-        self.assertEqual(lang_1, 'it')
-        self.assertIsInstance(extensions, AbstractExtension)
-        self.assertEqual(kwargs, {'debug': True})
+        self.assertIs(manifest, MANIFEST)
+        self.assertEqual(extension, 'copy_static')
         self.assertTrue(runner_run.called)
         self.assertEqual(log.call_args, mock.call('Build finished!'))
 
-    def test_main_invalid_ext(self, log, runner_run, runner_init, parse_args):
-        args = deepcopy(DEFAULT_ARGS)
-        args['extensions'] = 'copystatic,extension_does_not_exist'
-        parse_args.return_value = Namespace(**args)
-        return_value = innoconv.__main__.main()
-        self.assertEqual(return_value, 1)
-        self.assertFalse(runner_init.called)
-        self.assertFalse(runner_run.called)
-        err = ("Something went wrong: "
-               "Extension extension_does_not_exist not found!")
-        self.assertEqual(log.call_args, mock.call(err))
-
-    def test_main_logs_error(self, log, runner_run, runner_init, _):
+    def test_main_logs_error(self, log, runner_run, runner_init, *_):
         runner_run.side_effect = RuntimeError('Oooops')
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, 1)
@@ -65,9 +54,22 @@ class TestMain(unittest.TestCase):
         err = 'Something went wrong: Oooops'
         self.assertEqual(log.call_args, mock.call(err))
 
+    def test_main_no_manifest(self, *args):
+        _, _, _, _, _, mock_open = args
+        mock_open.side_effect = FileNotFoundError()
+        return_value = innoconv.__main__.main()
+        self.assertEqual(return_value, -2)
+
+    def test_main_runtime_error(self, *args, **logging):
+        log = logging['critical']
+        _, _, _, manifest_from_yaml, _ = args
+        manifest_from_yaml.side_effect = RuntimeError()
+        return_value = innoconv.__main__.main()
+        self.assertEqual(return_value, -3)
+        self.assertIsInstance(log.call_args[0][0], RuntimeError)
+
 
 class TestMainInit(unittest.TestCase):
-
     @mock.patch('sys.exit')
     @mock.patch.object(innoconv.__main__, '__name__', '__main__')
     @mock.patch('innoconv.__main__.main')

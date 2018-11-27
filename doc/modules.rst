@@ -8,6 +8,9 @@ Module overview
   innoconv.runner
   innoconv.extensions
   innoconv.extensions.abstract
-  innoconv.extensions.copystatic
+  innoconv.extensions.copy_static
+  innoconv.extensions.generate_toc
   innoconv.extensions.join_strings
+  innoconv.extensions.write_manifest
+  innoconv.manifest
   innoconv.utils
