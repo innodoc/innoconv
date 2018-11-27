@@ -3,7 +3,7 @@ flake8==3.6.0
 green==2.13.0
 mock==2.0.0
 pydocstyle==3.0.0
-pylint==2.1.1
+pylint==2.2.1
 PyYAML==3.13
 Sphinx==1.8.2
 sphinx-argparse==0.2.5

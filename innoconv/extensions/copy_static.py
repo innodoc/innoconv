@@ -174,7 +174,6 @@ class CopyStatic(AbstractExtension):
 
     def post_conversion(self, language):
         """Unused."""
-        pass
 
     def finish(self):
         """Finally copy the files."""
