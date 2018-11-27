@@ -1,54 +1,9 @@
-"""Utility module"""
+"""Utility module."""
 
 import json
 from subprocess import Popen, PIPE
-import sys
 
 from innoconv.constants import ENCODING
-
-
-class Logger():
-    """Logs message to stderr"""
-
-    @classmethod
-    def get_logger(cls):
-        """Gets the current Logger"""
-        try:
-            return cls.logger
-        except AttributeError:
-            cls.logger = Logger()
-            return cls.logger
-
-    def __init__(self):
-        self.debug = True
-
-    def log(self, msg_string, args):
-        """Log message to stderr.
-
-        :param msg_string: Message that is logged
-        :type msg_string: str
-        """
-
-        if self.debug:
-            sys.stderr.write("{}\n".format(msg_string))
-            for arg in args:
-                sys.stderr.write("{}\n".format(arg))
-            sys.stderr.flush()
-
-
-def set_debug(value=True):
-    """Enables debugging
-    """
-    Logger.get_logger().debug = value
-
-
-def log(msg_string, *args):
-    """Log message to stderr.
-
-    :param msg_string: Message that is logged
-    :type msg_string: str
-    """
-    Logger.get_logger().log(msg_string, args)
 
 
 def to_ast(filepath):
@@ -70,8 +25,9 @@ def to_ast(filepath):
     err = err.decode(ENCODING)
 
     if proc.returncode != 0:
-        log(err)
-        raise RuntimeError("pandoc process exited with non-zero return code.")
+        msg = ("pandoc process returned exit code ({})."
+               "This is the pandoc output:\n{}")
+        raise RuntimeError(msg.format(proc.returncode, err))
 
     loaded = json.loads(out)
     blocks = loaded['blocks']

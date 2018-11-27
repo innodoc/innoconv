@@ -3,16 +3,16 @@
 """Main entry for the innoconv document converter."""
 
 import argparse
+import logging
 import os
 import sys
 
 from innoconv.constants import (
-    DEFAULT_OUTPUT_DIR_BASE, DEFAULT_EXTENSIONS, MANIFEST_BASENAME)
+    DEFAULT_OUTPUT_DIR_BASE, DEFAULT_EXTENSIONS, MANIFEST_BASENAME, LOG_FORMAT)
 from innoconv.extensions import EXTENSIONS
 from innoconv.manifest import Manifest
 from innoconv.metadata import __author__, __url__
 from innoconv.runner import InnoconvRunner
-from innoconv.utils import log, set_debug
 
 INNOCONV_DESCRIPTION = """
   Convert interactive educational content.
@@ -33,8 +33,8 @@ warranty, not even for merchantability or fitness for a particular purpose.
 
 def get_arg_parser():
     """Get CLI arguments."""
-    def _format_default(val):
-        return " (default: {})".format(val)
+    def _format_default(msg, val):
+        return "{} (default: {})".format(msg, val)
 
     extlist = ["  {} - {}".format(ext, EXTENSIONS[ext].helptext())
                for ext in EXTENSIONS]
@@ -45,22 +45,23 @@ def get_arg_parser():
         epilog=INNOCONV_EPILOG.format(ext_help, __author__, __url__),
         formatter_class=argparse.RawTextHelpFormatter)
 
-    output_dir_help = "Output directory{}".format(
-        _format_default(DEFAULT_OUTPUT_DIR_BASE))
+    output_dir_help = _format_default(
+        "Output directory", DEFAULT_OUTPUT_DIR_BASE)
     innoconv_argparser.add_argument('-o', '--output-dir',
                                     default=DEFAULT_OUTPUT_DIR_BASE,
                                     help=output_dir_help)
 
-    debug_help = "Enable debug mode{}".format(_format_default(False))
-    innoconv_argparser.add_argument('-d', '--debug',
+    verbose_default = False
+    verbose_help = _format_default("Print verbose messages", verbose_default)
+    innoconv_argparser.add_argument('-v', '--verbose',
                                     action='store_true',
-                                    default=False,
-                                    help=debug_help)
+                                    default=verbose_default,
+                                    help=verbose_help)
 
-    extensions_help = "Enabled extensions{}".format(
-        _format_default(','.join(DEFAULT_EXTENSIONS)))
+    extensions_default = ','.join(DEFAULT_EXTENSIONS)
+    extensions_help = _format_default("Enabled extensions", extensions_default)
     innoconv_argparser.add_argument('-e', '--extensions',
-                                    default=','.join(DEFAULT_EXTENSIONS),
+                                    default=extensions_default,
                                     help=extensions_help)
 
     innoconv_argparser.add_argument('source_dir',
@@ -75,7 +76,8 @@ def main(args=None):
     source_dir = os.path.abspath(args['source_dir'])
     output_dir = os.path.abspath(args['output_dir'])
     extensions = args['extensions'].split(',')
-    set_debug(args['debug'])
+    log_level = logging.INFO if args['verbose'] else logging.WARNING
+    logging.basicConfig(level=log_level, format=LOG_FORMAT)
 
     # read course manifest
     filename = '{}.yml'.format(MANIFEST_BASENAME)
@@ -84,18 +86,21 @@ def main(args=None):
         with open(filepath, 'r') as file:
             manifest = Manifest.from_yaml(file.read())
     except FileNotFoundError as exc:
-        log(exc)
+        logging.critical(exc)
         return -2
+    except RuntimeError as exc:
+        logging.critical(exc)
+        return -3
 
     try:
-        # conversion
         runner = InnoconvRunner(source_dir, output_dir, manifest, extensions)
         runner.run()
-        log("Build finished!")
-        return 0
     except RuntimeError as error:
-        log("Something went wrong: {}".format(error))
+        msg = "Something went wrong: {}".format(error)
+        logging.critical(msg)
         return 1
+    logging.info("Build finished!")
+    return 0
 
 
 def init():

@@ -16,7 +16,7 @@ from innoconv.test.extensions import SOURCE, TARGET, PATHS, TestExtension
 
 @mock.patch('os.makedirs', return_value=True)
 @mock.patch('os.path.lexists', return_value=True)
-@mock.patch('os.path.isfile', side_effect=itertools.cycle((True, False)))
+@mock.patch('os.path.isfile', side_effect=itertools.cycle((True,)))
 @mock.patch('shutil.copyfile')
 class TestCopyStatic(TestExtension):
     def test_absolute_localized(self, copyfile, *_):
@@ -28,7 +28,7 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(mock.call(src, target), copyfile.call_args)
 
     def test_absolute_nonlocalized(self, copyfile, isfile, *_):
-        isfile.side_effect = itertools.cycle((False, True, False))
+        isfile.side_effect = itertools.cycle((False, True))
         self._run(
             CopyStatic, [get_image_ast('/present.jpg')], languages=('en',))
         self.assertEqual(copyfile.call_count, 1)
@@ -114,7 +114,7 @@ class TestCopyStatic(TestExtension):
     def test_only_en_present(self, copyfile, isfile, *_):
         ast = [get_image_ast('localizable.gif')]
         languages = ('en', 'la')
-        isfile.side_effect = itertools.cycle((True, False, False, True, False))
+        isfile.side_effect = itertools.cycle((True, False, True))
         self._run(CopyStatic, ast, languages=languages)
         self.assertEqual(copyfile.call_count, 8)
         for lang_path in (('en',), ()):
@@ -141,7 +141,7 @@ class TestCopyStatic(TestExtension):
                 self.assertIn(call, copyfile.call_args_list)
 
     def test_relative_nonlocalized(self, copyfile, isfile, *_):
-        isfile.side_effect = itertools.cycle((False, True, False))
+        isfile.side_effect = itertools.cycle((False, True))
         ast = [get_image_ast('example_image.jpg')]
         self._run(CopyStatic, ast, languages=('en',))
         self.assertEqual(copyfile.call_count, 4)
