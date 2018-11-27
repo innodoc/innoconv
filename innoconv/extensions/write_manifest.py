@@ -1,6 +1,6 @@
 """
-Every course needs a :class:`innoconv.manifest.Manifest`. A ``manifest.json``
-is written to the output folder.
+Every course needs a :class:`Manifest <innoconv.manifest.Manifest>`. A
+``manifest.json`` is written to the output folder.
 
 Additionally to the fields from the source manifest it can include a table
 of contents and a glossary.
