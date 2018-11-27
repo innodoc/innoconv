@@ -11,7 +11,7 @@ import tempfile
 class TestConversionFails(unittest.TestCase):
     def setUp(self):
         self.repo_dir = tempfile.TemporaryDirectory(prefix='innoconv-test-')
-        self.output_dir = join(self.repo_dir.name, 'output_dir_base')
+        self.output_dir = join(self.repo_dir.name, 'output_dir')
 
     def test_dir_does_not_exist(self):
         """A conversion should fail on non-existent directory."""
