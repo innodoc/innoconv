@@ -38,19 +38,15 @@ class WriteManifest(AbstractExtension):
 
     def pre_conversion(self, language):
         """Unused."""
-        pass
 
     def pre_process_file(self, path):
         """Unused."""
-        pass
 
     def post_process_file(self, _, title):
         """Unused."""
-        pass
 
     def post_conversion(self, language):
         """Unused."""
-        pass
 
     def finish(self):
         """Output course manifest."""

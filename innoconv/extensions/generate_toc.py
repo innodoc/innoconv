@@ -80,8 +80,6 @@ class GenerateToc(AbstractExtension):
 
     def post_conversion(self, language):
         """Unused."""
-        pass
 
     def finish(self):
         """Unused."""
-        pass
