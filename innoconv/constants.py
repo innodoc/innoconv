@@ -7,7 +7,12 @@ import os
 DEFAULT_OUTPUT_DIR_BASE = os.path.join('.', 'innoconv_output')
 
 #: Default enabled extensions
-DEFAULT_EXTENSIONS = ('copy_static', 'generate_toc', 'write_manifest')
+DEFAULT_EXTENSIONS = (
+    'join_strings',
+    'copy_static',
+    'generate_toc',
+    'write_manifest',
+)
 
 #: Encoding used in this project
 ENCODING = 'utf-8'
