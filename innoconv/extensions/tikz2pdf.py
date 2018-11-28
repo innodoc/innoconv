@@ -34,24 +34,18 @@ def run(cmd, stdin=None):
     """util to run command in a subprocess, and communicate with it."""
     pipe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     if stdin:
-        pipe.stdin.write(stdin.encode('utf-8'))
+        pipe.stdin.write(stdin.encode(ENCODING))
         pipe.stdin.close()
     pipe.wait()
 
     # error out if necessary
     if pipe.returncode != 0:
-        log(getcwd())
-        log('>', cmd)
-        log('Error.')
-        log('-' * 20, 'STDIN')
-        log(stdin)
-        log('-' * 20, 'STDOUT')
-        log(pipe.stdout.read().decode(ENCODING))
-        log('-' * 20, 'STDERR')
+        log(cmd)
+        log('Error', pipe.returncode)
         log(pipe.stderr.read().decode(ENCODING))
         raise RuntimeError("Tikz2Pdf: Error when converting Latex to PDF")
 
-    return pipe.stdout.read()
+    return pipe.stdout.read().decode(ENCODING)
 
 
 class Tikz2Pdf(AbstractExtension):
@@ -102,6 +96,8 @@ class Tikz2Pdf(AbstractExtension):
         except TypeError:
             pass
 
+    # Create Files
+
     def _create_tex(self, directory):
         filename = join(directory, 'input.tex')
         content = ""
@@ -136,6 +132,14 @@ class Tikz2Pdf(AbstractExtension):
         tikz_path = join(self.output_dir_base, STATIC_FOLDER, TIKZ_FOLDER)
         copy_tree(self.svgs_path, tikz_path, update=1)
 
+    def create_files(self, directory):
+        """Creates a tex file, converts it to pdfs, converts those to svgs and
+        finally copies them to the right folder"""
+        self._create_tex(directory)
+        self._create_pdfs(directory)
+        self._create_svgs(directory)
+        self._copy_svgs()
+
     # extension events
 
     def init(self, languages, output_dir_base, source_dir):
@@ -164,8 +168,5 @@ class Tikz2Pdf(AbstractExtension):
         current_dir = getcwd()
         with TemporaryDirectory(prefix='innoconv-tikz2pdf-') as temp_directory:
             chdir(temp_directory)
-            self._create_tex(temp_directory)
-            self._create_pdfs(temp_directory)
-            self._create_svgs(temp_directory)
-            self._copy_svgs()
+            self.create_files(temp_directory)
             chdir(current_dir)

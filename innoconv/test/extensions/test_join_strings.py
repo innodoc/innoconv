@@ -6,6 +6,7 @@ import unittest
 import copy
 
 from innoconv.extensions.join_strings import JoinStrings
+from innoconv.test.utils import get_tricky_ast_parts
 
 
 class TestJoinStrings(unittest.TestCase):
@@ -140,11 +141,7 @@ class TestJoinStrings(unittest.TestCase):
 
     def test_special_array(self):
         # Collection of simple special cases found in actual conversions
-        examples = (
-            [0, 1, 2],
-            [{'t': 'InlineMath'}, '\\frac12>\\frac23']
-        )
-        for given in examples:
+        for given in get_tricky_ast_parts():
             self._run_test(copy.deepcopy(given), given)
 
     def test_special_array2(self):
