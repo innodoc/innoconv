@@ -106,7 +106,7 @@ class TestCopyStatic(TestExtension):
         ast = [get_image_ast('test.png')]
         self._run(CopyStatic, ast, languages=('en',))
         self.assertEqual(makedirs.call_count, 4)
-        for path in PATHS:
+        for _, path in PATHS:
             call = mock.call(join(TARGET, 'en', STATIC_FOLDER, *path))
             with self.subTest(call):
                 self.assertIn(call, makedirs.call_args_list)
@@ -120,7 +120,7 @@ class TestCopyStatic(TestExtension):
         for lang_path in (('en',), ()):
             src_base = join(SOURCE, *lang_path, STATIC_FOLDER)
             target_base = join(TARGET, *lang_path, STATIC_FOLDER)
-            for path in PATHS:
+            for _, path in PATHS:
                 src = join(src_base, *path, 'localizable.gif')
                 target = join(target_base, *path, 'localizable.gif')
                 call = mock.call(src, target)
@@ -131,7 +131,7 @@ class TestCopyStatic(TestExtension):
         ast = [get_video_ast('example_video.ogv')]
         self._run(CopyStatic, ast, languages=('en',))
         self.assertEqual(copyfile.call_count, 4)
-        for path in PATHS:
+        for _, path in PATHS:
             src = join(
                 SOURCE, 'en', STATIC_FOLDER, *path, 'example_video.ogv')
             target = join(
@@ -145,7 +145,7 @@ class TestCopyStatic(TestExtension):
         ast = [get_image_ast('example_image.jpg')]
         self._run(CopyStatic, ast, languages=('en',))
         self.assertEqual(copyfile.call_count, 4)
-        for path in PATHS:
+        for _, path in PATHS:
             src = join(SOURCE, STATIC_FOLDER, *path, 'example_image.jpg')
             target = join(TARGET, STATIC_FOLDER, *path, 'example_image.jpg')
             call = mock.call(src, target)
@@ -157,7 +157,7 @@ class TestCopyStatic(TestExtension):
         ast = [get_image_ast('localized_present.png')]
         self._run(CopyStatic, ast, languages=languages)
         self.assertEqual(copyfile.call_count, 8)
-        for path in PATHS:
+        for _, path in PATHS:
             for lang in languages:
                 src = join(
                     SOURCE, lang, STATIC_FOLDER, *path,

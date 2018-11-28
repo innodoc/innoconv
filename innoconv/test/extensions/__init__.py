@@ -11,16 +11,16 @@ from innoconv.test.utils import get_filler_content
 SOURCE = '/source'
 TARGET = '/target'
 PATHS = (
-    (),
-    ('title-1',),
-    ('title-2',),
-    ('title-2', 'title-2-1'),
+    ("Welcome", ()),
+    ("Title 1", ('title-1',)),
+    ("Title 2", ('title-2',)),
+    ("Title 2-1", ('title-2', 'title-2-1')),
 )
 
 
 class TestExtension(unittest.TestCase):
     @staticmethod
-    def _run(extension, ast=None, languages=('en', 'de')):
+    def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS):
         if ast is None:
             ast = get_filler_content()
         title = {}
@@ -34,14 +34,9 @@ class TestExtension(unittest.TestCase):
         ext.start(TARGET, SOURCE)
         for language in languages:
             ext.pre_conversion(language)
-            ext.pre_process_file(language)
-            ext.post_process_file(ast, "Welcome {}".format(language))
-            ext.pre_process_file(join(language, 'title-1'))
-            ext.post_process_file(ast, "Title 1 {}".format(language))
-            ext.pre_process_file(join(language, 'title-2'))
-            ext.post_process_file(ast, "Title 2 {}".format(language))
-            ext.pre_process_file(join(language, 'title-2', 'title-2-1'))
-            ext.post_process_file(ast, "Title 2-1 {}".format(language))
+            for title, path in paths:
+                ext.pre_process_file(join(language, *path))
+                ext.post_process_file(ast, "{} {}".format(title, language))
             ext.post_conversion(language)
         ext.finish()
         return ext

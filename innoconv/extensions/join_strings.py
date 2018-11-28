@@ -30,8 +30,8 @@ class JoinStrings(AbstractExtension):
 
     _helptext = "Simplifies strings in the generated JSON files."
 
-    def __init__(self):
-        super(JoinStrings, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(JoinStrings, self).__init__(*args, **kwargs)
         self.previous_element = None  # the element we merge to
 
     # content parsing
@@ -95,17 +95,14 @@ class JoinStrings(AbstractExtension):
 
     # extension events
 
-    def init(self, languages, output_dir_base, source_dir):
+    def start(self, output_dir, source_dir):
         """Unused."""
-        pass
 
     def pre_conversion(self, language):
         """Unused."""
-        pass
 
     def pre_process_file(self, path):
         """Unused."""
-        pass
 
     def post_process_file(self, ast, _):
         """Concatenate the strings and spaces in the ast in-place."""
@@ -113,8 +110,6 @@ class JoinStrings(AbstractExtension):
 
     def post_conversion(self, language):
         """Unused."""
-        pass
 
     def finish(self):
         """Unused."""
-        pass
