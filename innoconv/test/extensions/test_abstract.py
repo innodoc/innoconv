@@ -5,6 +5,9 @@
 import unittest
 
 from innoconv.extensions.abstract import AbstractExtension
+from innoconv.test.utils import get_manifest
+
+MANIFEST = get_manifest()
 
 
 class TestExtension(AbstractExtension):
@@ -17,9 +20,9 @@ class TestAbstractExtension(unittest.TestCase):
         self.assertEqual(TestExtension.helptext(), "Foo bar")
 
     def test_notimplemented(self):
-        test_extension = TestExtension()
+        test_extension = TestExtension(MANIFEST)
         events = (
-            ('init', ('en', '', '')),
+            ('start', ('source', 'output')),
             ('pre_conversion', ('en',)),
             ('pre_process_file', ('relpath',)),
             ('post_process_file', (['ast'], 'Foo Title')),

@@ -14,18 +14,19 @@ class AbstractExtension():
 
     _helptext = ''
 
+    def __init__(self, manifest):
+        self._manifest = manifest
+
     @classmethod
     def helptext(cls):
         """Return a brief summary of what the extension is doing."""
         return cls._helptext
 
-    def init(self, languages, output_dir_base, source_dir):
+    def start(self, output_dir, source_dir):
         """Conversion is about to start.
 
-        :param languages: List of languages that are being converted.
-        :type languages: List of str
-        :param output_dir_base: Base output directory
-        :type output_dir_base: str
+        :param output_dir: Base output directory
+        :type output_dir: str
         :param source_dir: Content source directory
         :type source_dir: str
         """

@@ -5,34 +5,44 @@
 import unittest
 import mock
 
+from innoconv.extensions.abstract import AbstractExtension
+from innoconv.manifest import Manifest
 from innoconv.runner import InnoconvRunner
+
+MANIFEST = Manifest({
+    'title': {
+        'en': 'Foo Course Title',
+        'de': 'Foo Kurstitel',
+    },
+    'languages': ('de', 'en'),
+})
 
 
 def walk_side_effect(path):
     lang = path[-2:]
     return iter([
         (
-            '/source_dir/{}'.format(lang),
+            '/src/{}'.format(lang),
             ['section-1', 'section-2'],
             ['content.md'],
         ),
         (
-            '/source_dir/{}/section-1'.format(lang),
+            '/src/{}/section-1'.format(lang),
             ['section-1.1', 'section-1.2', '_static'],
             ['content.md'],
         ),
         (
-            '/source_dir/{}/section-1/section-1.1'.format(lang),
+            '/src/{}/section-1/section-1.1'.format(lang),
             [],
             ['content.md'],
         ),
         (
-            '/source_dir/{}/section-1/section-1.2'.format(lang),
+            '/src/{}/section-1/section-1.2'.format(lang),
             [],
             ['content.md'],
         ),
         (
-            '/source_dir/{}/section-2'.format(lang),
+            '/src/{}/section-2'.format(lang),
             [],
             ['content.md'],
         ),
@@ -43,7 +53,7 @@ def walk_side_effect_error(path):
     lang = path[-2:]
     return iter([
         (
-            '/source_dir/{}'.format(lang),
+            '/src/{}'.format(lang),
             ['section-1', 'section-2'],
             [],
         )
@@ -65,96 +75,131 @@ TITLE = [
 ]
 
 
+@mock.patch('builtins.open')
+@mock.patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
+@mock.patch('json.dump')
+@mock.patch('innoconv.runner.walk', side_effect=walk_side_effect)
+@mock.patch('innoconv.runner.makedirs')
+@mock.patch('innoconv.runner.isdir', return_value=True)
 class TestInnoconvRunner(unittest.TestCase):
-
     def setUp(self):
-        runner_to_ast_patcher = mock.patch('innoconv.runner.to_ast')
-        self.runner_to_ast_mock = runner_to_ast_patcher.start()
-        self.runner_to_ast_mock.return_value = ['content_ast'], TITLE
+        self.runner = InnoconvRunner('/src', '/out', MANIFEST, [])
 
-        json_dump_patcher = mock.patch('json.dump')
-        self.json_dump_mock = json_dump_patcher.start()
-
-        builtins_open_patcher = mock.patch('builtins.open')
-        self.builtins_open_mock = builtins_open_patcher.start()
-
-        os_walk_patcher = mock.patch('innoconv.runner.walk')
-        self.os_walk_mock = os_walk_patcher.start()
-        self.os_walk_mock.side_effect = walk_side_effect
-
-        os_makedirs_patcher = mock.patch('innoconv.runner.makedirs')
-        self.os_makedirs_mock = os_makedirs_patcher.start()
-
-        os_path_isdir_patcher = mock.patch('innoconv.runner.isdir')
-        self.os_path_isdir_mock = os_path_isdir_patcher.start()
-        self.os_path_isdir_mock.return_value = True
-
-        self.addCleanup(mock.patch.stopall)
-
-        self.runner = InnoconvRunner(
-            '/source_dir', '/output_dir', ['de', 'en'], [])
-
-    def test_run(self):
+    def test_run(self, *args):
+        _, makedirs, _, json_dump, *_ = args
         self.runner.run()
 
-        self.assertEqual(self.os_makedirs_mock.call_count, 10)
+        self.assertEqual(makedirs.call_count, 10)
+        self.assertEqual(json_dump.call_count, 10)
         for i, path in enumerate((
-                '/output_dir/de',
-                '/output_dir/de/section-1',
-                '/output_dir/de/section-1/section-1.1',
-                '/output_dir/de/section-1/section-1.2',
-                '/output_dir/de/section-2',
-                '/output_dir/en',
-                '/output_dir/en/section-1',
-                '/output_dir/en/section-1/section-1.1',
-                '/output_dir/en/section-1/section-1.2',
-                '/output_dir/en/section-2')):
-            args, _ = self.os_makedirs_mock.call_args_list[i]
-            self.assertEqual(args[0], path)
+                '/out/de',
+                '/out/de/section-1',
+                '/out/de/section-1/section-1.1',
+                '/out/de/section-1/section-1.2',
+                '/out/de/section-2',
+                '/out/en',
+                '/out/en/section-1',
+                '/out/en/section-1/section-1.1',
+                '/out/en/section-1/section-1.2',
+                '/out/en/section-2')):
+            with self.subTest(path):
+                self.assertEqual(
+                    makedirs.call_args_list[i], mock.call(path, exist_ok=True))
+                self.assertEqual(
+                    json_dump.call_args_list[i][0][0], ['content_ast'])
 
-        # called 12 times for content files
-        for i in (0, 1, 2, 3, 4, 7, 8, 9, 10, 11):
-            args, _ = self.json_dump_mock.call_args_list[i]
-            self.assertEqual(args[0], ['content_ast'])
-
-        # called twice for TOCs
-        for i in (5, 12):
-            toc = self.json_dump_mock.call_args_list[i][0][0]
-            self.assertEqual(toc, [
-                {
-                    'id': 'section-1',
-                    'title': TITLE,
-                    'children': [
-                        {
-                            'id': 'section-1.1',
-                            'title': TITLE,
-                        },
-                        {
-                            'id': 'section-1.2',
-                            'title': TITLE,
-                        },
-                    ],
-                },
-                {
-                    'id': 'section-2',
-                    'title': TITLE,
-                },
-            ])
-
-        # called twice for manifests
-        for i in (6, 13):
-            toc = self.json_dump_mock.call_args_list[i][0][0]
-            self.assertEqual(toc, {
-                'title': TITLE,
-            })
-
-    def test_run_no_folder(self):
+    def test_run_no_folder(self, isdir, *_):
         """Language folders do not exist"""
-        self.os_path_isdir_mock.return_value = False
+        isdir.return_value = False
         self.assertRaises(RuntimeError, self.runner.run)
 
-    def test_run_content_file_missing(self):
-
-        self.os_walk_mock.side_effect = walk_side_effect_error
+    def test_run_content_file_missing(self, *args):
+        _, _, walk, *_ = args
+        walk.side_effect = walk_side_effect_error
         with self.assertRaises(RuntimeError):
             self.runner.run()
+
+    def test_run_to_ast_fails(self, *args):
+        _, _, _, _, to_ast, *_ = args
+        to_ast.side_effect = RuntimeError()
+        with self.assertRaises(RuntimeError):
+            self.runner.run()
+
+
+@mock.patch('builtins.open')
+@mock.patch('innoconv.runner.EXTENSIONS', {'my_ext': AbstractExtension})
+@mock.patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
+@mock.patch('json.dump')
+@mock.patch('innoconv.runner.walk', side_effect=walk_side_effect)
+@mock.patch('innoconv.runner.makedirs')
+@mock.patch('innoconv.runner.isdir', return_value=True)
+@mock.patch('innoconv.extensions.abstract.AbstractExtension.__init__',
+            return_value=None)
+class TestInnoconvRunnerExtensions(unittest.TestCase):
+    def test_valid_ext(self, init, *_):
+        extensions = ('my_ext',)
+        InnoconvRunner('/src', '/out', MANIFEST, extensions)
+        self.assertIsInstance(init.call_args[0][0], Manifest)
+
+    def test_invalid_ext(self, *_):
+        extensions = ('my_ext', 'extension_does_not_exist')
+        with self.assertRaises(RuntimeError):
+            InnoconvRunner('/src', '/out', MANIFEST, extensions)
+
+    @mock.patch.multiple(
+        'innoconv.extensions.abstract.AbstractExtension',
+        start=mock.DEFAULT,
+        pre_conversion=mock.DEFAULT,
+        pre_process_file=mock.DEFAULT,
+        post_process_file=mock.DEFAULT,
+        post_conversion=mock.DEFAULT,
+        finish=mock.DEFAULT,
+    )
+    def test_notify_ext(self, *_, **mocks):
+        extensions = ('my_ext',)
+        runner = InnoconvRunner('/src', '/out', MANIFEST, extensions)
+        runner.run()
+
+        self.assertEqual(mocks['start'].call_count, 1)
+        self.assertEqual(mocks['start'].call_args, mock.call('/out', '/src'))
+
+        self.assertEqual(mocks['pre_conversion'].call_count, 2)
+        self.assertEqual(mocks['pre_conversion'].call_args_list[0],
+                         mock.call('de'))
+        self.assertEqual(mocks['pre_conversion'].call_args_list[1],
+                         mock.call('en'))
+
+        self.assertEqual(mocks['pre_process_file'].call_count, 10)
+        self.assertEqual(mocks['pre_process_file'].call_args_list[0],
+                         mock.call('de'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[1],
+                         mock.call('de/section-1'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[2],
+                         mock.call('de/section-1/section-1.1'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[3],
+                         mock.call('de/section-1/section-1.2'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[4],
+                         mock.call('de/section-2'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[5],
+                         mock.call('en'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[6],
+                         mock.call('en/section-1'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[7],
+                         mock.call('en/section-1/section-1.1'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[8],
+                         mock.call('en/section-1/section-1.2'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[9],
+                         mock.call('en/section-2'))
+
+        self.assertEqual(mocks['post_process_file'].call_count, 10)
+        for i in range(0, 10):
+            self.assertEqual(mocks['post_process_file'].call_args_list[i],
+                             mock.call(['content_ast'], TITLE))
+
+        self.assertEqual(mocks['post_conversion'].call_count, 2)
+        self.assertEqual(mocks['post_conversion'].call_args_list[0],
+                         mock.call('de'))
+        self.assertEqual(mocks['post_conversion'].call_args_list[1],
+                         mock.call('en'))
+
+        self.assertEqual(mocks['finish'].call_count, 1)

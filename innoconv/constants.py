@@ -6,28 +6,27 @@ import os
 #: Default innoconv output directory
 DEFAULT_OUTPUT_DIR_BASE = os.path.join('.', 'innoconv_output')
 
-#: Default languages
-DEFAULT_LANGUAGES = ('de', 'en')
-
 #: Default enabled extensions
-DEFAULT_EXTENSIONS = ('copystatic',)
+DEFAULT_EXTENSIONS = (
+    'join_strings',
+    'copy_static',
+    'generate_toc',
+    'write_manifest',
+)
 
 #: Encoding used in this project
 ENCODING = 'utf-8'
 
-#: Content filename for a section folder
-CONTENT_FILENAME = 'content.md'
-
-#: Output content filename for a section folder
-OUTPUT_CONTENT_FILENAME = 'content.json'
+#: Basename for the content file in a section
+CONTENT_BASENAME = 'content'
 
 #: Manifest filename
-MANIFEST_FILENAME = 'manifest.json'
+MANIFEST_BASENAME = 'manifest'
 
-#: TOC filename
-TOC_FILENAME = 'toc.json'
+#: Format for logger messages
+LOG_FORMAT = '%(levelname)s:%(filename)s %(message)s'
 
-#: Static Folder Name
+#: Static folder name
 STATIC_FOLDER = '_static'
 
 #: TikZ Folder Name

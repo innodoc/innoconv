@@ -35,12 +35,12 @@ resolved to ``/de/_static/chapter01/subdir/my_picture.png`` whereas
 ``/de/_static/subdir/my_picture.png``.
 """
 
+import logging
 import os.path
 import os
 import shutil
 from urllib import parse
 
-from innoconv.utils import log
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER
 
@@ -50,19 +50,19 @@ ACCEPTED_LINK_CLASSES = (
 
 
 class CopyStatic(AbstractExtension):
-    """This extension copies static files from the content source directory
-    to the output directory."""
+    """Copy static files from the content source directory to the output
+    directory.
+    """
 
-    _helptext = "Copies static files to the output folder."
+    _helptext = "Copy static files to the output folder."
 
-    def __init__(self):
-        super(CopyStatic, self).__init__()
-        self.source_dir = None
-        self.output_dir_base = None
-        self.language = None
-        self.languages = None
-        self.to_copy = set()
-        self.current_path = None
+    def __init__(self, *args, **kwargs):
+        super(CopyStatic, self).__init__(*args, **kwargs)
+        self._source_dir = None
+        self._output_dir = None
+        self._current_language = None
+        self._to_copy = set()
+        self._current_path = None
 
     # content parsing
 
@@ -101,7 +101,7 @@ class CopyStatic(AbstractExtension):
         if self._link_is_video(link_element):
             try:
                 path = self._get_path(link)
-                self.to_copy.add(path)
+                self._to_copy.add(path)
             except ValueError:
                 pass
 
@@ -109,21 +109,22 @@ class CopyStatic(AbstractExtension):
         link = image_element['c'][2][0]
         try:
             path = self._get_path(link)
-            self.to_copy.add(path)
+            self._to_copy.add(path)
         except ValueError:
             pass
 
     def _get_path(self, path):
-        """Check if a path linking to a remote ressource and for
-        relative/absolute path."""
+        """Build resulting copy path from resource reference."""
+        # remote resource
         if parse.urlparse(path).scheme:
             raise ValueError()
+        # absolute (relative to static folder)
         if os.path.isabs(path):
             return path[1:]
-        return os.path.join(
-            # remove language part from relative path
-            self.current_path.replace(self.language + os.path.sep, '', 1),
-            path)
+        # relative (prefixed with section path)
+        path_prefix = self._current_path.replace(self._current_language, '', 1)
+        path_prefix = path_prefix.rstrip('/')
+        return os.path.join(path_prefix, path).lstrip('/')
 
     # file copying
 
@@ -132,42 +133,40 @@ class CopyStatic(AbstractExtension):
             """Generate static file path."""
             return os.path.join(root_dir, lang, STATIC_FOLDER, path)
 
-        log("Copying {} static files:".format(len(self.to_copy)))
-        for path in self.to_copy:
-            for lang in self.languages:
+        logging.info("%d files found.", len(self._to_copy))
+        for path in self._to_copy:
+            for lang in self._manifest.languages:
                 # localized version of file
-                src = get_file_path(self.source_dir, path, lang)
-                dst = get_file_path(self.output_dir_base, path, lang)
+                src = get_file_path(self._source_dir, path, lang)
+                dst = get_file_path(self._output_dir, path, lang)
                 if not os.path.isfile(src):
                     # common version as fallback
-                    src = get_file_path(self.source_dir, path)
-                    dst = get_file_path(self.output_dir_base, path)
+                    src = get_file_path(self._source_dir, path)
+                    dst = get_file_path(self._output_dir, path)
                     if not os.path.isfile(src):
-                        raise RuntimeError(
-                            "Missing static file {}".format(path))
+                        msg = "Missing static file {}".format(path)
+                        raise RuntimeError(msg)
                 # create folders as needed
                 folder = os.path.dirname(dst)
                 if not os.path.lexists(folder):
                     os.makedirs(folder)
-                if not os.path.isfile(dst):
-                    log(" copying file {} to {}".format(src, dst))
-                    shutil.copyfile(src, dst)
+                logging.info(" %s -> %s", src, dst)
+                shutil.copyfile(src, dst)
 
     # extension events
 
-    def init(self, languages, output_dir_base, source_dir):
-        """Remember languages and directories."""
-        self.languages = languages
-        self.output_dir_base = output_dir_base
-        self.source_dir = source_dir
+    def start(self, output_dir, source_dir):
+        """Remember directories."""
+        self._output_dir = output_dir
+        self._source_dir = source_dir
 
     def pre_conversion(self, language):
         """Remember current conversion language."""
-        self.language = language
+        self._current_language = language
 
     def pre_process_file(self, path):
         """Remember file path."""
-        self.current_path = path
+        self._current_path = path
 
     def post_process_file(self, ast, _):
         """Generate list of files to copy."""
@@ -175,7 +174,6 @@ class CopyStatic(AbstractExtension):
 
     def post_conversion(self, language):
         """Unused."""
-        pass
 
     def finish(self):
         """Finally copy the files."""

@@ -2,34 +2,22 @@
 
 # pylint: disable=missing-docstring
 
-import unittest
 import copy
 
 from innoconv.extensions.join_strings import JoinStrings
+from innoconv.test.extensions import TestExtension
 from innoconv.test.utils import get_tricky_ast_parts
 
+PATHS = (
+    ("Foo", ('foo',)),
+)
 
-class TestJoinStrings(unittest.TestCase):
 
-    def __init__(self, arg):
-        super(TestJoinStrings, self).__init__(arg)
-        self.join_strings = JoinStrings()
-
-    def _run_test(self, given, expected):
-        with self.subTest(given=given):
-            self.join_strings.post_process_file(given, None)
-            self.assertEqual(expected, given)
-
-    def test_life_cycle(self):
-        given = {}
-        expected = {}
-        self.join_strings.init(['de'], 'SOURCE', 'TARGET')
-        self.join_strings.pre_conversion('de')
-        self.join_strings.pre_process_file('de/path/example')
-        self.join_strings.post_process_file(given, 'example')
-        self.join_strings.post_conversion('de')
-        self.join_strings.finish()
-        self.assertEqual(expected, given)
+class TestJoinStrings(TestExtension):
+    @staticmethod
+    def _run(extension, ast=None, languages=('en',), paths=PATHS):
+        return TestExtension._run(
+            extension, ast, paths=paths, languages=languages)
 
     def test_join_strings_unchanged(self):
         examples = (
@@ -45,13 +33,17 @@ class TestJoinStrings(unittest.TestCase):
             {}
         )
         for given in examples:
-            self._run_test(copy.deepcopy(given), given)
+            with self.subTest(given):
+                expected = copy.deepcopy(given)
+                self._run(JoinStrings, given)
+                self.assertEqual(expected, given)
 
     def test_join_strings_str(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Str", "c": "B"}]
         expected = [{"t": "Str", "c": "AB"}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
     def test_join_strings_space(self):
         examples = (
@@ -69,15 +61,19 @@ class TestJoinStrings(unittest.TestCase):
         )
         expected = [{"t": "Str", "c": " "}]
         for given in examples:
-            self._run_test(given, expected)
+            with self.subTest(given):
+                self._run(JoinStrings, given)
+                self.assertEqual(expected, given)
 
-    def test_join_strings_complete(self):
+    def test_join_strings_complete_a(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Str", "c": "B"}]
         expected = [{"t": "Str", "c": "A B"}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
+    def test_join_strings_complete_b(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Space"},
@@ -85,9 +81,10 @@ class TestJoinStrings(unittest.TestCase):
                  {"t": "Space"},
                  {"t": "Str", "c": "B"}]
         expected = [{"t": "Str", "c": "A B B"}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
-    def test_join_strings_ignore_unknown(self):
+    def test_join_strings_ignore_unknown_a(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Foo", "c": "Bar"},
@@ -95,8 +92,10 @@ class TestJoinStrings(unittest.TestCase):
         expected = [{"t": "Str", "c": "A "},
                     {"t": "Foo", "c": "Bar"},
                     {"t": "Str", "c": "B"}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
+    def test_join_strings_ignore_unknown_b(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Foo", "c": "Bar"},
@@ -106,7 +105,8 @@ class TestJoinStrings(unittest.TestCase):
                     {"t": "Foo", "c": "Bar"},
                     {"t": "Str", "c": "B"},
                     {"t": "Foo", "c": "Bar"}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
     def test_nested_json(self):
         given = [{"t": "Strong",
@@ -114,7 +114,8 @@ class TestJoinStrings(unittest.TestCase):
                         {"t": "Space"},
                         {"t": "Str", "c": "B"}]}]
         expected = [{"t": "Strong", "c": [{"t": "Str", "c": "A B"}]}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
     def test_nested_json_complete(self):
         given = [{"t": "Str", "c": "A"},
@@ -137,12 +138,16 @@ class TestJoinStrings(unittest.TestCase):
                                   {"t": "Foo", "c": "Bar"},
                                   {"t": "Str", "c": "B"}]},
                            {"t": "Str", "c": " B"}]}]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
 
     def test_special_array(self):
         # Collection of simple special cases found in actual conversions
         for given in get_tricky_ast_parts():
-            self._run_test(copy.deepcopy(given), given)
+            with self.subTest(given):
+                expected = copy.deepcopy(given)
+                self._run(JoinStrings, given)
+                self.assertEqual(expected, given)
 
     def test_special_array2(self):
         # Problematic case found in actual conversions
@@ -232,4 +237,5 @@ class TestJoinStrings(unittest.TestCase):
                 "t": "Para"
             }
         ]
-        self._run_test(given, expected)
+        self._run(JoinStrings, given)
+        self.assertEqual(expected, given)

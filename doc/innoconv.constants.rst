@@ -6,20 +6,17 @@ innoconv.constants
 .. autodata:: DEFAULT_OUTPUT_DIR_BASE
   :annotation:
 
-.. autodata:: DEFAULT_LANGUAGES
+.. autodata:: DEFAULT_EXTENSIONS
   :annotation:
 
 .. autodata:: ENCODING
   :annotation:
 
-.. autodata:: CONTENT_FILENAME
+.. autodata:: CONTENT_BASENAME
   :annotation:
 
-.. autodata:: OUTPUT_CONTENT_FILENAME
+.. autodata:: MANIFEST_BASENAME
   :annotation:
 
-.. autodata:: MANIFEST_FILENAME
-  :annotation:
-
-.. autodata:: TOC_FILENAME
+.. autodata:: STATIC_FOLDER
   :annotation:

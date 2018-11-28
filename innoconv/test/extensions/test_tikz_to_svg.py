@@ -10,7 +10,9 @@ import mock
 from innoconv.extensions.tikz2pdf import Tikz2Pdf, run
 from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME
 from innoconv.constants import ENCODING
-from innoconv.test.utils import get_tricky_ast_parts
+from innoconv.test.utils import get_tricky_ast_parts, get_manifest
+from innoconv.test.utils import get_image_ast
+from innoconv.test.extensions import SOURCE, TARGET, TEMP
 
 TIKZSTRING = ("\\begin{tikzpicture}[x=1.0cm, y=1.0cm] \n"
               "\\draw[thick, black] (-5.2,0) -- (6.2,0);\n"
@@ -31,32 +33,20 @@ TIKZBLOCK = {
     ]
 }
 
-IMAGEBLOCK = {
-    "t": "Image",
-    "c": [
-        ["", [], []],
-        [{
-            "t": "Str",
-            "c": TIKZSTRING
-        }],
-        [os.path.join(STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME.format(0)), ""]
-    ]
-}
-
-
-TEMPPATH = "/homes/mathphys/insam/TEMP/a"
-TESTPATH = "/homes/mathphys/insam/TEST/"  # "/homes/mathphys/insam/TEMP/a"
+IMAGEBLOCK = get_image_ast(
+    os.path.join(STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME.format(0)),
+    title=TIKZSTRING)
 
 
 class TestTikz2Pdf(unittest.TestCase):
 
     def __init__(self, arg):
         super(TestTikz2Pdf, self).__init__(arg)
-        self.tikz2pdf = Tikz2Pdf()
+        self.tikz2pdf = Tikz2Pdf(get_manifest())
 
     @mock.patch('innoconv.extensions.tikz2pdf.Popen')
-    @mock.patch('innoconv.extensions.tikz2pdf.log')
-    def test_run(self, mock_log, mock_popen):
+    @mock.patch('innoconv.extensions.tikz2pdf.critical')
+    def test_run(self, mock_critical, mock_popen):
         test_cmd = "x_call_x"
         error_value = 'x_error_x'
         input_value = 'x_input_x'
@@ -76,14 +66,14 @@ class TestTikz2Pdf(unittest.TestCase):
             mock_popen.return_value.returncode = 1
             with self.assertRaises(RuntimeError):
                 run(test_cmd)
-            mock_log.assert_has_calls([
+            mock_critical.assert_has_calls([
                 mock.call(test_cmd),
-                mock.call('Error', 1),
+                mock.call('Error: %i', 1),
                 mock.call(error_value)
             ])
 
         mock_popen.reset_mock()
-        mock_log.reset_mock()
+        mock_critical.reset_mock()
         with self.subTest(stdin=input_value):
             mock_popen.return_value.returncode = 0
             self.assertEqual(output_value, run(test_cmd, input_value))
@@ -109,10 +99,10 @@ class TestTikz2Pdf(unittest.TestCase):
     def test_conversion(self, mock_run, mock_mkdir, mock_copy_tree, mock_open):
         self.tikz2pdf.tikz_images = list()
         self.tikz2pdf.tikz_images.append(TIKZSTRING)
-        self.tikz2pdf.output_dir_base = TESTPATH
-        self.tikz2pdf.create_files(TEMPPATH)
+        self.tikz2pdf.output_dir_base = TARGET
+        self.tikz2pdf.create_files(TEMP)
 
-        tex_file_path = os.path.join(TEMPPATH, 'input.tex')
+        tex_file_path = os.path.join(TEMP, 'input.tex')
         mock_open.assert_called_with(tex_file_path, 'w+')
         self.assertIn(TIKZSTRING, mock_open.return_value.write.call_args[0][0])
 
@@ -124,8 +114,8 @@ class TestTikz2Pdf(unittest.TestCase):
             else:
                 self.assertTrue(command.startswith("pdflatex"))
 
-        svgs_path = os.path.join(TEMPPATH, 'svgs')
-        ouput_path = os.path.join(TESTPATH, STATIC_FOLDER, TIKZ_FOLDER)
+        svgs_path = os.path.join(TEMP, 'svgs')
+        ouput_path = os.path.join(TARGET, STATIC_FOLDER, TIKZ_FOLDER)
         mock_mkdir.assert_called_with(svgs_path)
         mock_copy_tree.assert_called_with(svgs_path, ouput_path, update=1)
 
@@ -143,7 +133,7 @@ class TestTikz2Pdf(unittest.TestCase):
             temp_dir)
         mock_getcwd.return_value = current_dir
 
-        self.tikz2pdf.init(['de'], TESTPATH, 'SOURCE')
+        self.tikz2pdf.start(TARGET, SOURCE)
         self.tikz2pdf.pre_conversion('de')
         self.tikz2pdf.pre_process_file('de/path/example')
         self.tikz2pdf.post_process_file([{'c': [block]}], 'example')
@@ -158,4 +148,4 @@ class TestTikz2Pdf(unittest.TestCase):
         ])
         mock_create_files.assert_called_with(temp_dir)
         self.assertEqual(IMAGEBLOCK, block)
-        self.assertEqual(self.tikz2pdf.output_dir_base, TESTPATH)
+        self.assertEqual(self.tikz2pdf.output_dir_base, TARGET)

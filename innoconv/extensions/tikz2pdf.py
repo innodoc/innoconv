@@ -1,6 +1,8 @@
 """
 Converts TikZ images in the content to SVG
 """
+from logging import critical, info
+
 from os import chdir, getcwd, mkdir
 from os.path import join
 from tempfile import TemporaryDirectory
@@ -10,7 +12,6 @@ from distutils.dir_util import copy_tree
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME
 from innoconv.constants import ENCODING
-from innoconv.utils import log
 
 LATEX_BOILERPLATE = r"""
 \documentclass[border=2bp]{standalone}
@@ -40,9 +41,9 @@ def run(cmd, stdin=None):
 
     # error out if necessary
     if pipe.returncode != 0:
-        log(cmd)
-        log('Error', pipe.returncode)
-        log(pipe.stderr.read().decode(ENCODING))
+        critical(cmd)
+        critical('Error: %i', pipe.returncode)
+        critical(pipe.stderr.read().decode(ENCODING))
         raise RuntimeError("Tikz2Pdf: Error when converting Latex to PDF")
 
     return pipe.stdout.read().decode(ENCODING)
@@ -54,8 +55,8 @@ class Tikz2Pdf(AbstractExtension):
 
     _helptext = "Converts TikZ to SVG"
 
-    def __init__(self):
-        super(Tikz2Pdf, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Tikz2Pdf, self).__init__(*args, **kwargs)
         self.output_dir_base = None
         self.tmp_dir = None
         self.tikz_images = None
@@ -73,6 +74,7 @@ class Tikz2Pdf(AbstractExtension):
             ["", [], []], [{"t": "Str", "c": tikz_code}],
             [filename, ""]
         ]
+        info('Found TikZ image # %i', len(self.tikz_images)-1)
 
     # Navigating ast
 
@@ -142,18 +144,16 @@ class Tikz2Pdf(AbstractExtension):
 
     # extension events
 
-    def init(self, languages, output_dir_base, source_dir):
+    def start(self, output_dir, source_dir):
         """Unused."""
         self.tikz_images = list()
-        self.output_dir_base = output_dir_base
+        self.output_dir_base = output_dir
 
     def pre_conversion(self, language):
         """Unused."""
-        pass
 
     def pre_process_file(self, path):
         """Unused."""
-        pass
 
     def post_process_file(self, ast, _):
         """Unused."""
@@ -161,7 +161,6 @@ class Tikz2Pdf(AbstractExtension):
 
     def post_conversion(self, language):
         """Unused."""
-        pass
 
     def finish(self):
         """Unused."""
@@ -170,3 +169,5 @@ class Tikz2Pdf(AbstractExtension):
             chdir(temp_directory)
             self.create_files(temp_directory)
             chdir(current_dir)
+
+        info('Create %i TikZ images', len(self.tikz_images))
