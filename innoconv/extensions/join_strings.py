@@ -1,34 +1,36 @@
 """
-By default the generated JSON files split text up at each space. This gets
-fixed by concatenating the strings and spaces whenever that's possible.
+This extension modifies the AST. It merges consecutive sequences of strings and
+spaces into a single string element.
 
-If an array in the generated JSON contains consecutive strings and/or spaces
-(as defined in ``TYPES_TO_MERGE``), they get joined to a single element.
+The motivation behind this extension is to make the AST more readable and also
+to save space by compressing the representation. The actual appearance in a
+viewer should remain completely untouched.
 
-**Example**:
-``{"t": "Str", "c": "Hello"},{"t": "Space"},{"t": "Str", "c": "World!"}]``
-becomes
-``{"t": "Str", "c": "Hello World!"}]``
+=======
+Example
+=======
 
-This only happens with *consecutive* array elements *within* the same array. If
-there are multiple strings/spaces, followed by any other element, then only the
-strings/spaces will be merged. If the other element is followed by more
-strings/spaces, these will be merged to a new string. If the other element has
-child elements containing strings/spaces, each one will be merged to their own
-string
-"""
++--------+----------------------------------------------------------------------+
+| Before | ``{"t": "Str", "c": "Foo"},{"t": "Space"},{"t": "Str", "c": "b!"}]`` |
++--------+----------------------------------------------------------------------+
+| After  | ``{"t": "Str", "c": "Foo b!"}]``                                     |
++--------+----------------------------------------------------------------------+
+"""  # noqa: E501
 
 from innoconv.extensions.abstract import AbstractExtension
 
-#: Content Types to be merged - everything but Str is considered whitespace
-TYPES_TO_MERGE = ('Space', 'Str', 'SoftBreak')
+#: Type that represents a string
+STR_TYPE = 'Str'
+
+#: Content types that are merged
+TYPES_TO_MERGE = (STR_TYPE, 'Space', 'SoftBreak')
 
 
 class JoinStrings(AbstractExtension):
-    """This extension concatenates conescutive Strings and Spaces in the ast
-    tree"""
+    """This extension merges consecutive strings and spaces in the
+    AST."""
 
-    _helptext = "Simplifies strings in the generated JSON files."
+    _helptext = "Merge sequences of strings and spaces in the AST."
 
     def __init__(self, *args, **kwargs):
         super(JoinStrings, self).__init__(*args, **kwargs)
@@ -37,8 +39,8 @@ class JoinStrings(AbstractExtension):
     # content parsing
 
     def _process_ast_element(self, ast_element):
-        """Process an element form the ast tree, navigating further down
-        the tree if possible"""
+        """Process an element in the AST descending further down if
+        possible."""
         self.previous_element = None   # Stop merging on new element
         if isinstance(ast_element, list):
             self._process_ast_array(ast_element)
@@ -50,17 +52,16 @@ class JoinStrings(AbstractExtension):
             pass
 
     def _process_ast_array(self, ast_array):
-        """The first instance of mergeable content is stored
-        in self.previous_element. Every subsequent instance of
-        mergeable content gets added to the first instance,
-        and finally removed"""
+        """The first instance of mergeable content is stored in
+        self.previous_element. Every subsequent instance of mergeable content
+        gets added to the first instance and finally removed"""
         def is_string_or_space(content_element):
             """Checks if an ast element is mergeable, i.e. string or space"""
             try:
                 return content_element['t'] in TYPES_TO_MERGE
-            except (TypeError, KeyError):  # could be not a (valid) dictionary
+            except (TypeError, KeyError):  # could be an invalid dictionary
                 return False
-        self.previous_element = None  # Only merge within one array
+        self.previous_element = None
         to_delete = set()
         for pos, ast_element in enumerate(ast_array):
             if is_string_or_space(ast_element):
@@ -75,19 +76,19 @@ class JoinStrings(AbstractExtension):
         for index in to_delete:
             del ast_array[index - removed_items]
             removed_items += 1
-        self.previous_element = None  # Only merge within one array
-        # This last line is necessary for when we finish an array
-        # and go back to an array already being squished which contained it
+        # Necessary for when we finish an element list and go back to a list
+        # that has been processed already which contained it.
+        self.previous_element = None
 
     def _prepare_previous_element(self, content_element):
         """Normalizes self.previous_element to always be a Str"""
         self.previous_element = content_element
-        if self.previous_element['t'] != 'Str':
-            self.previous_element['t'] = 'Str'
+        if self.previous_element['t'] != STR_TYPE:
+            self.previous_element['t'] = STR_TYPE
             self.previous_element['c'] = ' '
 
     def _merge_to_previous_element(self, content_element):
-        if content_element['t'] == 'Str':
+        if content_element['t'] == STR_TYPE:
             self.previous_element['c'] += content_element['c']
         else:
             if not self.previous_element['c'].endswith(' '):
@@ -105,7 +106,7 @@ class JoinStrings(AbstractExtension):
         """Unused."""
 
     def post_process_file(self, ast, _):
-        """Concatenate the strings and spaces in the ast in-place."""
+        """Process AST in-place."""
         self._process_ast_element(ast)
 
     def post_conversion(self, language):
