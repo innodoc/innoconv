@@ -56,7 +56,7 @@ class Manifest():
         :param yaml_data: YAML representation of a manifest
         :type yaml_data: str
         """
-        data = yaml.load(yaml_data)
+        data = yaml.safe_load(yaml_data)
         return Manifest(data)
 
 
