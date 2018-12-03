@@ -9,7 +9,7 @@ from innoconv.extensions.abstract import AbstractExtension
 
 
 class GenerateToc(AbstractExtension):
-    """Generate a TOC automatically from content sections."""
+    """Generate a TOC from content sections."""
     _helptext = "Generate a table of contents."
 
     def __init__(self, *args, **kwargs):
@@ -20,8 +20,8 @@ class GenerateToc(AbstractExtension):
 
     def _add_to_toc(self, title):
         path_components = self._splitall(self._current_path)
-        path_components.pop(0)  # language
-        if not path_components:  # this is the root section
+        path_components.pop(0)  # language folder
+        if not path_components:  # skip root section
             return
         children = self._manifest.toc
         while path_components:

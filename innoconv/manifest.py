@@ -28,7 +28,7 @@ class Manifest():
     """Represents course metadata."""
 
     required_fields = ('title', 'languages')
-    optional_fields = ('keywords', 'custom_content', 'toc')
+    optional_fields = ('keywords', 'custom_content')
 
     def __init__(self, data):
         """Initialize a manifest.
@@ -68,12 +68,16 @@ class ManifestEncoder(json.JSONEncoder):
         # https://github.com/PyCQA/pylint/issues/414
         if isinstance(o, Manifest):
             manifest_dict = {}
+            # required fields
             for field in Manifest.required_fields:
                 manifest_dict[field] = getattr(o, field)
+            # optional fields
             for field in Manifest.optional_fields:
                 try:
                     manifest_dict[field] = getattr(o, field)
                 except AttributeError:
                     pass
+            # extra fields
+            manifest_dict['toc'] = o.toc
             return manifest_dict
         return super(ManifestEncoder, self).default(o)
