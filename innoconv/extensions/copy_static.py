@@ -28,12 +28,22 @@ Files can be referenced using relative or absolute paths.
 *Relative paths* are resolved to the root folder but have the chapters path
 fragment appended.
 
-**Example**:
-A reference to ``subdir/my_picture.png`` in ``/de/chapter01/content.md`` is
-resolved to ``/de/_static/chapter01/subdir/my_picture.png`` whereas
-``/subdir/my_picture.png`` (note the leading ``/``!) is resolved to
-``/de/_static/subdir/my_picture.png``.
-"""
+-------
+Example
+-------
+
+This example shows how a reference to an image is resolved. The references
+happen inside the section ``chapter01`` in the English language version.
+
++----------+------------------------------+------------------------------------------------+
+| Type     | Reference                    | Resolved to                                    |
++==========+==============================+================================================+
+| Relative | ``subdir/my_picture.png``    | ``en/_static/chapter01/subdir/my_picture.png`` |
++----------+------------------------------+------------------------------------------------+
+| Absolute | | ``/subdir/my_picture.png`` | ``en/_static/subdir/my_picture.png``           |
+|          | | (with leading ``/``)       |                                                |
++----------+------------------------------+------------------------------------------------+
+"""  # noqa: E501
 
 import logging
 import os.path

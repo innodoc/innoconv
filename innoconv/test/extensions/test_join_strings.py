@@ -15,9 +15,11 @@ PATHS = (
 
 class TestJoinStrings(TestExtension):
     @staticmethod
-    def _run(extension, ast=None, languages=('en',), paths=PATHS):
+    def _run(extension, ast=None, languages=('en',), paths=PATHS,
+             file_title=None):
         return TestExtension._run(
-            extension, ast, paths=paths, languages=languages)
+            extension, ast, paths=paths, languages=languages,
+            file_title=file_title)
 
     def test_join_strings_unchanged(self):
         examples = (
@@ -71,6 +73,14 @@ class TestJoinStrings(TestExtension):
                  {"t": "Str", "c": "B"}]
         expected = [{"t": "Str", "c": "A B"}]
         self._run(JoinStrings, given)
+        self.assertEqual(expected, given)
+
+    def test_join_strings_title(self):
+        given = [{"t": "Str", "c": "A"},
+                 {"t": "Space"},
+                 {"t": "Str", "c": "B"}]
+        expected = [{"t": "Str", "c": "A B"}]
+        self._run(JoinStrings, file_title=given)
         self.assertEqual(expected, given)
 
     def test_join_strings_complete_b(self):
