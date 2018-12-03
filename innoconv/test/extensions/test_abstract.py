@@ -25,7 +25,7 @@ class TestAbstractExtension(unittest.TestCase):
             ('start', ('source', 'output')),
             ('pre_conversion', ('en',)),
             ('pre_process_file', ('relpath',)),
-            ('post_process_file', (['ast'], 'Foo Title')),
+            ('post_process_file', (['ast'], ['Foo Title'])),
             ('post_conversion', ('en',)),
             ('finish', ()),
         )
