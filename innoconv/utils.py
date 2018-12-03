@@ -32,8 +32,14 @@ def to_ast(filepath):
     loaded = json.loads(out)
     blocks = loaded['blocks']
     try:
-        title = loaded['meta']['title']['c']
+        title_ast = loaded['meta']['title']['c']
     except KeyError:
         raise ValueError("Missing title in meta block in {}".format(filepath))
+    title = ''
+    for element in title_ast:
+        if element['t'] == 'Str':
+            title += element['c']
+        elif element['t'] == 'Space':
+            title += ' '
 
     return blocks, title

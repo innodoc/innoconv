@@ -14,7 +14,8 @@ class TestToAst(unittest.TestCase):
     def test_to_ast(self, popen_mock):
         """to_ast() calls pandoc"""
         pandoc_output = ('{"blocks":[{"t":"Para","c":[]}],"meta":{"title":'
-                         '{"t":"MetaInlines","c":[{"t":"Str","c":"Test"}]}}}')
+                         '{"t":"MetaInlines","c":[{"t":"Str","c":"Test"},'
+                         '{"t":"Space"},{"t":"Str","c":"Title"}]}}}')
         process_mock = mock.Mock()
         attrs = {
             'returncode': 0,
@@ -27,7 +28,7 @@ class TestToAst(unittest.TestCase):
 
         self.assertTrue(popen_mock.called)
         self.assertEqual(blocks, [{'t': 'Para', 'c': []}])
-        self.assertEqual(title, [{'t': 'Str', 'c': 'Test'}])
+        self.assertEqual(title, 'Test Title')
 
     @mock.patch('innoconv.utils.Popen')
     def test_to_ast_fails_without_title(self, popen_mock):

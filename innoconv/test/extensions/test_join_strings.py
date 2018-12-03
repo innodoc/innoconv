@@ -14,13 +14,11 @@ PATHS = (
 
 class TestJoinStrings(TestExtension):
     @staticmethod
-    def _run(extension, ast=None, languages=('en',), paths=PATHS,
-             file_title=None):
+    def _run(extension, ast=None, languages=('en',), paths=PATHS):
         return TestExtension._run(
-            extension, ast, paths=paths, languages=languages,
-            file_title=file_title)
+            extension, ast, paths=paths, languages=languages)
 
-    def test_join_strings_unchanged(self):
+    def test_unchanged(self):
         examples = (
             [{"t": "Str", "c": "A"}],
             [{"t": "Str", "c": "A B"}],
@@ -39,14 +37,14 @@ class TestJoinStrings(TestExtension):
                 self._run(JoinStrings, given)
                 self.assertEqual(expected, given)
 
-    def test_join_strings_str(self):
+    def test_str(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Str", "c": "B"}]
         expected = [{"t": "Str", "c": "AB"}]
         self._run(JoinStrings, given)
         self.assertEqual(expected, given)
 
-    def test_join_strings_space(self):
+    def test_space(self):
         examples = (
             [{"t": "Space"}],
             [{"t": "Space"}, {"t": "Space"}],
@@ -66,7 +64,7 @@ class TestJoinStrings(TestExtension):
                 self._run(JoinStrings, given)
                 self.assertEqual(expected, given)
 
-    def test_join_strings_complete_a(self):
+    def test_complete_a(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Str", "c": "B"}]
@@ -74,15 +72,7 @@ class TestJoinStrings(TestExtension):
         self._run(JoinStrings, given)
         self.assertEqual(expected, given)
 
-    def test_join_strings_title(self):
-        given = [{"t": "Str", "c": "A"},
-                 {"t": "Space"},
-                 {"t": "Str", "c": "B"}]
-        expected = [{"t": "Str", "c": "A B"}]
-        self._run(JoinStrings, file_title=given)
-        self.assertEqual(expected, given)
-
-    def test_join_strings_complete_b(self):
+    def test_complete_b(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Space"},
@@ -93,7 +83,7 @@ class TestJoinStrings(TestExtension):
         self._run(JoinStrings, given)
         self.assertEqual(expected, given)
 
-    def test_join_strings_ignore_unknown_a(self):
+    def test_ignore_unknown_a(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Foo", "c": "Bar"},
@@ -104,7 +94,7 @@ class TestJoinStrings(TestExtension):
         self._run(JoinStrings, given)
         self.assertEqual(expected, given)
 
-    def test_join_strings_ignore_unknown_b(self):
+    def test_ignore_unknown_b(self):
         given = [{"t": "Str", "c": "A"},
                  {"t": "Space"},
                  {"t": "Foo", "c": "Bar"},

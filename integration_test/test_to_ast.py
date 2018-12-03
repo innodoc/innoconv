@@ -12,15 +12,12 @@ FIXTURES_DIR = '{}/fixtures'.format(
 
 
 class TestToAst(unittest.TestCase):
-
     def test_to_ast(self):
         """to_ast() returns AST if given test Markdown document"""
 
         blocks, title = to_ast('{}/test_valid.md'.format(FIXTURES_DIR))
 
-        self.assertEqual(title[0], {'t': 'Str', 'c': 'Test'})
-        self.assertEqual(title[1], {'t': 'Space'})
-        self.assertEqual(title[2], {'t': 'Str', 'c': 'document'})
+        self.assertEqual(title, 'Test document')
 
         self.assertEqual(len(blocks), 9)
 

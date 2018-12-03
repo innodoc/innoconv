@@ -80,16 +80,16 @@ def main(args=None):
     logging.basicConfig(level=log_level, format=LOG_FORMAT)
 
     # read course manifest
-    def read_manifest_data(file_ext):
+    def _read_manifest_data(file_ext):
         filename = '{}.{}'.format(MANIFEST_BASENAME, file_ext)
         filepath = os.path.join(source_dir, filename)
         with open(filepath, 'r') as file:
             return file.read()
     try:
-        manifest_data = read_manifest_data('yml')
+        manifest_data = _read_manifest_data('yml')
     except FileNotFoundError:
         try:
-            manifest_data = read_manifest_data('yaml')
+            manifest_data = _read_manifest_data('yaml')
         except FileNotFoundError:
             logging.critical("Could not find manifest.yml!")
             return -2
