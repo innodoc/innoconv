@@ -44,9 +44,17 @@ class TestConversionTubBase(unittest.TestCase):
         self.assertEqual(job.returncode, 0)
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
-        self._test_content()
         self._test_verbose_output(stderr)
-        self._test_copy_static(stderr)
+        with self.subTest(extension='join_strings'):
+            self._test_content()
+        with self.subTest(extension='copystatic'):
+            self._test_copy_static(stderr)
+        with self.subTest(extension='tikz2svg'):
+            self._test_tikz2svg(stderr)
+        with self.subTest(extension='generate_toc'):
+            self._test_generate_toc(stderr)
+        with self.subTest(extension='write_manifest'):
+            self._test_write_manifest(stderr)
 
     def _test_converted_folders_present(self):
         for lang in ('de', 'en'):
@@ -128,3 +136,16 @@ class TestConversionTubBase(unittest.TestCase):
         self.assertIn(
             'Build finished!',
             stderr)
+
+    @unittest.skip('TODO')
+    def _test_tikz2svg(self, stderr):
+        # test content in tub_base has to be prepared
+        pass
+
+    @unittest.skip('TODO')
+    def _test_generate_toc(self, stderr):
+        pass
+
+    @unittest.skip('TODO')
+    def _test_write_manifest(self, stderr):
+        pass
