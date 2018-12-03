@@ -6,6 +6,8 @@ import copy
 
 from innoconv.extensions.join_strings import JoinStrings
 from innoconv.test.extensions import TestExtension
+from innoconv.test.utils import get_tricky_ast_parts
+
 
 PATHS = (
     ("Foo", ('foo',)),
@@ -142,11 +144,7 @@ class TestJoinStrings(TestExtension):
 
     def test_special_array(self):
         # Collection of simple special cases found in actual conversions
-        examples = (
-            [0, 1, 2],
-            [{'t': 'InlineMath'}, '\\frac12>\\frac23']
-        )
-        for given in examples:
+        for given in get_tricky_ast_parts():
             with self.subTest(given):
                 expected = copy.deepcopy(given)
                 self._run(JoinStrings, given)
