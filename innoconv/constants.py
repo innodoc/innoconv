@@ -28,3 +28,9 @@ LOG_FORMAT = '%(levelname)s:%(filename)s %(message)s'
 
 #: Static folder name
 STATIC_FOLDER = '_static'
+
+#: TikZ Folder Name
+TIKZ_FOLDER = '_tikz'
+
+#: TikZ to SVG filename
+TIKZ_FILENAME = 'tikz_{0:05d}.svg'

@@ -16,6 +16,7 @@ PATHS = (
     ("Title 2", ('title-2',)),
     ("Title 2-1", ('title-2', 'title-2-1')),
 )
+TEMP = '/temp'
 
 
 class TestExtension(unittest.TestCase):
