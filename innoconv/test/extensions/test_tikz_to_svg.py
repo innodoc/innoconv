@@ -2,7 +2,6 @@
 
 # pylint: disable=missing-docstring
 
-import unittest
 import copy
 import os
 import mock
@@ -12,7 +11,7 @@ from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME
 from innoconv.constants import ENCODING
 from innoconv.test.utils import get_tricky_ast_parts, get_manifest
 from innoconv.test.utils import get_image_ast
-from innoconv.test.extensions import SOURCE, TARGET, TEMP
+from innoconv.test.extensions import TestExtension, TARGET, TEMP
 
 TIKZSTRING = ("\\begin{tikzpicture}[x=1.0cm, y=1.0cm] \n"
               "\\draw[thick, black] (-5.2,0) -- (6.2,0);\n"
@@ -37,48 +36,58 @@ IMAGEBLOCK = get_image_ast(
     os.path.join(STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME.format(0)),
     title=TIKZSTRING)
 
+PATHS = (
+    ("Foo", ('foo',)),
+)
 
-class TestTikz2Pdf(unittest.TestCase):
+
+class TestTikz2Pdf(TestExtension):
 
     def __init__(self, arg):
         super(TestTikz2Pdf, self).__init__(arg)
         self.tikz2pdf = Tikz2Pdf(get_manifest())
 
+    @staticmethod
+    def _run(extension=None, ast=None, languages=('de',), paths=PATHS,
+             file_title=None):
+        return TestExtension._run(
+            Tikz2Pdf, ast, paths=PATHS, languages=languages, file_title=None)
+
     @mock.patch('innoconv.extensions.tikz2pdf.Popen')
-    @mock.patch('innoconv.extensions.tikz2pdf.critical')
-    def test_run(self, mock_critical, mock_popen):
+    def test_run(self, mock_popen):
         test_cmd = "x_call_x"
-        error_value = 'x_error_x'
         input_value = 'x_input_x'
         output_value = 'x_output_x'
-        mock_popen.return_value.stderr.read.return_value = error_value.encode(
-            ENCODING)
         mock_popen.return_value.stdout.read.return_value = output_value.encode(
             ENCODING)
+        mock_popen.return_value.returncode = 0
 
-        with self.subTest(returncode=0):
-            mock_popen.return_value.returncode = 0
+        with self.subTest(stdin=None):
             self.assertEqual(output_value, run(test_cmd))
             self.assertTrue(mock_popen.called)
+            mock_popen.reset_mock()
 
-        mock_popen.reset_mock()
-        with self.subTest(returncode=1):
-            mock_popen.return_value.returncode = 1
-            with self.assertRaises(RuntimeError):
-                run(test_cmd)
-            mock_critical.assert_has_calls([
-                mock.call(test_cmd),
-                mock.call('Error: %i', 1),
-                mock.call(error_value)
-            ])
-
-        mock_popen.reset_mock()
-        mock_critical.reset_mock()
         with self.subTest(stdin=input_value):
-            mock_popen.return_value.returncode = 0
             self.assertEqual(output_value, run(test_cmd, input_value))
             mock_popen.return_value.stdin.write.assert_called_with(
                 input_value.encode(ENCODING))
+
+    @mock.patch('innoconv.extensions.tikz2pdf.Popen')
+    @mock.patch('innoconv.extensions.tikz2pdf.critical')
+    def test_run_error(self, mock_critical, mock_popen):
+        test_cmd = "x_call_x"
+        error_value = 'x_error_x'
+        mock_popen.return_value.stderr.read.return_value = error_value.encode(
+            ENCODING)
+
+        mock_popen.return_value.returncode = 1
+        with self.assertRaises(RuntimeError):
+            run(test_cmd)
+        mock_critical.assert_has_calls([
+            mock.call(test_cmd),
+            mock.call('Error: %i', 1),
+            mock.call(error_value)
+        ])
 
     def test_replace_block(self):
         self.tikz2pdf.tikz_images = list()
@@ -127,18 +136,13 @@ class TestTikz2Pdf(unittest.TestCase):
                                mock_getcwd, mock_create_files):
         block = copy.deepcopy(TIKZBLOCK)
         current_dir = 'x_path_x'
-        temp_dir = 'x_path_x'
+        temp_dir = 'x_path_temp_x'
 
         mock_temporary_directory.return_value.__enter__.return_value = (
             temp_dir)
         mock_getcwd.return_value = current_dir
 
-        self.tikz2pdf.start(TARGET, SOURCE)
-        self.tikz2pdf.pre_conversion('de')
-        self.tikz2pdf.pre_process_file('de/path/example')
-        self.tikz2pdf.post_process_file([{'c': [block]}], 'example')
-        self.tikz2pdf.post_conversion('de')
-        self.tikz2pdf.finish()
+        tikz2pdf = self._run(ast=[{'c': [block]}])
 
         self.assertTrue(mock_getcwd.called)
         self.assertTrue(mock_temporary_directory.called)
@@ -148,4 +152,4 @@ class TestTikz2Pdf(unittest.TestCase):
         ])
         mock_create_files.assert_called_with(temp_dir)
         self.assertEqual(IMAGEBLOCK, block)
-        self.assertEqual(self.tikz2pdf.output_dir_base, TARGET)
+        self.assertEqual(tikz2pdf.output_dir_base, TARGET)
