@@ -8,25 +8,6 @@ from os.path import join
 from innoconv.manifest import Manifest
 from innoconv.test.utils import get_filler_content
 
-
-def make_title(string_title, language):
-    str_array = string_title.split(' ')
-    title_ast = []
-    for title_part in str_array:
-        title_ast.append({
-            't': "Str",
-            'c': title_part
-        })
-        title_ast.append({
-            't': "Space"
-        })
-    title_ast.append({
-        't': "Str",
-        'c': language
-    })
-    return title_ast
-
-
 SOURCE = '/source'
 TARGET = '/target'
 PATHS = (
@@ -39,8 +20,7 @@ PATHS = (
 
 class TestExtension(unittest.TestCase):
     @staticmethod
-    def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS,
-             file_title=None):
+    def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS):
         if ast is None:
             ast = get_filler_content()
         title = {}
@@ -56,11 +36,7 @@ class TestExtension(unittest.TestCase):
             ext.pre_conversion(language)
             for title, path in paths:
                 ext.pre_process_file(join(language, *path))
-                if file_title is not None:
-                    title = file_title
-                else:
-                    title = make_title(title, language)
-                ext.post_process_file(ast, title)
+                ext.post_process_file(ast, "{} {}".format(title, language))
             ext.post_conversion(language)
         ext.finish()
         return ext

@@ -105,10 +105,9 @@ class JoinStrings(AbstractExtension):
     def pre_process_file(self, path):
         """Unused."""
 
-    def post_process_file(self, ast, title):
+    def post_process_file(self, ast, _):
         """Process AST in-place."""
         self._process_ast_element(ast)
-        self._process_ast_array(title)  # Title consist of strings too
 
     def post_conversion(self, language):
         """Unused."""
