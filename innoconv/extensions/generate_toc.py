@@ -23,10 +23,7 @@ class GenerateToc(AbstractExtension):
         path_components.pop(0)  # language
         if not path_components:  # this is the root section
             return
-        try:
-            children = self._manifest.toc[self._language]
-        except KeyError:
-            children = self._manifest.toc[self._language] = []
+        children = self._manifest.toc
         while path_components:
             section_id = path_components.pop(0)
             # find/create child leaf
@@ -43,8 +40,12 @@ class GenerateToc(AbstractExtension):
             if not found:
                 children.append({
                     'id': section_id,
-                    'title': title,
+                    'title': {
+                        self._language: title
+                    },
                 })
+        if found:
+            found['title'][self._language] = title
 
     @staticmethod
     def _splitall(path):

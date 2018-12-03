@@ -28,7 +28,7 @@ class Manifest():
     """Represents course metadata."""
 
     required_fields = ('title', 'languages')
-    optional_fields = ('keywords', 'custom_content')
+    optional_fields = ('keywords', 'custom_content', 'toc')
 
     def __init__(self, data):
         """Initialize a manifest.
@@ -47,7 +47,7 @@ class Manifest():
                 setattr(self, field, data[field])
             except KeyError:
                 pass
-        self.toc = {}
+        self.toc = []
 
     @classmethod
     def from_yaml(cls, yaml_data):
