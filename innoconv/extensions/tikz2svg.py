@@ -49,14 +49,14 @@ def run(cmd, stdin=None):
     return pipe.stdout.read().decode(ENCODING)
 
 
-class Tikz2Pdf(AbstractExtension):
+class Tikz2Svg(AbstractExtension):
     """This extension converts TikZ images to svg images, and embeds
     them in the content"""
 
     _helptext = "Converts TikZ to SVG"
 
     def __init__(self, *args, **kwargs):
-        super(Tikz2Pdf, self).__init__(*args, **kwargs)
+        super(Tikz2Svg, self).__init__(*args, **kwargs)
         self.output_dir_base = None
         self.tmp_dir = None
         self.tikz_images = None
@@ -87,8 +87,8 @@ class Tikz2Pdf(AbstractExtension):
             return
         try:
             try:
-                if (ast_element["t"] == "CodeBlock" and
-                        ast_element["c"][0][1][0] == "tikz"):
+                if (ast_element["t"] == "CodeBlock"
+                        and ast_element["c"][0][1][0] == "tikz"):
                     self.replace_tikz_element(ast_element)
                     return
             except (TypeError, KeyError):

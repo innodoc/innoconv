@@ -1,4 +1,4 @@
-"""Unit tests for tikz2pdf extension"""
+"""Unit tests for tikz2svg extension"""
 
 # pylint: disable=missing-docstring
 
@@ -6,7 +6,7 @@ import copy
 import os
 import mock
 
-from innoconv.extensions.tikz2pdf import Tikz2Pdf, run
+from innoconv.extensions.tikz2svg import Tikz2Svg, run
 from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME
 from innoconv.constants import ENCODING
 from innoconv.test.utils import get_tricky_ast_parts, get_manifest
@@ -41,18 +41,18 @@ PATHS = (
 )
 
 
-class TestTikz2Pdf(TestExtension):
+class TestTikz2Svg(TestExtension):
 
     def __init__(self, arg):
-        super(TestTikz2Pdf, self).__init__(arg)
-        self.tikz2pdf = Tikz2Pdf(get_manifest())
+        super(TestTikz2Svg, self).__init__(arg)
+        self.tikz2svg = Tikz2Svg(get_manifest())
 
     @staticmethod
     def _run(extension=None, ast=None, languages=('de',), paths=PATHS):
         return TestExtension._run(
-            Tikz2Pdf, ast, paths=PATHS, languages=languages)
+            Tikz2Svg, ast, paths=PATHS, languages=languages)
 
-    @mock.patch('innoconv.extensions.tikz2pdf.Popen')
+    @mock.patch('innoconv.extensions.tikz2svg.Popen')
     def test_run(self, mock_popen):
         test_cmd = "x_call_x"
         input_value = 'x_input_x'
@@ -71,8 +71,8 @@ class TestTikz2Pdf(TestExtension):
             mock_popen.return_value.stdin.write.assert_called_with(
                 input_value.encode(ENCODING))
 
-    @mock.patch('innoconv.extensions.tikz2pdf.Popen')
-    @mock.patch('innoconv.extensions.tikz2pdf.critical')
+    @mock.patch('innoconv.extensions.tikz2svg.Popen')
+    @mock.patch('innoconv.extensions.tikz2svg.critical')
     def test_run_error(self, mock_critical, mock_popen):
         test_cmd = "x_call_x"
         error_value = 'x_error_x'
@@ -89,26 +89,26 @@ class TestTikz2Pdf(TestExtension):
         ])
 
     def test_replace_block(self):
-        self.tikz2pdf.tikz_images = list()
+        self.tikz2svg.tikz_images = list()
         block = copy.deepcopy(TIKZBLOCK)
-        self.tikz2pdf.replace_tikz_element(block)
+        self.tikz2svg.replace_tikz_element(block)
         self.assertEqual(block, IMAGEBLOCK)
-        self.assertIn(TIKZSTRING, self.tikz2pdf.tikz_images)
+        self.assertIn(TIKZSTRING, self.tikz2svg.tikz_images)
 
     def test_tricky_ast(self):
         for test in get_tricky_ast_parts():
             with self.subTest(test=test):
-                self.tikz2pdf.post_process_file(test, None)
+                self.tikz2svg.post_process_file(test, None)
 
     @mock.patch("builtins.open", new_callable=mock.mock_open, read_data="data")
-    @mock.patch('innoconv.extensions.tikz2pdf.copy_tree')
-    @mock.patch('innoconv.extensions.tikz2pdf.mkdir')
-    @mock.patch('innoconv.extensions.tikz2pdf.run')
+    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
+    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    @mock.patch('innoconv.extensions.tikz2svg.run')
     def test_conversion(self, mock_run, mock_mkdir, mock_copy_tree, mock_open):
-        self.tikz2pdf.tikz_images = list()
-        self.tikz2pdf.tikz_images.append(TIKZSTRING)
-        self.tikz2pdf.output_dir_base = TARGET
-        self.tikz2pdf.create_files(TEMP)
+        self.tikz2svg.tikz_images = list()
+        self.tikz2svg.tikz_images.append(TIKZSTRING)
+        self.tikz2svg.output_dir_base = TARGET
+        self.tikz2svg.create_files(TEMP)
 
         tex_file_path = os.path.join(TEMP, 'input.tex')
         mock_open.assert_called_with(tex_file_path, 'w+')
@@ -127,10 +127,10 @@ class TestTikz2Pdf(TestExtension):
         mock_mkdir.assert_called_with(svgs_path)
         mock_copy_tree.assert_called_with(svgs_path, ouput_path, update=1)
 
-    @mock.patch('innoconv.extensions.tikz2pdf.Tikz2Pdf.create_files')
-    @mock.patch('innoconv.extensions.tikz2pdf.getcwd')
-    @mock.patch('innoconv.extensions.tikz2pdf.chdir')
-    @mock.patch('innoconv.extensions.tikz2pdf.TemporaryDirectory')
+    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg.create_files')
+    @mock.patch('innoconv.extensions.tikz2svg.getcwd')
+    @mock.patch('innoconv.extensions.tikz2svg.chdir')
+    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
     def test_simple_life_cycle(self, mock_temporary_directory, mock_chdir,
                                mock_getcwd, mock_create_files):
         block = copy.deepcopy(TIKZBLOCK)
@@ -141,7 +141,7 @@ class TestTikz2Pdf(TestExtension):
             temp_dir)
         mock_getcwd.return_value = current_dir
 
-        tikz2pdf = self._run(ast=[{'c': [block]}])
+        tikz2svg = self._run(ast=[{'c': [block]}])
 
         self.assertTrue(mock_getcwd.called)
         self.assertTrue(mock_temporary_directory.called)
@@ -151,4 +151,4 @@ class TestTikz2Pdf(TestExtension):
         ])
         mock_create_files.assert_called_with(temp_dir)
         self.assertEqual(IMAGEBLOCK, block)
-        self.assertEqual(tikz2pdf.output_dir_base, TARGET)
+        self.assertEqual(tikz2svg.output_dir_base, TARGET)

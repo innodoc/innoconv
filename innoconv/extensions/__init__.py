@@ -7,7 +7,7 @@ from innoconv.extensions.copy_static import CopyStatic
 from innoconv.extensions.generate_toc import GenerateToc
 from innoconv.extensions.join_strings import JoinStrings
 from innoconv.extensions.write_manifest import WriteManifest
-from innoconv.extensions.tikz2pdf import Tikz2Pdf
+from innoconv.extensions.tikz2svg import Tikz2Svg
 
 #: List of available extensions
 EXTENSIONS = {
@@ -15,5 +15,5 @@ EXTENSIONS = {
     'generate_toc': GenerateToc,
     'join_strings': JoinStrings,
     'write_manifest': WriteManifest,
-    'tikz2pdf': Tikz2Pdf
+    'tikz2svg': Tikz2Svg
 }
