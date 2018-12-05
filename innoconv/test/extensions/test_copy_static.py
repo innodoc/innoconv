@@ -114,7 +114,7 @@ class TestCopyStatic(TestExtension):
     def test_only_en_present(self, copyfile, isfile, *_):
         ast = [get_image_ast('localizable.gif')]
         languages = ('en', 'la')
-        isfile.side_effect = itertools.cycle((True, False, True))
+        isfile.side_effect = lambda p: '/la/' not in p
         self._run(CopyStatic, ast, languages=languages)
         self.assertEqual(copyfile.call_count, 8)
         for lang_path in (('en',), ()):

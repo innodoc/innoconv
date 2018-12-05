@@ -120,8 +120,14 @@ class CopyStatic(AbstractExtension):
         try:
             path = self._get_path(link)
             self._to_copy.add(path)
+            if self._localized_exists(path):
+                image_element['c'][0][1].append('localized')
         except ValueError:
             pass
+
+    def _localized_exists(self, path):
+        local_path = self._get_file_path(path, self._current_language)
+        return os.path.isfile(local_path)
 
     def _get_path(self, path):
         """Build resulting copy path from resource reference."""
@@ -138,21 +144,24 @@ class CopyStatic(AbstractExtension):
 
     # file copying
 
+    def _get_file_path(self, path, lang='', base_dir=None):
+        """Generate static file path."""
+        if base_dir is None:
+            base_dir = self._source_dir
+        return os.path.join(base_dir, lang, STATIC_FOLDER, path)
+
     def _copy_files(self):
-        def get_file_path(root_dir, path, lang=''):
-            """Generate static file path."""
-            return os.path.join(root_dir, lang, STATIC_FOLDER, path)
 
         logging.info("%d files found.", len(self._to_copy))
         for path in self._to_copy:
             for lang in self._manifest.languages:
                 # localized version of file
-                src = get_file_path(self._source_dir, path, lang)
-                dst = get_file_path(self._output_dir, path, lang)
+                src = self._get_file_path(path, lang)
+                dst = self._get_file_path(path, lang, self._output_dir)
                 if not os.path.isfile(src):
                     # common version as fallback
-                    src = get_file_path(self._source_dir, path)
-                    dst = get_file_path(self._output_dir, path)
+                    src = self._get_file_path(path)
+                    dst = self._get_file_path(path, self._output_dir)
                     if not os.path.isfile(src):
                         msg = "Missing static file {}".format(path)
                         raise RuntimeError(msg)

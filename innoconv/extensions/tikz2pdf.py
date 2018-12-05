@@ -68,7 +68,7 @@ class Tikz2Pdf(AbstractExtension):
         tikz_code = element['c'][1]
         self.tikz_images.append(tikz_code)
         filename = TIKZ_FILENAME.format(len(self.tikz_images)-1)
-        filename = join(STATIC_FOLDER, TIKZ_FOLDER, filename)
+        filename = '/'+join(TIKZ_FOLDER, filename)
         element['t'] = "Image"
         element['c'] = [
             ["", [], []], [{"t": "Str", "c": tikz_code}],

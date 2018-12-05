@@ -33,7 +33,7 @@ TIKZBLOCK = {
 }
 
 IMAGEBLOCK = get_image_ast(
-    os.path.join(STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME.format(0)),
+    '/'+os.path.join(TIKZ_FOLDER, TIKZ_FILENAME.format(0)),
     title=TIKZSTRING)
 
 PATHS = (
