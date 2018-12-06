@@ -18,7 +18,7 @@ PATHS = (
 
 class TestGenerateToc(TestExtension):
     def test_generate_toc(self):
-        generate_toc = self._run(GenerateToc, paths=PATHS)
+        generate_toc, _ = self._run(GenerateToc, paths=PATHS)
         manifest = generate_toc._manifest  # pylint: disable=protected-access
         toc = manifest.toc
         self.assertIs(len(toc), 2)

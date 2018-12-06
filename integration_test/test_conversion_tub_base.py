@@ -80,30 +80,31 @@ class TestConversionTubBase(unittest.TestCase):
 
     def _test_copy_static(self, stderr):
         self.assertTrue(isdir(join(self.output_dir, STATIC_FOLDER)))
-        self.assertTrue(isdir(join(self.output_dir, 'de', STATIC_FOLDER)))
+        self.assertTrue(isdir(join(self.output_dir, STATIC_FOLDER, '_de')))
         self.assertTrue(isfile(join(self.output_dir,
                                     STATIC_FOLDER,
                                     'adam.jpg')))
         self.assertTrue(isfile(join(self.output_dir,
-                                    'de',
                                     STATIC_FOLDER,
+                                    '_de',
                                     'flag.png')))
         self.assertTrue(isfile(join(self.output_dir,
-                                    'de',
                                     STATIC_FOLDER,
+                                    '_de',
                                     '02-elements',
                                     '06-media',
                                     'TU_Logo.png')))
         self.assertFalse(
             isfile(join(self.output_dir, STATIC_FOLDER, 'flag.png')))
         self.assertFalse(
-            isfile(join(self.output_dir, 'de', STATIC_FOLDER, 'TESTFILE.txt')))
-        self.assertIn('6 files found', stderr)
+            isfile(
+                join(self.output_dir, STATIC_FOLDER, '_de', 'TESTFILE.txt')))
+        self.assertIn('8 files found', stderr)
         self.assertIn(
             join(
                 self.output_dir,
-                'de',
                 STATIC_FOLDER,
+                '_de',
                 '02-elements',
                 '06-media',
                 'TU_Logo.png'),
