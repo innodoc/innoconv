@@ -110,58 +110,72 @@ class CopyStatic(AbstractExtension):
         self._process_ast_array(content)
         if self._link_is_video(link_element):
             try:
-                path = self._get_path(link)
-                self._to_copy.add(path)
+                link_element['c'][2][0] = self._add_static(link)
             except ValueError:
                 pass
 
     def _process_image(self, image_element):
         link = image_element['c'][2][0]
         try:
-            path = self._get_path(link)
-            self._to_copy.add(path)
+            image_element['c'][2][0] = self._add_static(link)
         except ValueError:
             pass
 
-    def _get_path(self, path):
-        """Build resulting copy path from resource reference."""
-        # remote resource
-        if parse.urlparse(path).scheme:
+    def _add_static(self, orig_path):
+        """Remember paths to copy and rewrite URL."""
+        def _get_src_file_path(root_dir, _path, _sec_path, lang=''):
+            return os.path.join(
+                root_dir, lang, STATIC_FOLDER, _sec_path, _path)
+
+        def _get_dest_file_path(root_dir, _path, _sec_path, lang=''):
+            if lang:
+                lang = '_{}'.format(lang)
+            return os.path.join(
+                root_dir, STATIC_FOLDER, lang, _sec_path, _path)
+
+        # skip remote resource
+        if parse.urlparse(orig_path).scheme:
             raise ValueError()
-        # absolute (relative to static folder)
-        if os.path.isabs(path):
-            return path[1:]
-        # relative (prefixed with section path)
-        path_prefix = self._current_path.replace(self._current_language, '', 1)
-        path_prefix = path_prefix.rstrip('/')
-        return os.path.join(path_prefix, path).lstrip('/')
+
+        # relative to section?
+        if orig_path[0] == '/':
+            ref_path = orig_path[1:]
+            section_path = ''
+        else:
+            ref_path = orig_path
+            section_path = self._current_path[3:]  # strip language
+            if section_path:
+                section_path = '{}/'.format(section_path.strip('/'))
+
+        # localized version
+        src = _get_src_file_path(
+            self._source_dir, ref_path, section_path, self._current_language)
+        dst = _get_dest_file_path(
+            self._output_dir, ref_path, section_path, self._current_language)
+        rewritten = '_{}/{}{}'.format(
+            self._current_language, section_path, ref_path)
+        if not os.path.isfile(src):
+            # common version
+            src = _get_src_file_path(self._source_dir, ref_path, section_path)
+            dst = _get_dest_file_path(self._output_dir, ref_path, section_path)
+            rewritten = '{}{}'.format(section_path, ref_path)
+            if not os.path.isfile(src):
+                msg = "Missing static file {}".format(orig_path)
+                raise RuntimeError(msg)
+
+        self._to_copy.add((src, dst))
+        return rewritten
 
     # file copying
-
     def _copy_files(self):
-        def get_file_path(root_dir, path, lang=''):
-            """Generate static file path."""
-            return os.path.join(root_dir, lang, STATIC_FOLDER, path)
-
         logging.info("%d files found.", len(self._to_copy))
-        for path in self._to_copy:
-            for lang in self._manifest.languages:
-                # localized version of file
-                src = get_file_path(self._source_dir, path, lang)
-                dst = get_file_path(self._output_dir, path, lang)
-                if not os.path.isfile(src):
-                    # common version as fallback
-                    src = get_file_path(self._source_dir, path)
-                    dst = get_file_path(self._output_dir, path)
-                    if not os.path.isfile(src):
-                        msg = "Missing static file {}".format(path)
-                        raise RuntimeError(msg)
-                # create folders as needed
-                folder = os.path.dirname(dst)
-                if not os.path.lexists(folder):
-                    os.makedirs(folder)
-                logging.info(" %s -> %s", src, dst)
-                shutil.copyfile(src, dst)
+        for src, dst in self._to_copy:
+            # create folders as needed
+            folder = os.path.dirname(dst)
+            if not os.path.lexists(folder):
+                os.makedirs(folder)
+            logging.info(" %s -> %s", src, dst)
+            shutil.copyfile(src, dst)
 
     # extension events
 

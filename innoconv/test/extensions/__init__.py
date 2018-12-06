@@ -2,6 +2,7 @@
 
 # pylint: disable=missing-docstring
 
+from copy import deepcopy
 import unittest
 from os.path import join
 
@@ -32,11 +33,15 @@ class TestExtension(unittest.TestCase):
         })
         ext = extension(manifest)
         ext.start(DEST, SOURCE)
+        asts = []
         for language in languages:
             ext.pre_conversion(language)
             for title, path in paths:
                 ext.pre_process_file(join(language, *path))
-                ext.post_process_file(ast, "{} {}".format(title, language))
+                file_ast = deepcopy(ast)
+                asts.append(file_ast)
+                file_title = "{} {}".format(title, language)
+                ext.post_process_file(file_ast, file_title)
             ext.post_conversion(language)
         ext.finish()
-        return ext
+        return ext, asts
