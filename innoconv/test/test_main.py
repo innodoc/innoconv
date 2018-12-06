@@ -3,8 +3,8 @@
 # pylint: disable=missing-docstring
 
 import unittest
+from unittest.mock import call, DEFAULT, mock_open, patch
 from argparse import ArgumentParser, Namespace
-import mock
 
 import innoconv.__main__
 from innoconv.test.utils import get_manifest
@@ -26,13 +26,13 @@ class TestGetArgs(unittest.TestCase):
         self.assertIsInstance(args, ArgumentParser)
 
 
-@mock.patch('builtins.open', new_callable=mock.mock_open)
-@mock.patch('innoconv.__main__.Manifest.from_yaml', return_value=MANIFEST)
-@mock.patch('argparse.ArgumentParser.parse_args',
-            return_value=Namespace(**DEFAULT_ARGS))
-@mock.patch('innoconv.__main__.InnoconvRunner.__init__', return_value=None)
-@mock.patch('innoconv.__main__.InnoconvRunner.run')
-@mock.patch.multiple('logging', info=mock.DEFAULT, critical=mock.DEFAULT)
+@patch('builtins.open', new_callable=mock_open)
+@patch('innoconv.__main__.Manifest.from_yaml', return_value=MANIFEST)
+@patch('argparse.ArgumentParser.parse_args',
+       return_value=Namespace(**DEFAULT_ARGS))
+@patch('innoconv.__main__.InnoconvRunner.__init__', return_value=None)
+@patch('innoconv.__main__.InnoconvRunner.run')
+@patch.multiple('logging', info=DEFAULT, critical=DEFAULT)
 class TestMain(unittest.TestCase):
     def test_main(self, runner_run, runner_init, *_, **logging):
         log = logging['info']
@@ -45,7 +45,7 @@ class TestMain(unittest.TestCase):
         self.assertIs(manifest, MANIFEST)
         self.assertEqual(extension, 'copy_static')
         self.assertTrue(runner_run.called)
-        self.assertEqual(log.call_args, mock.call('Build finished!'))
+        self.assertEqual(log.call_args, call('Build finished!'))
 
     def test_main_logs_error(self, runner_run, runner_init, *_, **logging):
         log = logging['critical']
@@ -54,11 +54,11 @@ class TestMain(unittest.TestCase):
         self.assertEqual(return_value, 1)
         self.assertTrue(runner_init.called)
         err = 'Something went wrong: Oooops'
-        self.assertEqual(log.call_args, mock.call(err))
+        self.assertEqual(log.call_args, call(err))
 
     def test_main_no_manifest(self, *args, **_):
-        _, _, _, _, mock_open = args
-        mock_open.side_effect = FileNotFoundError()
+        _, _, _, _, mocked_open = args
+        mocked_open.side_effect = FileNotFoundError()
         return_value = innoconv.__main__.main()
         self.assertEqual(return_value, -2)
 
@@ -72,9 +72,9 @@ class TestMain(unittest.TestCase):
 
 
 class TestMainInit(unittest.TestCase):
-    @mock.patch('sys.exit')
-    @mock.patch.object(innoconv.__main__, '__name__', '__main__')
-    @mock.patch('innoconv.__main__.main')
+    @patch('sys.exit')
+    @patch.object(innoconv.__main__, '__name__', '__main__')
+    @patch('innoconv.__main__.main')
     def test_main_init(self, main, sys_exit):
         main.return_value = 19
         innoconv.__main__.init()
