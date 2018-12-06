@@ -3,7 +3,7 @@
 # pylint: disable=missing-docstring,too-many-instance-attributes
 
 import unittest
-import mock
+from unittest.mock import call, DEFAULT, patch
 
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.manifest import Manifest
@@ -75,12 +75,12 @@ TITLE = [
 ]
 
 
-@mock.patch('builtins.open')
-@mock.patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
-@mock.patch('json.dump')
-@mock.patch('innoconv.runner.walk', side_effect=walk_side_effect)
-@mock.patch('innoconv.runner.makedirs')
-@mock.patch('innoconv.runner.isdir', return_value=True)
+@patch('builtins.open')
+@patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
+@patch('json.dump')
+@patch('innoconv.runner.walk', side_effect=walk_side_effect)
+@patch('innoconv.runner.makedirs')
+@patch('innoconv.runner.isdir', return_value=True)
 class TestInnoconvRunner(unittest.TestCase):
     def setUp(self):
         self.runner = InnoconvRunner('/src', '/out', MANIFEST, [])
@@ -104,7 +104,7 @@ class TestInnoconvRunner(unittest.TestCase):
                 '/out/en/section-2')):
             with self.subTest(path):
                 self.assertEqual(
-                    makedirs.call_args_list[i], mock.call(path, exist_ok=True))
+                    makedirs.call_args_list[i], call(path, exist_ok=True))
                 self.assertEqual(
                     json_dump.call_args_list[i][0][0], ['content_ast'])
 
@@ -126,15 +126,15 @@ class TestInnoconvRunner(unittest.TestCase):
             self.runner.run()
 
 
-@mock.patch('builtins.open')
-@mock.patch('innoconv.runner.EXTENSIONS', {'my_ext': AbstractExtension})
-@mock.patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
-@mock.patch('json.dump')
-@mock.patch('innoconv.runner.walk', side_effect=walk_side_effect)
-@mock.patch('innoconv.runner.makedirs')
-@mock.patch('innoconv.runner.isdir', return_value=True)
-@mock.patch('innoconv.extensions.abstract.AbstractExtension.__init__',
-            return_value=None)
+@patch('builtins.open')
+@patch('innoconv.runner.EXTENSIONS', {'my_ext': AbstractExtension})
+@patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
+@patch('json.dump')
+@patch('innoconv.runner.walk', side_effect=walk_side_effect)
+@patch('innoconv.runner.makedirs')
+@patch('innoconv.runner.isdir', return_value=True)
+@patch('innoconv.extensions.abstract.AbstractExtension.__init__',
+       return_value=None)
 class TestInnoconvRunnerExtensions(unittest.TestCase):
     def test_valid_ext(self, init, *_):
         extensions = ('my_ext',)
@@ -146,14 +146,14 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             InnoconvRunner('/src', '/out', MANIFEST, extensions)
 
-    @mock.patch.multiple(
+    @patch.multiple(
         'innoconv.extensions.abstract.AbstractExtension',
-        start=mock.DEFAULT,
-        pre_conversion=mock.DEFAULT,
-        pre_process_file=mock.DEFAULT,
-        post_process_file=mock.DEFAULT,
-        post_conversion=mock.DEFAULT,
-        finish=mock.DEFAULT,
+        start=DEFAULT,
+        pre_conversion=DEFAULT,
+        pre_process_file=DEFAULT,
+        post_process_file=DEFAULT,
+        post_conversion=DEFAULT,
+        finish=DEFAULT,
     )
     def test_notify_ext(self, *_, **mocks):
         extensions = ('my_ext',)
@@ -161,45 +161,45 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         runner.run()
 
         self.assertEqual(mocks['start'].call_count, 1)
-        self.assertEqual(mocks['start'].call_args, mock.call('/out', '/src'))
+        self.assertEqual(mocks['start'].call_args, call('/out', '/src'))
 
         self.assertEqual(mocks['pre_conversion'].call_count, 2)
         self.assertEqual(mocks['pre_conversion'].call_args_list[0],
-                         mock.call('de'))
+                         call('de'))
         self.assertEqual(mocks['pre_conversion'].call_args_list[1],
-                         mock.call('en'))
+                         call('en'))
 
         self.assertEqual(mocks['pre_process_file'].call_count, 10)
         self.assertEqual(mocks['pre_process_file'].call_args_list[0],
-                         mock.call('de'))
+                         call('de'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[1],
-                         mock.call('de/section-1'))
+                         call('de/section-1'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[2],
-                         mock.call('de/section-1/section-1.1'))
+                         call('de/section-1/section-1.1'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[3],
-                         mock.call('de/section-1/section-1.2'))
+                         call('de/section-1/section-1.2'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[4],
-                         mock.call('de/section-2'))
+                         call('de/section-2'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[5],
-                         mock.call('en'))
+                         call('en'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[6],
-                         mock.call('en/section-1'))
+                         call('en/section-1'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[7],
-                         mock.call('en/section-1/section-1.1'))
+                         call('en/section-1/section-1.1'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[8],
-                         mock.call('en/section-1/section-1.2'))
+                         call('en/section-1/section-1.2'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[9],
-                         mock.call('en/section-2'))
+                         call('en/section-2'))
 
         self.assertEqual(mocks['post_process_file'].call_count, 10)
         for i in range(0, 10):
             self.assertEqual(mocks['post_process_file'].call_args_list[i],
-                             mock.call(['content_ast'], TITLE))
+                             call(['content_ast'], TITLE))
 
         self.assertEqual(mocks['post_conversion'].call_count, 2)
         self.assertEqual(mocks['post_conversion'].call_args_list[0],
-                         mock.call('de'))
+                         call('de'))
         self.assertEqual(mocks['post_conversion'].call_args_list[1],
-                         mock.call('en'))
+                         call('en'))
 
         self.assertEqual(mocks['finish'].call_count, 1)

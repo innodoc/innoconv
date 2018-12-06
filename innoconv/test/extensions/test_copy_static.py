@@ -4,28 +4,28 @@
 
 from os.path import join
 import itertools
-import mock
+from unittest.mock import call, patch
 
 from innoconv.extensions.copy_static import CopyStatic
 from innoconv.constants import STATIC_FOLDER
 from innoconv.test.utils import (
     get_filler_content, get_image_ast, get_video_ast, get_generic_link_ast,
     get_para_ast, get_youtube_ast)
-from innoconv.test.extensions import SOURCE, TARGET, PATHS, TestExtension
+from innoconv.test.extensions import SOURCE, DEST, PATHS, TestExtension
 
 
-@mock.patch('os.makedirs', return_value=True)
-@mock.patch('os.path.lexists', return_value=True)
-@mock.patch('os.path.isfile', side_effect=itertools.cycle((True,)))
-@mock.patch('shutil.copyfile')
+@patch('os.makedirs', return_value=True)
+@patch('os.path.lexists', return_value=True)
+@patch('os.path.isfile', side_effect=itertools.cycle((True,)))
+@patch('shutil.copyfile')
 class TestCopyStatic(TestExtension):
     def test_absolute_localized(self, copyfile, *_):
         self._run(
             CopyStatic, [get_image_ast('/present.jpg')], languages=('en',))
         self.assertEqual(copyfile.call_count, 1)
         src = join(SOURCE, 'en', STATIC_FOLDER, 'present.jpg')
-        target = join(TARGET, 'en', STATIC_FOLDER, 'present.jpg')
-        self.assertEqual(mock.call(src, target), copyfile.call_args)
+        dst = join(DEST, 'en', STATIC_FOLDER, 'present.jpg')
+        self.assertEqual(call(src, dst), copyfile.call_args)
 
     def test_absolute_nonlocalized(self, copyfile, isfile, *_):
         isfile.side_effect = itertools.cycle((False, True))
@@ -33,8 +33,8 @@ class TestCopyStatic(TestExtension):
             CopyStatic, [get_image_ast('/present.jpg')], languages=('en',))
         self.assertEqual(copyfile.call_count, 1)
         src = join(SOURCE, STATIC_FOLDER, 'present.jpg')
-        target = join(TARGET, STATIC_FOLDER, 'present.jpg')
-        self.assertEqual(mock.call(src, target), copyfile.call_args)
+        dst = join(DEST, STATIC_FOLDER, 'present.jpg')
+        self.assertEqual(call(src, dst), copyfile.call_args)
 
     def test_example(self, copyfile, *_):
         ast = [
@@ -100,16 +100,16 @@ class TestCopyStatic(TestExtension):
         self._run(CopyStatic, ast, languages=('en',))
         self.assertEqual(copyfile.call_count, 1)
 
-    def test_make_target_dirs(self, *args):
+    def test_make_dst_dirs(self, *args):
         _, _, lexists, makedirs = args
         lexists.return_value = False
         ast = [get_image_ast('test.png')]
         self._run(CopyStatic, ast, languages=('en',))
         self.assertEqual(makedirs.call_count, 4)
         for _, path in PATHS:
-            call = mock.call(join(TARGET, 'en', STATIC_FOLDER, *path))
-            with self.subTest(call):
-                self.assertIn(call, makedirs.call_args_list)
+            call_args = call(join(DEST, 'en', STATIC_FOLDER, *path))
+            with self.subTest(call_args):
+                self.assertIn(call_args, makedirs.call_args_list)
 
     def test_only_en_present(self, copyfile, isfile, *_):
         ast = [get_image_ast('localizable.gif')]
@@ -119,13 +119,13 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 8)
         for lang_path in (('en',), ()):
             src_base = join(SOURCE, *lang_path, STATIC_FOLDER)
-            target_base = join(TARGET, *lang_path, STATIC_FOLDER)
+            dst_base = join(DEST, *lang_path, STATIC_FOLDER)
             for _, path in PATHS:
                 src = join(src_base, *path, 'localizable.gif')
-                target = join(target_base, *path, 'localizable.gif')
-                call = mock.call(src, target)
-                with self.subTest(call):
-                    self.assertIn(call, copyfile.call_args_list)
+                dst = join(dst_base, *path, 'localizable.gif')
+                call_args = call(src, dst)
+                with self.subTest(call_args):
+                    self.assertIn(call_args, copyfile.call_args_list)
 
     def test_relative_localized(self, copyfile, *_):
         ast = [get_video_ast('example_video.ogv')]
@@ -134,11 +134,11 @@ class TestCopyStatic(TestExtension):
         for _, path in PATHS:
             src = join(
                 SOURCE, 'en', STATIC_FOLDER, *path, 'example_video.ogv')
-            target = join(
-                TARGET, 'en', STATIC_FOLDER, *path, 'example_video.ogv')
-            call = mock.call(src, target)
-            with self.subTest(call):
-                self.assertIn(call, copyfile.call_args_list)
+            dst = join(
+                DEST, 'en', STATIC_FOLDER, *path, 'example_video.ogv')
+            call_args = call(src, dst)
+            with self.subTest(call_args):
+                self.assertIn(call_args, copyfile.call_args_list)
 
     def test_relative_nonlocalized(self, copyfile, isfile, *_):
         isfile.side_effect = itertools.cycle((False, True))
@@ -147,10 +147,10 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 4)
         for _, path in PATHS:
             src = join(SOURCE, STATIC_FOLDER, *path, 'example_image.jpg')
-            target = join(TARGET, STATIC_FOLDER, *path, 'example_image.jpg')
-            call = mock.call(src, target)
-            with self.subTest(call):
-                self.assertIn(call, copyfile.call_args_list)
+            dst = join(DEST, STATIC_FOLDER, *path, 'example_image.jpg')
+            call_args = call(src, dst)
+            with self.subTest(call_args):
+                self.assertIn(call_args, copyfile.call_args_list)
 
     def test_relative_two_langs(self, copyfile, *_):
         languages = ('de', 'en')
@@ -158,15 +158,17 @@ class TestCopyStatic(TestExtension):
         self._run(CopyStatic, ast, languages=languages)
         self.assertEqual(copyfile.call_count, 8)
         for _, path in PATHS:
-            for lang in languages:
-                src = join(
-                    SOURCE, lang, STATIC_FOLDER, *path,
-                    'localized_present.png')
-                target = join(
-                    TARGET, lang, STATIC_FOLDER, *path,
-                    'localized_present.png')
-                call = mock.call(src, target)
-                self.assertIn(call, copyfile.call_args_list)
+            with self.subTest(path):
+                for lang in languages:
+                    with self.subTest(lang):
+                        src = join(
+                            SOURCE, lang, STATIC_FOLDER, *path,
+                            'localized_present.png')
+                        dst = join(
+                            DEST, lang, STATIC_FOLDER, *path,
+                            'localized_present.png')
+                        call_args = call(src, dst)
+                        self.assertIn(call_args, copyfile.call_args_list)
 
     def test_stacked_single_picture(self, copyfile, *_):
         ast = [

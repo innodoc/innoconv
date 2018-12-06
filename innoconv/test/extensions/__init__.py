@@ -9,7 +9,7 @@ from innoconv.manifest import Manifest
 from innoconv.test.utils import get_filler_content
 
 SOURCE = '/source'
-TARGET = '/target'
+DEST = '/destination'
 PATHS = (
     ("Welcome", ()),
     ("Title 1", ('title-1',)),
@@ -31,7 +31,7 @@ class TestExtension(unittest.TestCase):
             'title': title,
         })
         ext = extension(manifest)
-        ext.start(TARGET, SOURCE)
+        ext.start(DEST, SOURCE)
         for language in languages:
             ext.pre_conversion(language)
             for title, path in paths:
