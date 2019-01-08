@@ -33,7 +33,7 @@ TIKZBLOCK = {
 }
 
 IMAGEBLOCK = get_image_ast(
-    '/'+os.path.join(TIKZ_FOLDER, TIKZ_FILENAME.format(0)),
+    '/' + os.path.join(TIKZ_FOLDER, TIKZ_FILENAME.format(0)),
     description='TikZ Image')
 
 PATHS = (
@@ -42,7 +42,6 @@ PATHS = (
 
 
 class TestTikz2Svg(TestExtension):
-
     def __init__(self, arg):
         super(TestTikz2Svg, self).__init__(arg)
         self.tikz2svg = Tikz2Svg(get_manifest())
@@ -133,12 +132,12 @@ class TestTikz2Svg(TestExtension):
     @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
     def test_simple_life_cycle(self, mock_temporary_directory, mock_chdir,
                                mock_getcwd, mock_create_files):
+        from pprint import pprint
         block = copy.deepcopy(TIKZBLOCK)
         current_dir = 'x_path_x'
         temp_dir = 'x_path_temp_x'
 
-        mock_temporary_directory.return_value.__enter__.return_value = (
-            temp_dir)
+        mock_temporary_directory.return_value.__enter__.return_value = temp_dir
         mock_getcwd.return_value = current_dir
 
         tikz2svg = self._run(ast=[{'c': [block]}])
@@ -150,5 +149,7 @@ class TestTikz2Svg(TestExtension):
             mock.call(current_dir)
         ])
         mock_create_files.assert_called_with(temp_dir)
+        pprint(block)
+        pprint(IMAGEBLOCK)
         self.assertEqual(IMAGEBLOCK, block)
         self.assertEqual(tikz2svg.output_dir_base, DEST)

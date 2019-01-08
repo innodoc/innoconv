@@ -8,9 +8,10 @@ DEFAULT_OUTPUT_DIR_BASE = os.path.join('.', 'innoconv_output')
 
 #: Default enabled extensions
 DEFAULT_EXTENSIONS = (
-    'join_strings',
     'copy_static',
     'generate_toc',
+    'join_strings',
+    'tikz2svg',
     'write_manifest',
 )
 
@@ -29,8 +30,5 @@ LOG_FORMAT = '%(levelname)s:%(filename)s %(message)s'
 #: Static folder name
 STATIC_FOLDER = '_static'
 
-#: TikZ Folder Name
+#: TikZ folder name
 TIKZ_FOLDER = '_tikz'
-
-#: TikZ to SVG filename
-TIKZ_FILENAME = 'tikz_{0:05d}.svg'

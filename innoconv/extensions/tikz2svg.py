@@ -1,11 +1,10 @@
 # pylint: disable=line-too-long
 """
 
-Content can include TikZ figures. They will be rendered to SVG and saved in a
-special folder ``_tikz`` in the folder ``_static`` in the output directory.
-At the same time, the TikZ blocks in the content get replaced with references
-to the generated images.
+Content can include TikZ figures. They will be rendered to SVG and saved under
+the folder ``_tikz`` in the static folder of the output directory.
 
+TikZ blocks are then replaced by references to the generated SVG image.
 
 -------
 Example
@@ -29,50 +28,33 @@ tag, like this: ::
 
 from logging import critical, info
 
-from os import chdir, getcwd, mkdir
+from os import mkdir
 from os.path import join
 from tempfile import TemporaryDirectory
 from subprocess import Popen, PIPE
 from distutils.dir_util import copy_tree
 
 from innoconv.extensions.abstract import AbstractExtension
-from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER, TIKZ_FILENAME
+from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER
 from innoconv.constants import ENCODING
 
-LATEX_BOILERPLATE = r"""
-\documentclass[border=2bp]{standalone}
-\usepackage{tikz}
-\usetikzlibrary{external}
-\tikzexternalize[prefix=figures/]
-\begin{document}
-\begingroup
-\tikzset{every picture/.style={scale=1}}
-
-%(content)s
-
-\endgroup
-\end{document}
+TEX_FILE_TEMPLATE = r"""
+\documentclass[tikz,border=0pt]{{standalone}}
+\usetikzlibrary{{external}}
+\tikzexternalize[prefix={}/]
+\begin{{document}}
+\tikzset{{every picture/.style={{scale=1}}}}
+{}
+\end{{document}}
 """
+PDF_PREFIX = 'pdf'
+CMD_PDFLATEX = ('pdflatex -halt-on-error -shell-escape '
+                '-jobname tikzconversion -file-line-error --')
+CMD_PDF2SVG = 'pdf2svg {} {}'
 
-PDFLATEX = 'pdflatex --shell-escape -file-line-error -interaction=nonstopmode'
 
-
-def run(cmd, stdin=None):
-    """util to run command in a subprocess, and communicate with it."""
-    pipe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    if stdin:
-        pipe.stdin.write(stdin.encode(ENCODING))
-        pipe.stdin.close()
-    pipe.wait()
-
-    # error out if necessary
-    if pipe.returncode != 0:
-        critical(cmd)
-        critical('Error: %i', pipe.returncode)
-        critical(pipe.stderr.read().decode(ENCODING))
-        raise RuntimeError("Tikz2Pdf: Error when converting Latex to PDF")
-
-    return pipe.stdout.read().decode(ENCODING)
+def _get_tikz_name(i):
+    return 'tikz_{0:05d}'.format(i)
 
 
 class Tikz2Svg(AbstractExtension):
@@ -83,26 +65,42 @@ class Tikz2Svg(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         super(Tikz2Svg, self).__init__(*args, **kwargs)
-        self.output_dir_base = None
-        self.tmp_dir = None
-        self.tikz_images = None
-        self.figures_path = None
-        self.svgs_path = None
+        self._output_dir = None
+        self._tikz_images = None
 
-    def replace_tikz_element(self, element):
-        """replaces a tikz image with a reference to the image"""
+    @staticmethod
+    def _run(cmd, cwd, stdin=None):
+        """util to run command in a subprocess, and communicate with it."""
+        pipe = Popen(
+            cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd)
+        if stdin:
+            pipe.stdin.write(stdin.encode(ENCODING))
+            pipe.stdin.close()
+        pipe.wait()
+
+        # error out if necessary
+        if pipe.returncode != 0:
+            critical(cmd)
+            critical('Error: %i', pipe.returncode)
+            critical(pipe.stdout.read().decode(ENCODING))
+            with open(join(cwd, PDF_PREFIX, 'tikz_00000.log'), 'r') as file:
+                critical('tikz_00000.log:')
+                critical(file.read())
+                critical('-- END --')
+            raise RuntimeError("Tikz2Pdf: Error when converting Latex to PDF!")
+
+    def _tikz_found(self, element):
+        """Remember TikZ code and replace with image."""
         tikz_code = element['c'][1]
-        self.tikz_images.append(tikz_code)
-        filename = TIKZ_FILENAME.format(len(self.tikz_images)-1)
-        filename = '/'+join(TIKZ_FOLDER, filename)
-        element['t'] = "Image"
+        self._tikz_images.append(tikz_code)
+        filename = '/{}'.format(
+            join(TIKZ_FOLDER, _get_tikz_name(len(self._tikz_images) - 1)))
+        element['t'] = 'Image'
         element['c'] = [
             ["", [], []], [{'c': '', 't': 'Str'}],
             [filename, "TikZ Image"]
         ]
-        info('Found TikZ image # %i', len(self.tikz_images)-1)
-
-    # Navigating ast
+        info('Found TikZ image #%i', len(self._tikz_images) - 1)
 
     def _process_ast_element(self, ast_element):
         """Process an element form the ast tree, navigating further down
@@ -113,9 +111,9 @@ class Tikz2Svg(AbstractExtension):
             return
         try:
             try:
-                if (ast_element["t"] == "CodeBlock"
-                        and ast_element["c"][0][1][0] == "tikz"):
-                    self.replace_tikz_element(ast_element)
+                if (ast_element['t'] == 'CodeBlock'
+                        and 'tikz' in ast_element['c'][0][1]):
+                    self._tikz_found(ast_element)
                     return
             except (TypeError, KeyError):
                 pass
@@ -124,56 +122,45 @@ class Tikz2Svg(AbstractExtension):
         except TypeError:
             pass
 
-    # Create Files
+    def _render_and_copy_tikz(self):
+        info("Compiling %i TikZ images.", len(self._tikz_images))
+        if len(self._tikz_images) < 1:
+            return
+        with TemporaryDirectory(prefix='innoconv-tikz2pdf-') as tmp_dir:
+            # generate tex document
+            tikz_images = ""
+            for i, tikz in enumerate(self._tikz_images):
+                tikz_images += '\\tikzsetnextfilename{{{}}}\n'.format(
+                    _get_tikz_name(i))
+                tikz_images += tikz
+            texdoc = TEX_FILE_TEMPLATE.format(PDF_PREFIX, tikz_images)
 
-    def _create_tex(self, directory):
-        filename = join(directory, 'input.tex')
-        content = ""
-        for i, tikz in enumerate(self.tikz_images):
-            content += "\n\n"
-            content += "\\tikzsetnextfilename{{tkiz_{0:05d}}}".format(i)
-            content += "\n"
-            content += tikz
-        doc = LATEX_BOILERPLATE % {'content': content}
-        with open(filename, 'w+') as file:
-            file.write(doc)
-        return doc
+            # compile tex
+            pdf_path = join(tmp_dir, PDF_PREFIX)
+            mkdir(pdf_path)
+            print(texdoc)
+            self._run(CMD_PDFLATEX, tmp_dir, stdin=texdoc)
 
-    def _create_pdfs(self, directory):
-        self.figures_path = join(directory, 'figures')
-        mkdir(self.figures_path)
-        run(PDFLATEX + ' input.tex')
+            # convert to SVG
+            svg_path = join(tmp_dir, 'svg_out')
+            mkdir(svg_path)
+            for i, _ in enumerate(self._tikz_images):
+                file_base = _get_tikz_name(i)
+                pdf_filename = join(pdf_path, '{}{}'.format(file_base, '.pdf'))
+                svg_filename = join(svg_path, '{}{}'.format(file_base, '.svg'))
+                cmd = CMD_PDF2SVG.format(pdf_filename, svg_filename)
+                self._run(cmd, tmp_dir)
 
-    def _create_svgs(self, directory):
-        self.svgs_path = join(directory, 'svgs')
-        mkdir(self.svgs_path)
-        for i, _ in enumerate(self.tikz_images):
-            self._create_svg(i)
-
-    def _create_svg(self, i):
-        pdf_filename = join(self.figures_path, 'tkiz_{0:05d}.pdf'.format(i))
-        svg_filename = join(self.svgs_path, TIKZ_FILENAME.format(i))
-        pdf2svg = 'pdf2svg {} {}'.format(pdf_filename, svg_filename)
-        run(pdf2svg)
-
-    def _copy_svgs(self):
-        tikz_path = join(self.output_dir_base, STATIC_FOLDER, TIKZ_FOLDER)
-        copy_tree(self.svgs_path, tikz_path, update=1)
-
-    def create_files(self, directory):
-        """Creates a tex file, converts it to pdfs, converts those to svgs and
-        finally copies them to the right folder"""
-        self._create_tex(directory)
-        self._create_pdfs(directory)
-        self._create_svgs(directory)
-        self._copy_svgs()
+            # copy SVG files
+            tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
+            copy_tree(svg_path, tikz_path, update=True)
 
     # extension events
 
     def start(self, output_dir, source_dir):
-        """Initializes the list of images to be converted."""
-        self.tikz_images = list()
-        self.output_dir_base = output_dir
+        """Initialize the list of images to be converted."""
+        self._tikz_images = list()
+        self._output_dir = output_dir
 
     def pre_conversion(self, _):
         """Unused."""
@@ -182,19 +169,12 @@ class Tikz2Svg(AbstractExtension):
         """Unused."""
 
     def post_process_file(self, ast, _):
-        """Reads TikZ from AST and repalces it with an image tag."""
+        """Find TikZ images in AST and replace with image tags."""
         self._process_ast_element(ast)
 
     def post_conversion(self, _):
         """Unused."""
 
     def finish(self):
-        """Renders the images into a temporary folder and copies svg files to
-        _static"""
-        current_dir = getcwd()
-        with TemporaryDirectory(prefix='innoconv-tikz2pdf-') as temp_directory:
-            chdir(temp_directory)
-            self.create_files(temp_directory)
-            chdir(current_dir)
-
-        info('Create %i TikZ images', len(self.tikz_images))
+        """Render images and copy SVG files to the static folder."""
+        self._render_and_copy_tikz()
