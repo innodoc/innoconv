@@ -33,6 +33,7 @@ from os.path import join
 from tempfile import TemporaryDirectory
 from subprocess import Popen, PIPE
 from distutils.dir_util import copy_tree
+from hashlib import md5
 
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER
@@ -42,7 +43,7 @@ TEX_FILE_TEMPLATE = r"""
 \documentclass{{standalone}}
 \usepackage{{tikz}}
 \begin{{document}}
-\tikzset{{every picture/.style={{scale=1}}}}
+\tikzset{{every picture/.style={{scale=1.0}}}}
 {}
 \end{{document}}
 """
@@ -50,8 +51,8 @@ CMD_PDFLATEX = ('pdflatex -halt-on-error -jobname {} -file-line-error --')
 CMD_PDF2SVG = 'pdf2svg {} {}'
 
 
-def _get_tikz_name(i):
-    return 'tikz_{:05d}'.format(i)
+def _get_tikz_name(tikz_hash):
+    return f'tikz_{tikz_hash}'
 
 
 class Tikz2Svg(AbstractExtension):
@@ -81,17 +82,16 @@ class Tikz2Svg(AbstractExtension):
 
     def _tikz_found(self, element):
         """Remember TikZ code and replace with image."""
-        tikz_code = element['c'][1]
-        self._tikz_images.append(tikz_code)
-        num = len(self._tikz_images) - 1
-        filename = '{}.svg'.format(join(TIKZ_FOLDER, _get_tikz_name(num)))
-        critical(f'Replacing with filename {filename}')
+        code = element['c'][1].strip()
+        tikz_hash = md5(code.encode()).hexdigest()
+        self._tikz_images[tikz_hash] = code
+        filename = f'{_get_tikz_name(tikz_hash)}.svg'
         element['t'] = 'Image'
         element['c'] = [
-            ["", [], []], [{'c': '', 't': 'Str'}],
-            [filename, "TikZ Image"]
+            ['', [], []], [{'c': '', 't': 'Str'}],
+            [join(TIKZ_FOLDER, filename), "TikZ Image"],
         ]
-        info('Found TikZ image #%i', num)
+        info(f'Found TikZ image {filename}')
 
     def _process_ast_element(self, ast_element):
         """Process an element form the ast tree, navigating further down
@@ -114,7 +114,7 @@ class Tikz2Svg(AbstractExtension):
             pass
 
     def _render_and_copy_tikz(self):
-        info("Compiling %i TikZ images.", len(self._tikz_images))
+        info(f"Compiling {len(self._tikz_images)} TikZ images.")
         if len(self._tikz_images) < 1:
             return
         with TemporaryDirectory(prefix='innoconv-tikz2pdf-') as tmp_dir:
@@ -122,16 +122,16 @@ class Tikz2Svg(AbstractExtension):
             mkdir(pdf_path)
             svg_path = join(tmp_dir, 'svg_out')
             mkdir(svg_path)
-            for i, tikz_code in enumerate(self._tikz_images):
-                file_base = _get_tikz_name(i)
+            for tikz_hash, tikz_code in self._tikz_images.items():
+                file_base = _get_tikz_name(tikz_hash)
                 # generate tex document
                 texdoc = TEX_FILE_TEMPLATE.format(tikz_code)
                 # compile tex
-                cmd = CMD_PDFLATEX.format('pdf_out/{}'.format(file_base))
+                cmd = CMD_PDFLATEX.format(f'pdf_out/{file_base}')
                 self._run(cmd, tmp_dir, stdin=texdoc)
                 # convert to SVG
-                pdf_filename = join(pdf_path, '{}.pdf'.format(file_base))
-                svg_filename = join(svg_path, '{}.svg'.format(file_base))
+                pdf_filename = join(pdf_path, f'{file_base}.pdf')
+                svg_filename = join(svg_path, f'{file_base}.svg')
                 cmd = CMD_PDF2SVG.format(pdf_filename, svg_filename)
                 self._run(cmd, tmp_dir)
             # copy SVG files
@@ -142,7 +142,7 @@ class Tikz2Svg(AbstractExtension):
 
     def start(self, output_dir, source_dir):
         """Initialize the list of images to be converted."""
-        self._tikz_images = list()
+        self._tikz_images = dict()
         self._output_dir = output_dir
 
     def pre_conversion(self, _):
