@@ -39,29 +39,26 @@ from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER
 from innoconv.constants import ENCODING
 
 TEX_FILE_TEMPLATE = r"""
-\documentclass[tikz,border=0pt]{{standalone}}
-\usetikzlibrary{{external}}
-\tikzexternalize[prefix={}/]
+\documentclass{{standalone}}
+\usepackage{{tikz}}
 \begin{{document}}
 \tikzset{{every picture/.style={{scale=1}}}}
 {}
 \end{{document}}
 """
-PDF_PREFIX = 'pdf'
-CMD_PDFLATEX = ('pdflatex -halt-on-error -shell-escape '
-                '-jobname tikzconversion -file-line-error --')
+CMD_PDFLATEX = ('pdflatex -halt-on-error -jobname {} -file-line-error --')
 CMD_PDF2SVG = 'pdf2svg {} {}'
 
 
 def _get_tikz_name(i):
-    return 'tikz_{0:05d}'.format(i)
+    return 'tikz_{:05d}'.format(i)
 
 
 class Tikz2Svg(AbstractExtension):
-    """This extension converts TikZ images to svg images, and embeds
-    them in the content"""
+    """This extension converts TikZ pictures to SVG files and embeds
+    them in the content."""
 
-    _helptext = "Converts TikZ to SVG"
+    _helptext = "Convert TikZ code to SVG files."
 
     def __init__(self, *args, **kwargs):
         super(Tikz2Svg, self).__init__(*args, **kwargs)
@@ -70,37 +67,31 @@ class Tikz2Svg(AbstractExtension):
 
     @staticmethod
     def _run(cmd, cwd, stdin=None):
-        """util to run command in a subprocess, and communicate with it."""
         pipe = Popen(
             cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd)
         if stdin:
             pipe.stdin.write(stdin.encode(ENCODING))
             pipe.stdin.close()
         pipe.wait()
-
-        # error out if necessary
         if pipe.returncode != 0:
             critical(cmd)
             critical('Error: %i', pipe.returncode)
             critical(pipe.stdout.read().decode(ENCODING))
-            with open(join(cwd, PDF_PREFIX, 'tikz_00000.log'), 'r') as file:
-                critical('tikz_00000.log:')
-                critical(file.read())
-                critical('-- END --')
-            raise RuntimeError("Tikz2Pdf: Error when converting Latex to PDF!")
+            raise RuntimeError("Tikz2Pdf: Error converting to PDF!")
 
     def _tikz_found(self, element):
         """Remember TikZ code and replace with image."""
         tikz_code = element['c'][1]
         self._tikz_images.append(tikz_code)
-        filename = '/{}'.format(
-            join(TIKZ_FOLDER, _get_tikz_name(len(self._tikz_images) - 1)))
+        num = len(self._tikz_images) - 1
+        filename = '{}.svg'.format(join(TIKZ_FOLDER, _get_tikz_name(num)))
+        critical(f'Replacing with filename {filename}')
         element['t'] = 'Image'
         element['c'] = [
             ["", [], []], [{'c': '', 't': 'Str'}],
             [filename, "TikZ Image"]
         ]
-        info('Found TikZ image #%i', len(self._tikz_images) - 1)
+        info('Found TikZ image #%i', num)
 
     def _process_ast_element(self, ast_element):
         """Process an element form the ast tree, navigating further down
@@ -127,30 +118,22 @@ class Tikz2Svg(AbstractExtension):
         if len(self._tikz_images) < 1:
             return
         with TemporaryDirectory(prefix='innoconv-tikz2pdf-') as tmp_dir:
-            # generate tex document
-            tikz_images = ""
-            for i, tikz in enumerate(self._tikz_images):
-                tikz_images += '\\tikzsetnextfilename{{{}}}\n'.format(
-                    _get_tikz_name(i))
-                tikz_images += tikz
-            texdoc = TEX_FILE_TEMPLATE.format(PDF_PREFIX, tikz_images)
-
-            # compile tex
-            pdf_path = join(tmp_dir, PDF_PREFIX)
+            pdf_path = join(tmp_dir, 'pdf_out')
             mkdir(pdf_path)
-            print(texdoc)
-            self._run(CMD_PDFLATEX, tmp_dir, stdin=texdoc)
-
-            # convert to SVG
             svg_path = join(tmp_dir, 'svg_out')
             mkdir(svg_path)
-            for i, _ in enumerate(self._tikz_images):
+            for i, tikz_code in enumerate(self._tikz_images):
                 file_base = _get_tikz_name(i)
-                pdf_filename = join(pdf_path, '{}{}'.format(file_base, '.pdf'))
-                svg_filename = join(svg_path, '{}{}'.format(file_base, '.svg'))
+                # generate tex document
+                texdoc = TEX_FILE_TEMPLATE.format(tikz_code)
+                # compile tex
+                cmd = CMD_PDFLATEX.format('pdf_out/{}'.format(file_base))
+                self._run(cmd, tmp_dir, stdin=texdoc)
+                # convert to SVG
+                pdf_filename = join(pdf_path, '{}.pdf'.format(file_base))
+                svg_filename = join(svg_path, '{}.svg'.format(file_base))
                 cmd = CMD_PDF2SVG.format(pdf_filename, svg_filename)
                 self._run(cmd, tmp_dir)
-
             # copy SVG files
             tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
             copy_tree(svg_path, tikz_path, update=True)
