@@ -1,5 +1,5 @@
 # pylint: disable=line-too-long
-"""
+r"""
 Content can include Ti\ *k*\Z figures. They will be rendered to SVG and saved
 in the folder ``_tikz`` in the static folder of the output directory.
 
@@ -47,7 +47,9 @@ from innoconv.constants import ENCODING
 
 TEX_FILE_TEMPLATE = r"""
 \documentclass{{standalone}}
+\usepackage{{amsfonts}}
 \usepackage{{tikz}}
+\usetikzlibrary{{arrows,calc,decorations.pathmorphing}}
 \begin{{document}}
 \tikzset{{every picture/.style={{
   scale=1.4,every node/.style={{scale=1.4}}}}
@@ -84,8 +86,12 @@ class Tikz2Svg(AbstractExtension):
         pipe.wait()
         if pipe.returncode != 0:
             critical(cmd)
-            critical('Error: %i', pipe.returncode)
+            critical(f"Error: {pipe.returncode}")
+            critical("Printing program output for debugging:")
             critical(pipe.stdout.read().decode(ENCODING))
+            if stdin:
+                critical("Printing STDIN:")
+                critical(stdin)
             raise RuntimeError("Tikz2Pdf: Error converting to PDF!")
 
     def _tikz_found(self, element, caption=None):
@@ -107,7 +113,8 @@ class Tikz2Svg(AbstractExtension):
         def _parse_tikz(elem, parent):
             try:
                 # parse caption
-                if parent['t'] == 'Div' and 'figure' in parent['c'][0][1]:
+                if (parent and parent['t'] == 'Div' and
+                        'figure' in parent['c'][0][1]):
                     if parent['c'][1][0]['t'] == 'Para':
                         caption = parent['c'][1].pop(0)['c']
                         self._tikz_found(elem, caption)
