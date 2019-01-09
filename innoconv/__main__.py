@@ -6,6 +6,7 @@ import argparse
 import logging
 import os
 import sys
+import coloredlogs
 
 from innoconv.constants import (
     DEFAULT_OUTPUT_DIR_BASE, DEFAULT_EXTENSIONS, MANIFEST_BASENAME, LOG_FORMAT)
@@ -77,7 +78,7 @@ def main(args=None):
     output_dir = os.path.abspath(args['output_dir'])
     extensions = args['extensions'].split(',')
     log_level = logging.INFO if args['verbose'] else logging.WARNING
-    logging.basicConfig(level=log_level, format=LOG_FORMAT)
+    coloredlogs.install(level=log_level, fmt=LOG_FORMAT)
 
     # read course manifest
     def _read_manifest_data(file_ext):
