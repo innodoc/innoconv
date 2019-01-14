@@ -115,7 +115,7 @@ class Tikz2Svg(AbstractExtension):
 
     def _render_and_copy_tikz(self):
         info(f"Compiling {len(self._tikz_images)} TikZ images.")
-        if len(self._tikz_images) < 1:
+        if not self._tikz_images:
             return
         with TemporaryDirectory(prefix='innoconv-tikz2pdf-') as tmp_dir:
             pdf_path = join(tmp_dir, 'pdf_out')
