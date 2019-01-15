@@ -47,14 +47,13 @@ from innoconv.constants import ENCODING
 
 TEX_FILE_TEMPLATE = r"""
 \documentclass{{standalone}}
-\usepackage{{amsfonts}}
 \usepackage{{tikz}}
-\usetikzlibrary{{arrows,calc,decorations.pathmorphing}}
+{preamble}
 \begin{{document}}
 \tikzset{{every picture/.style={{
   scale=1.4,every node/.style={{scale=1.4}}}}
 }}
-{}
+{tikz_code}
 \end{{document}}
 """
 CMD_PDFLATEX = ('pdflatex -halt-on-error -jobname {} -file-line-error --')
@@ -103,7 +102,7 @@ class Tikz2Svg(AbstractExtension):
         element['t'] = 'Image'
         element['c'] = [
             ['', [], []],
-            caption or [{'c': '', 't': 'Str'}],
+            caption or [],
             [join(TIKZ_FOLDER, filename), "TikZ Image"],
         ]
         info(f'Found TikZ image {filename}')
@@ -150,7 +149,16 @@ class Tikz2Svg(AbstractExtension):
             for tikz_hash, tikz_code in self._tikz_images.items():
                 file_base = _get_tikz_name(tikz_hash)
                 # generate tex document
-                texdoc = TEX_FILE_TEMPLATE.format(tikz_code)
+                try:
+                    preamble = self._manifest.tikz_preamble
+                    # as this template is used with .format() we need to escape
+                    # all curly brackets
+                    preamble.replace('{', '{{')
+                    preamble.replace('}', '}}')
+                except AttributeError:
+                    preamble = ''
+                texdoc = TEX_FILE_TEMPLATE.format(
+                    tikz_code=tikz_code, preamble=preamble)
                 # compile tex
                 cmd = CMD_PDFLATEX.format(f'pdf_out/{file_base}')
                 self._run(cmd, tmp_dir, stdin=texdoc)
