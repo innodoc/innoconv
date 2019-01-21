@@ -1,28 +1,34 @@
 # pylint: disable=line-too-long
-"""
+r"""
+Content can include Ti\ *k*\Z figures. They will be rendered to SVG and saved
+in the folder ``_tikz`` in the static folder of the output directory.
 
-Content can include TikZ figures. They will be rendered to SVG and saved under
-the folder ``_tikz`` in the static folder of the output directory.
-
-TikZ blocks are then replaced by references to the generated SVG image.
+Ti\ *k*\Z code blocks are replaced by image elements.
 
 -------
 Example
 -------
 
-A TikZ figure is represented in the content like the following: ::
+A Ti\ *k*\Z image is written using a code block.
 
- ``\\begin{tikzpicture}[x=1.0cm, y=1.0cm]
-    \\draw[thick, black] (-5.2,0) -- (6.2,0);
-    \\foreach \\x in {-5, -4, ..., 6}
-    \\draw[shift={(\\x,0)},color=black] (0pt,6pt) -- (0pt,-6pt)
-    node[below=1.5pt] {\\normalsize $\\x$};
- \\end{tikzpicture}``
+.. code-block:: latex
+
+  ```tikz
+  \\begin{tikzpicture}
+  \\shade[left color=blue,right color=red,rounded corners=8pt] (-0.5,-0.5)
+    rectangle (2.5,3.45);
+  \\draw[white,thick,dashed,rounded corners=8pt] (0,0) -- (0,2) -- (1,3.25)
+    -- (2,2) -- (2,0) -- (0,2) -- (2,2) -- (0,0) -- (2,0);
+  \\node[white] at (1,-0.25) {\\footnotesize House of Santa Claus};
+  \\end{tikzpicture}
+  ```
 
 Upon conversion, this code block will be replaced in the output with an image
-tag, like this: ::
+tag, similar to the following.
 
-![](/_tikz/tikz_00000.svg "Tikz Image")
+.. code-block:: md
+
+  ![](/_tikz/tikz_abcdef0123456789.svg "Alt text")
 """
 
 
@@ -42,9 +48,12 @@ from innoconv.constants import ENCODING
 TEX_FILE_TEMPLATE = r"""
 \documentclass{{standalone}}
 \usepackage{{tikz}}
+{preamble}
 \begin{{document}}
-\tikzset{{every picture/.style={{scale=1.0}}}}
-{}
+\tikzset{{every picture/.style={{
+  scale=1.4,every node/.style={{scale=1.4}}}}
+}}
+{tikz_code}
 \end{{document}}
 """
 CMD_PDFLATEX = ('pdflatex -halt-on-error -jobname {} -file-line-error --')
@@ -56,7 +65,7 @@ def _get_tikz_name(tikz_hash):
 
 
 class Tikz2Svg(AbstractExtension):
-    """This extension converts TikZ pictures to SVG files and embeds
+    r"""This extension converts Ti\ *k*\Z images to SVG files and embeds
     them in the content."""
 
     _helptext = "Convert TikZ code to SVG files."
@@ -76,11 +85,15 @@ class Tikz2Svg(AbstractExtension):
         pipe.wait()
         if pipe.returncode != 0:
             critical(cmd)
-            critical('Error: %i', pipe.returncode)
+            critical(f"Error: {pipe.returncode}")
+            critical("Printing program output for debugging:")
             critical(pipe.stdout.read().decode(ENCODING))
+            if stdin:
+                critical("Printing STDIN:")
+                critical(stdin)
             raise RuntimeError("Tikz2Pdf: Error converting to PDF!")
 
-    def _tikz_found(self, element):
+    def _tikz_found(self, element, caption=None):
         """Remember TikZ code and replace with image."""
         code = element['c'][1].strip()
         tikz_hash = md5(code.encode()).hexdigest()
@@ -88,28 +101,39 @@ class Tikz2Svg(AbstractExtension):
         filename = f'{_get_tikz_name(tikz_hash)}.svg'
         element['t'] = 'Image'
         element['c'] = [
-            ['', [], []], [{'c': '', 't': 'Str'}],
+            ['', [], []],
+            caption or [],
             [join(TIKZ_FOLDER, filename), "TikZ Image"],
         ]
         info(f'Found TikZ image {filename}')
 
-    def _process_ast_element(self, ast_element):
-        """Process an element form the ast tree, navigating further down
-        the tree if possible"""
-        if isinstance(ast_element, list):
-            for ast_sub_element in ast_element:
-                self._process_ast_element(ast_sub_element)
+    def _process_ast_element(self, elem, parent=None):
+        """Process an element form the AST and traverse its children."""
+        def _parse_tikz(elem, parent):
+            try:
+                # parse caption
+                if (parent and parent['t'] == 'Div' and
+                        'figure' in parent['c'][0][1]):
+                    if parent['c'][1][0]['t'] == 'Para':
+                        caption = parent['c'][1].pop(0)['c']
+                        self._tikz_found(elem, caption)
+                        return
+            except KeyError:
+                pass
+            self._tikz_found(elem)
+
+        if isinstance(elem, list):
+            for child in elem:
+                self._process_ast_element(child, parent)
             return
         try:
             try:
-                if (ast_element['t'] == 'CodeBlock'
-                        and 'tikz' in ast_element['c'][0][1]):
-                    self._tikz_found(ast_element)
-                    return
+                if elem['t'] == 'CodeBlock' and 'tikz' in elem['c'][0][1]:
+                    _parse_tikz(elem, parent)
             except (TypeError, KeyError):
                 pass
-            for key in ast_element:
-                self._process_ast_element(ast_element[key])
+            for key in elem:
+                self._process_ast_element(elem[key], elem)
         except TypeError:
             pass
 
@@ -125,7 +149,16 @@ class Tikz2Svg(AbstractExtension):
             for tikz_hash, tikz_code in self._tikz_images.items():
                 file_base = _get_tikz_name(tikz_hash)
                 # generate tex document
-                texdoc = TEX_FILE_TEMPLATE.format(tikz_code)
+                try:
+                    preamble = self._manifest.tikz_preamble
+                    # as this template is used with .format() we need to escape
+                    # all curly brackets
+                    preamble.replace('{', '{{')
+                    preamble.replace('}', '}}')
+                except AttributeError:
+                    preamble = ''
+                texdoc = TEX_FILE_TEMPLATE.format(
+                    tikz_code=tikz_code, preamble=preamble)
                 # compile tex
                 cmd = CMD_PDFLATEX.format(f'pdf_out/{file_base}')
                 self._run(cmd, tmp_dir, stdin=texdoc)

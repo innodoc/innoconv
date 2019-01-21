@@ -28,7 +28,7 @@ class Manifest():
     """Represents course metadata."""
 
     required_fields = ('title', 'languages')
-    optional_fields = ('keywords', 'custom_content')
+    optional_fields = ('keywords', 'custom_content', 'tikz_preamble')
 
     def __init__(self, data):
         """Initialize a manifest.

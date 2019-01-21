@@ -52,9 +52,10 @@ class TestTikz2Svg(TestExtension):
         self.tikz2svg = Tikz2Svg(get_manifest())
 
     @staticmethod
-    def _run(extension=None, ast=None, languages=('de',), paths=PATHS):
+    def _run(extension=None, ast=None, languages=('de',), paths=PATHS,
+             manifest=None):
         return TestExtension._run(
-            Tikz2Svg, ast, paths=PATHS, languages=languages)
+            Tikz2Svg, ast, paths=PATHS, languages=languages, manifest=manifest)
 
     @mock.patch('innoconv.extensions.tikz2svg.Popen')
     def test_run(self, mock_popen):
@@ -74,6 +75,7 @@ class TestTikz2Svg(TestExtension):
     def test_run_error(self, mock_critical, mock_popen):
         test_cmd = "x_call_x"
         error_value = 'x_error_x'
+        stdin_value = 'x_stdin_x'
         mock_popen.return_value.stdout.read.return_value = error_value.encode(
             ENCODING)
         mock_popen.return_value.returncode = 1
@@ -81,8 +83,20 @@ class TestTikz2Svg(TestExtension):
             Tikz2Svg._run(test_cmd, "")
         mock_critical.assert_has_calls([
             mock.call(test_cmd),
-            mock.call('Error: %i', 1),
+            mock.call('Error: 1'),
+            mock.call('Printing program output for debugging:'),
             mock.call(error_value)
+        ])
+        mock_critical.reset()
+        with self.assertRaises(RuntimeError):
+            Tikz2Svg._run(test_cmd, "", stdin=stdin_value)
+        mock_critical.assert_has_calls([
+            mock.call(test_cmd),
+            mock.call('Error: 1'),
+            mock.call('Printing program output for debugging:'),
+            mock.call(error_value),
+            mock.call('Printing STDIN:'),
+            mock.call(stdin_value),
         ])
 
     def test_replace_block(self):
@@ -150,3 +164,49 @@ class TestTikz2Svg(TestExtension):
         self.assertFalse(mock_mkdir.called)
         self.assertEqual(0, len(asts[0]))
         self.assertEqual(tikz2svg._output_dir, DEST)
+
+    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
+    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    def test_with_caption(self, mock_mkdir, mock_copy_tree,
+                          mock_temporary_directory, _):
+        block = copy.deepcopy(TIKZBLOCK)
+        content = [
+            {'t': 'Div',
+             'c': [
+                 [None, ['figure'], None],
+                 [{'t': 'Para',
+                   'c': [{'c': 'x_caption_x', 't': 'Str'}]}],
+                 block
+             ]}
+        ]
+        mock_temporary_directory.return_value.__enter__.return_value = ''
+        tikz2svg, asts = self._run(ast=[{'c': [content]}])
+        self.assertTrue(mock_temporary_directory.called)
+        self.assertTrue(mock_copy_tree.called)
+        self.assertTrue(mock_mkdir.called)
+        block = asts[0][0]['c'][0][0]['c'][2]
+        image_block = copy.deepcopy(IMAGEBLOCK)
+        image_block['c'][1].append({'c': 'x_caption_x', 't': 'Str'})
+        self.assertEqual(image_block, block)
+        self.assertEqual(tikz2svg._output_dir, DEST)
+
+    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
+    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    def test_preamble(self, mock_mkdir, mock_copy_tree,
+                      mock_temporary_directory, mock_run):
+        block = copy.deepcopy(TIKZBLOCK)
+        mock_temporary_directory.return_value.__enter__.return_value = ''
+        tikz2svg, asts = self._run(ast=[{'c': [block]}], manifest={
+            'tikz_preamble': 'x_tikz_preamble_x'})
+        self.assertTrue(mock_temporary_directory.called)
+        self.assertTrue(mock_copy_tree.called)
+        self.assertTrue(mock_mkdir.called)
+        block = asts[0][0]['c'][0]
+        self.assertEqual(IMAGEBLOCK, block)
+        self.assertEqual(tikz2svg._output_dir, DEST)
+        self.assertIn('x_tikz_preamble_x',
+                      mock_run.call_args_list[0][1]['stdin'])

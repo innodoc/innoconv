@@ -22,13 +22,17 @@ TEMP = '/temp'
 
 class TestExtension(unittest.TestCase):
     @staticmethod
-    def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS):
+    def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS,
+             manifest=None):
         if ast is None:
             ast = get_filler_content()
         title = {}
         for language in languages:
             title[language] = "Title ({})".format(language)
+        if manifest is None:
+            manifest = dict()
         manifest = Manifest({
+            **manifest,
             'languages': languages,
             'title': title,
         })
