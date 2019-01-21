@@ -32,12 +32,12 @@ def get_image_ast(path, title='', description=''):
                 [],
                 []
             ],
-            [
+            ([
                 {
                     't': 'Str',
                     'c': title
                 }
-            ],
+            ] if title else []),
             [
                 path,
                 description
