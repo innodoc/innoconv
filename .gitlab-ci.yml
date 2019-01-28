@@ -29,16 +29,15 @@ install:
     - stat `which pdflatex`
     - pdflatex --version
     - mkdir `kpsewhich -var-value TEXMFHOME`
-    - kpsewhich -var-value TEXMFHOME
     - mkdir standalone
     - cd standalone
     - wget http://mirrors.ctan.org/install/macros/latex/contrib/standalone.tds.zip
     - unzip standalone.tds.zip
     - cd ..
     - cp -rv standalone/* `kpsewhich -var-value TEXMFHOME`/
+    - rm -rf standalone
+    - rm -rf standalone.tds.zip
     - texhash `kpsewhich -var-value TEXMFHOME` --verbose
-    - kpsewhich --show-path tex
-    - kpsewhich .tex
     - kpsewhich standalone
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
@@ -78,18 +77,16 @@ integration tests:
   script:
     - apk add texlive
     - pdflatex --version
-    - wget http://mirrors.ctan.org/macros/latex/contrib/ydoc.zip
-    - unzip ydoc.zip
-    - cd ydoc
-    - tex ydoc.dtx
-    - cd ..
-    - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
-    - unzip standalone.zip
-    - mv ydoc/* standalone/
+    - mkdir `kpsewhich -var-value TEXMFHOME`
+    - mkdir standalone
     - cd standalone
-    - latex standalone.ins
+    - wget http://mirrors.ctan.org/install/macros/latex/contrib/standalone.tds.zip
+    - unzip standalone.tds.zip
     - cd ..
-    - texhash standalone --verbose
+    - cp -rv standalone/* `kpsewhich -var-value TEXMFHOME`/
+    - rm -rf standalone
+    - rm -rf standalone.tds.zip
+    - texhash `kpsewhich -var-value TEXMFHOME` --verbose
     - source venv/bin/activate
     - ./setup.py integration_test
   cache:
