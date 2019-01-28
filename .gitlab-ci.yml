@@ -46,6 +46,8 @@ install:
     - texhash ~/texmf --verbose
     - kpsewhich -var-value TEXMFHOME
     - kpsewhich -var-value TEXROOT
+    - kpsewhich -var-value TEXMF
+    - kpsewhich -var-value TEXMFDBS
     - kpsewhich --show-path tex
     - kpsewhich .tex
     - kpsewhich standalone
