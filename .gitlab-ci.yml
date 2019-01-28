@@ -28,26 +28,14 @@ install:
     - which pdflatex
     - stat `which pdflatex`
     - pdflatex --version
-    - wget http://mirrors.ctan.org/macros/latex/contrib/ydoc.zip
-    - unzip ydoc.zip
-    - cd ydoc
-    - tex ydoc.dtx
-    - cd ..
-    - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
-    - unzip standalone.zip
-    - mv ydoc/* standalone/
-    - cd standalone
-    - latex standalone.ins
-    - cd ..
-    - mkdir ~/texmf
-    - mv standalone/* ~/texmf
-    - echo ${TEXMF}
-    - pwd
-    - texhash ~/texmf --verbose
     - kpsewhich -var-value TEXMFHOME
-    - kpsewhich -var-value TEXROOT
-    - kpsewhich -var-value TEXMF
-    - kpsewhich -var-value TEXMFDBS
+    - mkdir standalone
+    - cd standalone
+    - wget http://mirrors.ctan.org/install/macros/latex/contrib/standalone.tds.zip
+    - unzip standalone.tds.zip
+    - mv * `kpsewhich -var-value TEXMFHOME`/
+    - cd ..
+    - texhash `kpsewhich -var-value TEXMFHOME` --verbose
     - kpsewhich --show-path tex
     - kpsewhich .tex
     - kpsewhich standalone
