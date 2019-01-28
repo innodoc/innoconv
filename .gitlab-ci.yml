@@ -39,6 +39,12 @@ install:
     - rm -rf standalone.tds.zip
     - texhash `kpsewhich -var-value TEXMFHOME` --verbose
     - kpsewhich standalone
+    - wget https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
+    - tar -zxf pdf2svg-0.2.3.tar.gz
+    - cd pdf2svg-0.2.3
+    - ./configure --prefix=/usr/local
+    - make
+    - make install
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
     - python -m venv venv
