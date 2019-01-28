@@ -57,27 +57,6 @@ class TestTikz2Svg(TestExtension):
         return TestExtension._run(
             Tikz2Svg, ast, paths=PATHS, languages=languages, manifest=manifest)
 
-    def test_popen(self):
-        tests = [
-            'echo "Test"',
-            "which echo",
-            "which pdflatex",
-            # "which pdf2svg",
-            "stat `which pdflatex`",
-            # "stat `which pdf2svg`",
-            "stat /usr/bin/pdflatex",
-            "stat /usr/bin/pdftex",
-            "find /usr/bin/ -name pdftex",
-            "find /usr/bin/ -name pdflatex",
-            "`which pdflatex` --version",
-            "/usr/bin/pdftex --version",
-            "/usr/bin/pdflatex --version",
-            "pdflatex --version",
-        ]
-        for test in tests:
-            with self.subTest(test=test):
-                print(self.tikz2svg._run(test, "/"))
-
     @mock.patch('innoconv.extensions.tikz2svg.Popen')
     def test_run(self, mock_popen):
         test_cmd = "x_call_x"
