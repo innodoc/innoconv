@@ -60,6 +60,7 @@ class TestTikz2Svg(TestExtension):
     def test_popen(self):
         self.tikz2svg._run('echo "Test"', "/")
         self.tikz2svg._run("which echo", "/")
+        self.tikz2svg._run("find /usr/bin/ -name pdflatex", "/")
         self.tikz2svg._run("/usr/bin/pdflatex --version", "/")
         self.tikz2svg._run("which pdflatex", "/")
         self.tikz2svg._run("pdflatex --version", "/")
