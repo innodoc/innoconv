@@ -33,23 +33,20 @@ install:
     - cd ydoc
     - tex ydoc.dtx
     - cd ..
-    - mktexlsr ydoc --verbose
-    - texhash rehash --verbose
+    - texhash ydoc --verbose
     - wget http://mirrors.ctan.org/install/macros/latex/contrib/adjustbox.tds.zip
     - mkdir adjustbox
     - mv adjustbox.tds.zip adjustbox
     - cd adjustbox
     - unzip adjustbox.tds.zip
     - cd ..
-    - mktexlsr adjustbox --verbose
-    - texhash rehash --verbose
+    - texhash adjustbox --verbose
     - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
     - unzip standalone.zip
     - cd standalone
     - latex standalone.ins
     - cd ..
-    - mktexlsr standalone --verbose
-    - texhash rehash --verbose
+    - texhash standalone --verbose
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
     - python -m venv venv
