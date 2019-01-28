@@ -58,6 +58,7 @@ class TestTikz2Svg(TestExtension):
             Tikz2Svg, ast, paths=PATHS, languages=languages, manifest=manifest)
 
     def test_popen(self):
+        self.tikz2svg._run("which pdflatex", "/")
         self.tikz2svg._run("pdflatex --version", "/")
 
     @mock.patch('innoconv.extensions.tikz2svg.Popen')
