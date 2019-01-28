@@ -28,7 +28,7 @@ install:
     - which pdflatex
     - stat `which pdflatex`
     - pdflatex --version
-    - ls -al `kpsewhich -var-value TEXMFHOME`/../
+    - mkdir `kpsewhich -var-value TEXMFHOME`
     - kpsewhich -var-value TEXMFHOME
     - mkdir standalone
     - cd standalone
