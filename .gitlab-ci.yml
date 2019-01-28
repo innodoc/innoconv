@@ -41,8 +41,9 @@ install:
     - cd ..
     - mkdir ~/texmf
     - mv standalone/* ~/texmf/
-    - texhash ~/texmf/ --verbose
-    - kpsewhich tex
+    - texhash ~/texmf --verbose
+    - kpsewhich --show-path tex
+    - kpsewhich .tex
     - kpsewhich standalone
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
