@@ -28,6 +28,14 @@ install:
     - which pdflatex
     - stat `which pdflatex`
     - pdflatex --version
+    - wget http://mirrors.ctan.org/install/macros/latex/contrib/adjustbox.tds.zip
+    - mkdir adjustbox
+    - mv adjustbox.tds.zip adjustbox
+    - cd adjustbox
+    - unzip adjustbox.tds.zip
+    - cd ..
+    - mktexlsr adjustbox
+    - texhash
     - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
     - unzip standalone.zip
     - cd standalone
