@@ -28,8 +28,22 @@ install:
     - which pdflatex
     - stat `which pdflatex`
     - pdflatex --version
-    - tlmgr init-usertree
-    - tlmgr install standalone
+    - wget http://mirrors.ctan.org/macros/latex/contrib/ydoc.zip
+    - unzip ydoc.zip
+    - cd ydoc
+    - tex ydoc.dtx
+    - cd ..
+    - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
+    - unzip standalone.zip
+    - mv ydoc/* standalone/
+    - cd standalone
+    - latex standalone.ins
+    - cd ..
+    - mkdir ~/texmf
+    - mv standalone/* /root/texmf/
+    - echo ${TEXMF}
+    - pwd
+    - texhash /root/texmf/ --verbose
     - kpsewhich --show-path tex
     - kpsewhich .tex
     - kpsewhich standalone
