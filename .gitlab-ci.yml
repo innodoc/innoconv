@@ -39,6 +39,11 @@ install:
     - rm -rf standalone.tds.zip
     - texhash `kpsewhich -var-value TEXMFHOME` --verbose
     - kpsewhich standalone
+    - wget https://www.cairographics.org/releases/cairo-1.8.10.tar.gz
+    - tar -xvzf cairo-1.8.10.tar.gz
+    - cd cairo-1.8.10/
+    - ./autogen.sh
+    - cd ..
     - wget https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
     - tar -zxf v0.2.3.tar.gz
     - cd pdf2svg-0.2.3
