@@ -35,6 +35,7 @@ install:
     - cd ..
     - mktexlsr ydoc --verbose
     - texhash --verbose
+    - kpsewhich -show-path tex
     - wget http://mirrors.ctan.org/install/macros/latex/contrib/adjustbox.tds.zip
     - mkdir adjustbox
     - mv adjustbox.tds.zip adjustbox
@@ -43,6 +44,7 @@ install:
     - cd ..
     - mktexlsr adjustbox ydoc --verbose
     - texhash --verbose
+    - kpsewhich -show-path tex
     - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
     - unzip standalone.zip
     - cd standalone
