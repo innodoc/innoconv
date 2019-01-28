@@ -40,10 +40,12 @@ install:
     - latex standalone.ins
     - cd ..
     - mkdir ~/texmf
-    - mv standalone/* /root/texmf/
+    - mv standalone/* ~/texmf
     - echo ${TEXMF}
     - pwd
-    - texhash /root/texmf/ --verbose
+    - texhash ~/texmf --verbose
+    - kpsewhich -var-value TEXMFHOME
+    - kpsewhich -var-value TEXROOT
     - kpsewhich --show-path tex
     - kpsewhich .tex
     - kpsewhich standalone
