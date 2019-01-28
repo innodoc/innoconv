@@ -28,6 +28,7 @@ install:
     - which pdflatex
     - stat `which pdflatex`
     - pdflatex --version
+    - tlmgr init-usertree
     - tlmgr install standalone
     - kpsewhich --show-path tex
     - kpsewhich .tex
