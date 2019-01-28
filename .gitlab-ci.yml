@@ -32,7 +32,7 @@ install:
     - unzip ydoc.zip
     - cd ydoc
     - tex ydoc.dtx
-    - mv * ~/texmf/
+    - mv `pwd`/* ~/texmf/
     - cd ..
     - texhash --verbose
     - kpsewhich -show-path tex
@@ -41,7 +41,7 @@ install:
     - mv adjustbox.tds.zip adjustbox
     - cd adjustbox
     - unzip adjustbox.tds.zip
-    - mv * ~/texmf/
+    - mv `pwd`/* ~/texmf/
     - cd ..
     - texhash --verbose
     - kpsewhich -show-path tex
@@ -49,7 +49,7 @@ install:
     - unzip standalone.zip
     - cd standalone
     - latex standalone.ins
-    - mv * ~/texmf/
+    - mv `pwd`/* ~/texmf/
     - cd ..
     - texhash --verbose
     - kpsewhich -show-path tex
