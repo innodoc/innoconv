@@ -78,6 +78,18 @@ integration tests:
   script:
     - apk add texlive
     - pdflatex --version
+    - wget http://mirrors.ctan.org/macros/latex/contrib/ydoc.zip
+    - unzip ydoc.zip
+    - cd ydoc
+    - tex ydoc.dtx
+    - cd ..
+    - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
+    - unzip standalone.zip
+    - mv ydoc/* standalone/
+    - cd standalone
+    - latex standalone.ins
+    - cd ..
+    - texhash standalone --verbose
     - source venv/bin/activate
     - ./setup.py integration_test
   cache:
