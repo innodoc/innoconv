@@ -33,8 +33,8 @@ install:
     - cd standalone
     - wget http://mirrors.ctan.org/install/macros/latex/contrib/standalone.tds.zip
     - unzip standalone.tds.zip
-    - mv * `kpsewhich -var-value TEXMFHOME`/
     - cd ..
+    - mv -v standalone/* `kpsewhich -var-value TEXMFHOME`/
     - texhash `kpsewhich -var-value TEXMFHOME` --verbose
     - kpsewhich --show-path tex
     - kpsewhich .tex
