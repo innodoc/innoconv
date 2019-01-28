@@ -32,8 +32,8 @@ install:
     - unzip ydoc.zip
     - cd ydoc
     - tex ydoc.dtx
+    - mv * ~/texmf/
     - cd ..
-    - mv ydoc/* ~/texmf/
     - texhash --verbose
     - kpsewhich -show-path tex
     - wget http://mirrors.ctan.org/install/macros/latex/contrib/adjustbox.tds.zip
@@ -41,16 +41,16 @@ install:
     - mv adjustbox.tds.zip adjustbox
     - cd adjustbox
     - unzip adjustbox.tds.zip
+    - mv * ~/texmf/
     - cd ..
-    - mv adjustbox/* ~/texmf/
     - texhash --verbose
     - kpsewhich -show-path tex
     - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
     - unzip standalone.zip
     - cd standalone
     - latex standalone.ins
+    - mv * ~/texmf/
     - cd ..
-    - mv standalone/* ~/texmf/
     - texhash --verbose
     - kpsewhich -show-path tex
     - mkdir -p .local
