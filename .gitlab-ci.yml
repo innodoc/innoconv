@@ -41,15 +41,16 @@ install:
     - cd adjustbox
     - unzip adjustbox.tds.zip
     - cd ..
-    - mktexlsr adjustbox --verbose
+    - mktexlsr adjustbox ydoc --verbose
     - texhash --verbose
     - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
     - unzip standalone.zip
     - cd standalone
     - latex standalone.ins
     - cd ..
-    - mktexlsr standalone --verbose
+    - mktexlsr standalone adjustbox ydoc --verbose
     - texhash --verbose
+    - kpsewhich -show-path tex
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
     - python -m venv venv
