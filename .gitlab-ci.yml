@@ -42,6 +42,7 @@ install:
     - mkdir ~/texmf
     - mv standalone/* ~/texmf/
     - echo ${TEXMF}
+    - pwd
     - texhash ~/texmf --verbose
     - kpsewhich --show-path tex
     - kpsewhich .tex
