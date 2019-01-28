@@ -33,16 +33,9 @@ install:
     - cd ydoc
     - tex ydoc.dtx
     - cd ..
-    - texhash ydoc --verbose
-    - wget http://mirrors.ctan.org/install/macros/latex/contrib/adjustbox.tds.zip
-    - mkdir adjustbox
-    - mv adjustbox.tds.zip adjustbox
-    - cd adjustbox
-    - unzip adjustbox.tds.zip
-    - cd ..
-    - texhash adjustbox --verbose
     - wget http://mirrors.ctan.org/macros/latex/contrib/standalone.zip
     - unzip standalone.zip
+    - mv ydoc/* standalone/
     - cd standalone
     - latex standalone.ins
     - cd ..
