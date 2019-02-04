@@ -6,7 +6,7 @@
 import copy
 import os
 from hashlib import md5
-import mock
+from unittest.mock import call, patch, Mock, mock_open
 
 from innoconv.extensions.tikz2svg import Tikz2Svg, _get_tikz_name
 from innoconv.constants import STATIC_FOLDER, TIKZ_FOLDER
@@ -57,11 +57,11 @@ class TestTikz2Svg(TestExtension):
         return TestExtension._run(
             Tikz2Svg, ast, paths=PATHS, languages=languages, manifest=manifest)
 
-    @mock.patch('innoconv.extensions.tikz2svg.Popen')
+    @patch('innoconv.extensions.tikz2svg.Popen')
     def test_run(self, mock_popen):
         test_cmd = "x_call_x"
         test_value = 'x_test_x'
-        process_mock = mock.Mock()
+        process_mock = Mock()
         mock_popen.return_value = process_mock
         process_mock.returncode = 0
         Tikz2Svg._run(test_cmd, "", test_value)
@@ -70,8 +70,8 @@ class TestTikz2Svg(TestExtension):
         self.assertTrue(process_mock.stdin.close.called)
         self.assertTrue(process_mock.wait.called)
 
-    @mock.patch('innoconv.extensions.tikz2svg.Popen')
-    @mock.patch('innoconv.extensions.tikz2svg.critical')
+    @patch('innoconv.extensions.tikz2svg.Popen')
+    @patch('innoconv.extensions.tikz2svg.critical')
     def test_run_error(self, mock_critical, mock_popen):
         test_cmd = "x_call_x"
         error_value = 'x_error_x'
@@ -82,21 +82,21 @@ class TestTikz2Svg(TestExtension):
         with self.assertRaises(RuntimeError):
             Tikz2Svg._run(test_cmd, "")
         mock_critical.assert_has_calls([
-            mock.call(test_cmd),
-            mock.call('Error: 1'),
-            mock.call('Printing program output for debugging:'),
-            mock.call(error_value)
+            call(test_cmd),
+            call('Error: 1'),
+            call('Printing program output for debugging:'),
+            call(error_value)
         ])
         mock_critical.reset()
         with self.assertRaises(RuntimeError):
             Tikz2Svg._run(test_cmd, "", stdin=stdin_value)
         mock_critical.assert_has_calls([
-            mock.call(test_cmd),
-            mock.call('Error: 1'),
-            mock.call('Printing program output for debugging:'),
-            mock.call(error_value),
-            mock.call('Printing STDIN:'),
-            mock.call(stdin_value),
+            call(test_cmd),
+            call('Error: 1'),
+            call('Printing program output for debugging:'),
+            call(error_value),
+            call('Printing STDIN:'),
+            call(stdin_value),
         ])
 
     def test_replace_block(self):
@@ -111,11 +111,11 @@ class TestTikz2Svg(TestExtension):
             with self.subTest(test=test):
                 self.tikz2svg.post_process_file(test, None)
 
-    @mock.patch("builtins.open", new_callable=mock.mock_open, read_data="data")
-    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
-    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
-    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
-    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @patch("builtins.open", new_callable=mock_open, read_data="data")
+    @patch('innoconv.extensions.tikz2svg.copy_tree')
+    @patch('innoconv.extensions.tikz2svg.mkdir')
+    @patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
     def test_conversion(self, mock_temporary_directory, mock_run, mock_mkdir,
                         mock_copy_tree, _):
         mock_temporary_directory.return_value.__enter__.return_value = TEMP
@@ -135,10 +135,10 @@ class TestTikz2Svg(TestExtension):
         mock_mkdir.assert_called_with(svgs_path)
         mock_copy_tree.assert_called_with(svgs_path, ouput_path, update=1)
 
-    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
-    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
-    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
-    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    @patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @patch('innoconv.extensions.tikz2svg.copy_tree')
+    @patch('innoconv.extensions.tikz2svg.mkdir')
     def test_simple_life_cycle(self, mock_mkdir, mock_copy_tree,
                                mock_temporary_directory, _):
         block = copy.deepcopy(TIKZBLOCK)
@@ -151,10 +151,10 @@ class TestTikz2Svg(TestExtension):
         self.assertEqual(IMAGEBLOCK, block)
         self.assertEqual(tikz2svg._output_dir, DEST)
 
-    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
-    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
-    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
-    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    @patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @patch('innoconv.extensions.tikz2svg.copy_tree')
+    @patch('innoconv.extensions.tikz2svg.mkdir')
     def test_empty_life_cycle(self, mock_mkdir, mock_copy_tree,
                               mock_temporary_directory, _):
         mock_temporary_directory.return_value.__enter__.return_value = ''
@@ -165,10 +165,10 @@ class TestTikz2Svg(TestExtension):
         self.assertEqual(0, len(asts[0]))
         self.assertEqual(tikz2svg._output_dir, DEST)
 
-    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
-    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
-    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
-    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    @patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @patch('innoconv.extensions.tikz2svg.copy_tree')
+    @patch('innoconv.extensions.tikz2svg.mkdir')
     def test_with_caption(self, mock_mkdir, mock_copy_tree,
                           mock_temporary_directory, _):
         block = copy.deepcopy(TIKZBLOCK)
@@ -192,10 +192,10 @@ class TestTikz2Svg(TestExtension):
         self.assertEqual(image_block, block)
         self.assertEqual(tikz2svg._output_dir, DEST)
 
-    @mock.patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
-    @mock.patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
-    @mock.patch('innoconv.extensions.tikz2svg.copy_tree')
-    @mock.patch('innoconv.extensions.tikz2svg.mkdir')
+    @patch('innoconv.extensions.tikz2svg.Tikz2Svg._run')
+    @patch('innoconv.extensions.tikz2svg.TemporaryDirectory')
+    @patch('innoconv.extensions.tikz2svg.copy_tree')
+    @patch('innoconv.extensions.tikz2svg.mkdir')
     def test_preamble(self, mock_mkdir, mock_copy_tree,
                       mock_temporary_directory, mock_run):
         block = copy.deepcopy(TIKZBLOCK)
