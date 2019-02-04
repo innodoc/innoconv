@@ -23,6 +23,7 @@ before_script:
 install:
   stage: setup
   script:
+    - apk add build-base
     - mkdir -p .local
     - python -m venv venv
     - source venv/bin/activate
