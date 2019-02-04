@@ -36,8 +36,10 @@ texhash `kpsewhich -var-value TEXMFHOME` --verbose
 
 # Install pdf2svg
 if [ -e .local/bin/pdf2svg ]; then
+  echo pdf2svg already installed, found in `which pdf2svg`
+else
   echo Installing pdf2svg
-  wget https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
+  wget -q https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
   tar -zxf v0.2.3.tar.gz
   mv pdf2svg-0.2.3 pdf2svg
   rm -f v0.2.3.tar.gz
@@ -47,6 +49,5 @@ if [ -e .local/bin/pdf2svg ]; then
   make install
   cd ..
   rm -rf pdf2svg
-else
-  echo pdf2svg already installed, found in `which pdf2svg`
+  echo Installed pdf2svg to `which pdf2svg`
 fi
