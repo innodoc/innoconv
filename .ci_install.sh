@@ -3,21 +3,16 @@
 # Stop on first error
 set -e
 
-# Install necessary build tools
-apk add build-base
-apk add --no-cache\
-  cairo-dev\
-  cairo\
-  cairo-tools\
-  jpeg-dev\
-  zlib-dev\
-  freetype-dev\
-  lcms2-dev openjpeg-dev\
-  tiff-dev\
-  tk-dev\
-  tcl-dev\
-  poppler-dev
-pip install "flask==1.0.1" "CairoSVG==2.1.3"
+# setup cache, include setuptools as that means we have to setup everything
+if ! [ -e .local ]; then
+  apk add build-base
+  mkdir -p .local
+  python -m venv venv
+  source venv/bin/activate
+  pip install --upgrade pip setuptools
+else
+  source venv/bin/activate
+fi
 
 # Install pdflatex
 apk add texlive
@@ -26,6 +21,7 @@ apk add texlive
 echo Installing necessary LaTeX packages
 if ! [ -e .local/tex_packages ]; then
   echo Packages not present yet, downloading them
+  apk add build-base
   mkdir .local/tex_packages
   mkdir standalone
   cd standalone
@@ -43,10 +39,22 @@ texhash `kpsewhich -var-value TEXMFHOME`
 echo Installed packages, using `kpsewhich standalone`
 
 # Install pdf2svg
-if [ -e .local/bin/pdf2svg ]; then
-  echo pdf2svg already installed, found in `which pdf2svg`
-else
+if ! [ -e .local/bin/pdf2svg ]; then
   echo Installing pdf2svg
+  apk add build-base
+  apk add --no-cache\
+    cairo-dev\
+    cairo\
+    cairo-tools\
+    jpeg-dev\
+    zlib-dev\
+    freetype-dev\
+    lcms2-dev openjpeg-dev\
+    tiff-dev\
+    tk-dev\
+    tcl-dev\
+    poppler-dev
+  pip install "flask==1.0.1" "CairoSVG==2.1.3"
   wget -q https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
   tar -zxf v0.2.3.tar.gz
   mv pdf2svg-0.2.3 pdf2svg
@@ -58,4 +66,14 @@ else
   cd ..
   rm -rf pdf2svg
   echo Installed pdf2svg to `which pdf2svg`
+else
+  echo Using pdf2svg in `which pdf2svg`
+fi
+
+if ! [ -e .local/bin/pandoc ]; then
+  echo Installing pandoc
+  wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local
+  echo Installed pandoc to `which pandoc`
+else
+  echo Using pandoc in `which pandoc`
 fi

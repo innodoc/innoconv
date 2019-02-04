@@ -23,12 +23,7 @@ before_script:
 install:
   stage: setup
   script:
-    - mkdir -p .local
-    - python -m venv venv
-    - source venv/bin/activate
-    - pip install --upgrade pip setuptools
     - ./.ci_install.sh
-    - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
     - pip install -r requirements.txt
     - ./setup.py install
 
