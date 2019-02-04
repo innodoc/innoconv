@@ -4,6 +4,18 @@
 set -e
 
 apk add build-base
+apk add --no-cache\
+  cairo-dev\
+  cairo\
+  cairo-tools\
+  jpeg-dev\
+  zlib-dev\
+  freetype-dev\
+  lcms2-dev openjpeg-dev\
+  tiff-dev\
+  tk-dev\
+  tcl-dev\
+  poppler-dev
 
 # setup cache, include setuptools as that means we have to setup everything
 if ! [ -e .local ]; then
@@ -15,6 +27,7 @@ python -m venv venv
 source venv/bin/activate
 pip install --upgrade pip setuptools
 pip install -r requirements.txt
+pip install "flask==1.0.1" "CairoSVG==2.1.3"
 
 # Install pdflatex
 apk add texlive
@@ -42,19 +55,6 @@ echo Installed packages, using `kpsewhich standalone`
 # Install pdf2svg
 if ! [ -e .local/bin/pdf2svg ]; then
   echo Installing pdf2svg
-  apk add --no-cache\
-    cairo-dev\
-    cairo\
-    cairo-tools\
-    jpeg-dev\
-    zlib-dev\
-    freetype-dev\
-    lcms2-dev openjpeg-dev\
-    tiff-dev\
-    tk-dev\
-    tcl-dev\
-    poppler-dev
-  pip install "flask==1.0.1" "CairoSVG==2.1.3"
   wget -q https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
   tar -zxf v0.2.3.tar.gz
   mv pdf2svg-0.2.3 pdf2svg
