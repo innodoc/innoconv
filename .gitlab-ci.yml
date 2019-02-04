@@ -5,7 +5,7 @@ stages:
   - test
 
 cache: &cache
-  key: default-innoconv
+  key: innoconv-$CI_COMMIT_REF_SLUG
   paths:
     - .pip-cache/
     - venv/
@@ -53,7 +53,6 @@ integration tests:
   stage: test
   script:
     - ./.ci_install.sh
-    - source venv/bin/activate
     - ./setup.py integration_test
   cache:
     <<: *cache
