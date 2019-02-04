@@ -5,7 +5,7 @@ stages:
   - test
 
 cache: &cache
-  key: innoconv-$CI_COMMIT_REF_SLUG
+  key: innoconv-${CI_COMMIT_REF_SLUG}
   paths:
     - .pip-cache/
     - venv/

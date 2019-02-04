@@ -3,16 +3,16 @@
 # Stop on first error
 set -e
 
+apk add build-base
+
 # setup cache, include setuptools as that means we have to setup everything
 if ! [ -e .local ]; then
   echo "Setting up cache"
-  apk add build-base
   mkdir -p .local
 fi
 
 if ! [ -e venv ]; then
   echo "Setting up pip"
-  apk add build-base
   python -m venv venv
   source venv/bin/activate
   pip install --upgrade pip setuptools
@@ -28,7 +28,6 @@ apk add texlive
 echo Installing necessary LaTeX packages
 if ! [ -e .local/tex_packages ]; then
   echo Packages not present yet, downloading them
-  apk add build-base
   mkdir .local/tex_packages
   mkdir standalone
   cd standalone
@@ -48,7 +47,6 @@ echo Installed packages, using `kpsewhich standalone`
 # Install pdf2svg
 if ! [ -e .local/bin/pdf2svg ]; then
   echo Installing pdf2svg
-  apk add build-base
   apk add --no-cache\
     cairo-dev\
     cairo\
