@@ -23,16 +23,22 @@ pip install "flask==1.0.1" "CairoSVG==2.1.3"
 apk add texlive
 
 # Install necessary latex packages
-mkdir `kpsewhich -var-value TEXMFHOME`
-mkdir standalone
-cd standalone
-wget http://mirrors.ctan.org/install/macros/latex/contrib/standalone.tds.zip
-unzip standalone.tds.zip
-cd ..
-cp -rv standalone/* `kpsewhich -var-value TEXMFHOME`/
-rm -rf standalone
-rm -rf standalone.tds.zip
-texhash `kpsewhich -var-value TEXMFHOME` --verbose
+echo Installing Necessary LaTeX Packages
+if ! [ -e .local/tex_packages ]; then
+  echo packages not present yet, downloading them
+  mkdir .local/tex_packages
+  mkdir standalone
+  cd standalone
+  wget -q http://mirrors.ctan.org/install/macros/latex/contrib/standalone.tds.zip
+  unzip standalone.tds.zip
+  cd ..
+  cp -rv standalone/* .local/tex_packages/
+  rm -rf standalone
+  rm -f standalone.tds.zip
+fi
+
+ln -s .local/tex_packages `kpsewhich -var-value TEXMFHOME`
+texhash `kpsewhich -var-value TEXMFHOME`
 
 # Install pdf2svg
 if [ -e .local/bin/pdf2svg ]; then
