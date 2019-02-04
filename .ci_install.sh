@@ -11,15 +11,10 @@ if ! [ -e .local ]; then
   mkdir -p .local
 fi
 
-if ! [ -e venv ]; then
-  echo "Setting up pip"
-  python -m venv venv
-  source venv/bin/activate
-  pip install --upgrade pip setuptools
-  pip install -r requirements.txt
-else
-  source venv/bin/activate
-fi
+python -m venv venv
+source venv/bin/activate
+pip install --upgrade pip setuptools
+pip install -r requirements.txt
 
 # Install pdflatex
 apk add texlive
