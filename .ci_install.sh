@@ -1,8 +1,10 @@
 #!/bin/sh
 
+
 # Stop on first error
 set -e
 
+# Install necessary build tools
 apk add build-base
 apk add --no-cache\
   cairo-dev\
@@ -16,17 +18,6 @@ apk add --no-cache\
   tk-dev\
   tcl-dev\
   poppler-dev
-
-# setup cache, include setuptools as that means we have to setup everything
-if ! [ -e .local ]; then
-  echo "Setting up cache"
-  mkdir -p .local
-fi
-
-python -m venv venv
-source venv/bin/activate
-pip install --upgrade pip setuptools
-pip install -r requirements.txt
 pip install "flask==1.0.1" "CairoSVG==2.1.3"
 
 # Install pdflatex

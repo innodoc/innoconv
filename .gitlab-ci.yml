@@ -23,7 +23,12 @@ before_script:
 install:
   stage: setup
   script:
+    - mkdir -p .local
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip setuptools
     - ./.ci_install.sh
+    - pip install -r requirements.txt
     - ./setup.py install
 
 linting:
@@ -53,6 +58,7 @@ integration tests:
   stage: test
   script:
     - ./.ci_install.sh
+    - source venv/bin/activate
     - ./setup.py integration_test
   cache:
     <<: *cache
