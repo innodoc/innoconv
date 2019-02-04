@@ -5,11 +5,18 @@ set -e
 
 # setup cache, include setuptools as that means we have to setup everything
 if ! [ -e .local ]; then
+  echo "Setting up cache"
   apk add build-base
   mkdir -p .local
+fi
+
+if ! [ -e venv ]; then
+  echo "Setting up pip"
+  apk add build-base
   python -m venv venv
   source venv/bin/activate
   pip install --upgrade pip setuptools
+  pip install -r requirements.txt
 else
   source venv/bin/activate
 fi
