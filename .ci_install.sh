@@ -35,10 +35,18 @@ rm -rf standalone.tds.zip
 texhash `kpsewhich -var-value TEXMFHOME` --verbose
 
 # Install pdf2svg
-wget https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
-tar -zxf v0.2.3.tar.gz
-cd pdf2svg-0.2.3
-./configure --prefix=/usr/local
-make
-make install
-cd ..
+if [ -e .local/bin/pdf2svg ]; then
+  echo Installing pdf2svg
+  wget https://github.com/dawbarton/pdf2svg/archive/v0.2.3.tar.gz
+  tar -zxf v0.2.3.tar.gz
+  mv pdf2svg-0.2.3 pdf2svg
+  rm -f v0.2.3.tar.gz
+  cd pdf2svg
+  ./configure --quiet --enable-silent-rules --prefix=`pwd`/../.local
+  make
+  make install
+  cd ..
+  rm -rf pdf2svg
+else
+  echo pdf2svg already installed, found in `which pdf2svg`
+fi
