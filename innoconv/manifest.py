@@ -28,7 +28,8 @@ class Manifest():
     """Represents course metadata."""
 
     required_fields = ('title', 'languages')
-    optional_fields = ('keywords', 'custom_content')
+    optional_fields = ('keywords', 'custom_content', 'tikz_preamble')
+    innoconv_only_fields = ('tikz_preamble',)
 
     def __init__(self, data):
         """Initialize a manifest.
@@ -70,13 +71,15 @@ class ManifestEncoder(json.JSONEncoder):
             manifest_dict = {}
             # required fields
             for field in Manifest.required_fields:
-                manifest_dict[field] = getattr(o, field)
+                if field not in Manifest.innoconv_only_fields:
+                    manifest_dict[field] = getattr(o, field)
             # optional fields
             for field in Manifest.optional_fields:
-                try:
-                    manifest_dict[field] = getattr(o, field)
-                except AttributeError:
-                    pass
+                if field not in Manifest.innoconv_only_fields:
+                    try:
+                        manifest_dict[field] = getattr(o, field)
+                    except AttributeError:
+                        pass
             # extra fields
             manifest_dict['toc'] = o.toc
             return manifest_dict

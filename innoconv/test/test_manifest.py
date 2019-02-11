@@ -24,6 +24,10 @@ KEYWORDS = MINIMUM + """
 keywords: [foo, bar, baz]
 """
 
+TIKZ = MINIMUM + """
+tikz_preamble: 'tikz_'
+"""
+
 MISSING_TITLE = """
 languages: [en, de]
 """
@@ -66,6 +70,12 @@ class TestManifestFromYaml(unittest.TestCase):
         self.assertIn('bar', keywords)
         self.assertIn('baz', keywords)
 
+    def test_tikz(self):
+        manifest = Manifest.from_yaml(TIKZ)
+        self.assertTrue(hasattr(manifest, 'tikz_preamble'))
+        tikz_preamble = getattr(manifest, 'tikz_preamble')
+        self.assertEqual('tikz_', tikz_preamble)
+
     def test_missing_required(self):
         for data in (MISSING_TITLE, MISSING_LANGUAGES):
             with self.subTest(data):
@@ -83,6 +93,14 @@ class TestManifestEncoder(unittest.TestCase):
         self.assertEqual(manifest_dict['title']['en'], 'Foo Title')
         self.assertEqual(manifest_dict['keywords'], ['foo', 'bar', 'baz'])
         self.assertNotIn('custom_content', manifest_dict)
+
+    def test_encoder_skip_innoconv_only_fields(self):
+        manifest = Manifest.from_yaml(TIKZ)
+        manifest_str = json.dumps(manifest, cls=ManifestEncoder)
+        manifest_dict = json.loads(manifest_str)
+        self.assertIn('languages', manifest_dict)
+        self.assertIn('title', manifest_dict)
+        self.assertNotIn('tikz_preamble', manifest_dict)
 
     def test_encoder_fail(self):
         class Foo():
