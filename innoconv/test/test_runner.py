@@ -9,12 +9,25 @@ from innoconv.extensions.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 from innoconv.runner import InnoconvRunner
 
-MANIFEST = Manifest({
+BASE_MANIFEST = {
     'title': {
         'en': 'Foo Course Title',
         'de': 'Foo Kurstitel',
     },
-    'languages': ('de', 'en'),
+    'languages': ('de', 'en')
+}
+
+SHORT_MANIFEST = Manifest(BASE_MANIFEST)
+
+MANIFEST = Manifest({
+    **BASE_MANIFEST,
+    'custom_content': ([{
+        'name': 'about',
+        'title_de': 'Über den Kurs',
+        'title_en': 'About the course',
+        'link_in_nav': True,
+        'link_in_footer': True
+    }])
 })
 
 
@@ -76,6 +89,7 @@ TITLE = [
 
 
 @patch('builtins.open')
+@patch('innoconv.runner.isfile', return_value=True)
 @patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
 @patch('json.dump')
 @patch('innoconv.runner.walk', side_effect=walk_side_effect)
@@ -89,19 +103,21 @@ class TestInnoconvRunner(unittest.TestCase):
         _, makedirs, _, json_dump, *_ = args
         self.runner.run()
 
-        self.assertEqual(makedirs.call_count, 10)
-        self.assertEqual(json_dump.call_count, 10)
+        self.assertEqual(makedirs.call_count, 12)
+        self.assertEqual(json_dump.call_count, 12)
         for i, path in enumerate((
                 '/out/de',
                 '/out/de/section-1',
                 '/out/de/section-1/section-1.1',
                 '/out/de/section-1/section-1.2',
                 '/out/de/section-2',
+                '/out/de/_content',
                 '/out/en',
                 '/out/en/section-1',
                 '/out/en/section-1/section-1.1',
                 '/out/en/section-1/section-1.2',
-                '/out/en/section-2')):
+                '/out/en/section-2',
+                '/out/en/_content',)):
             with self.subTest(path):
                 self.assertEqual(
                     makedirs.call_args_list[i], call(path, exist_ok=True))
@@ -112,6 +128,20 @@ class TestInnoconvRunner(unittest.TestCase):
         """Language folders do not exist"""
         isdir.return_value = False
         self.assertRaises(RuntimeError, self.runner.run)
+
+    def test_run_no_custom_content_file(self, *args):
+        """Custom content file does not exists"""
+        _, _, _, _, _, is_file, *_ = args
+        is_file.return_value = False
+        self.assertRaises(RuntimeError, self.runner.run)
+
+    def test_run_no_custom_content(self, *args):
+        """There is no custom content"""
+        _, makedirs, _, json_dump, *_ = args
+        self.runner = InnoconvRunner('/src', '/out', SHORT_MANIFEST, [])
+        self.runner.run()
+        self.assertEqual(makedirs.call_count, 10)
+        self.assertEqual(json_dump.call_count, 10)
 
     def test_run_content_file_missing(self, *args):
         _, _, walk, *_ = args
@@ -126,6 +156,7 @@ class TestInnoconvRunner(unittest.TestCase):
             self.runner.run()
 
 
+@patch('innoconv.runner.isfile', return_value=True)
 @patch('builtins.open')
 @patch('innoconv.runner.EXTENSIONS', {'my_ext': AbstractExtension})
 @patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
@@ -169,7 +200,7 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         self.assertEqual(mocks['pre_conversion'].call_args_list[1],
                          call('en'))
 
-        self.assertEqual(mocks['pre_process_file'].call_count, 10)
+        self.assertEqual(mocks['pre_process_file'].call_count, 12)
         self.assertEqual(mocks['pre_process_file'].call_args_list[0],
                          call('de'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[1],
@@ -181,17 +212,21 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         self.assertEqual(mocks['pre_process_file'].call_args_list[4],
                          call('de/section-2'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[5],
-                         call('en'))
+                         call('de/_content'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[6],
-                         call('en/section-1'))
+                         call('en'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[7],
-                         call('en/section-1/section-1.1'))
+                         call('en/section-1'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[8],
-                         call('en/section-1/section-1.2'))
+                         call('en/section-1/section-1.1'))
         self.assertEqual(mocks['pre_process_file'].call_args_list[9],
+                         call('en/section-1/section-1.2'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[10],
                          call('en/section-2'))
+        self.assertEqual(mocks['pre_process_file'].call_args_list[11],
+                         call('en/_content'))
 
-        self.assertEqual(mocks['post_process_file'].call_count, 10)
+        self.assertEqual(mocks['post_process_file'].call_count, 12)
         for i in range(0, 10):
             self.assertEqual(mocks['post_process_file'].call_args_list[i],
                              call(['content_ast'], TITLE))
