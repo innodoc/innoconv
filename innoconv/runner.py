@@ -49,9 +49,6 @@ class InnoconvRunner():
             return
 
         path = abspath(join(self._source_dir, language, CUSTOM_CONTENT_FOLDER))
-        if not isdir(path):
-            raise RuntimeError(
-                f"Error: Directory {path} does not exist")
 
         for custom_content in self._manifest.custom_content:
             content_name = custom_content["name"]
