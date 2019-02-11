@@ -76,6 +76,7 @@ TITLE = [
 
 
 @patch('builtins.open')
+@patch('innoconv.runner.isfile', return_value=True)
 @patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
 @patch('json.dump')
 @patch('innoconv.runner.walk', side_effect=walk_side_effect)
@@ -126,6 +127,7 @@ class TestInnoconvRunner(unittest.TestCase):
             self.runner.run()
 
 
+@patch('innoconv.runner.isfile', return_value=True)
 @patch('builtins.open')
 @patch('innoconv.runner.EXTENSIONS', {'my_ext': AbstractExtension})
 @patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))

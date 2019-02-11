@@ -28,3 +28,6 @@ LOG_FORMAT = '%(levelname)s:%(filename)s %(message)s'
 
 #: Static folder name
 STATIC_FOLDER = '_static'
+
+#: Custom content folder name
+CUSTOM_CONTENT_FOLDER = '_content'

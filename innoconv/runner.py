@@ -13,9 +13,9 @@ certain events. The events are documented in
 import json
 import logging
 from os import makedirs, walk
-from os.path import abspath, dirname, isdir, join, sep
+from os.path import abspath, dirname, isdir, join, sep, isfile
 
-from innoconv.constants import CONTENT_BASENAME
+from innoconv.constants import CONTENT_BASENAME, CUSTOM_CONTENT_FOLDER
 from innoconv.extensions import EXTENSIONS
 from innoconv.utils import to_ast
 
@@ -39,22 +39,44 @@ class InnoconvRunner():
         for language in self._manifest.languages:
             self._notify_extensions('pre_conversion', language)
             self._convert_language_folder(language)
+            self._convert_custom_pages(language)
             self._notify_extensions('post_conversion', language)
 
         self._notify_extensions('finish')
+
+    def _convert_custom_pages(self, language):
+        if not hasattr(self._manifest, 'custom_content'):
+            return
+
+        path = abspath(join(self._source_dir, language, CUSTOM_CONTENT_FOLDER))
+        if not isdir(path):
+            raise RuntimeError(
+                f"Error: Directory {path} does not exist")
+
+        for custom_content in self._manifest.custom_content:
+            content_name = custom_content["name"]
+            content_filename = f'{join(path, content_name)}.md'
+            if isfile(content_filename):
+                self._process_file(content_filename, content_name)
+            else:
+                raise RuntimeError(
+                    f"Error: Missing {content_name} for language {language}")
 
     def _convert_language_folder(self, language):
         path = abspath(join(self._source_dir, language))
 
         if not isdir(path):
             raise RuntimeError(
-                "Error: Directory {} does not exist".format(path))
+                f"Error: Directory {path} does not exist")
 
         for root, dirs, files in walk(path):
             # note: all dirs manipulation must happen in-place!
-            for i, directory in enumerate(dirs):
-                if directory.startswith('_'):
+            i = 0
+            while i < len(dirs):
+                if dirs[i].startswith('_'):
                     del dirs[i]  # skip meta directories like '_static'
+                else:
+                    i += 1
             dirs.sort()  # sort section names
 
             # process content file
@@ -64,13 +86,15 @@ class InnoconvRunner():
                 self._process_file(filepath)
             else:
                 raise RuntimeError(
-                    "Found section without content file: {}".format(root))
+                    f"Found section without content file: {root}")
 
-    def _process_file(self, filepath):
+    def _process_file(self, filepath, output_filename=None):
         # relative path
         rel_path = dirname(filepath.replace(self._source_dir, '').lstrip(sep))
         # full filepath
-        output_filename = '{}.json'.format(CONTENT_BASENAME)
+        if output_filename is None:
+            output_filename = CONTENT_BASENAME
+        output_filename = '{}.json'.format(output_filename)
         filepath_out = join(self._output_dir, rel_path, output_filename)
 
         # convert file using pandoc
@@ -97,4 +121,4 @@ class InnoconvRunner():
                 self._extensions.append(EXTENSIONS[ext_name](self._manifest))
             except (ImportError, KeyError) as exc:
                 raise RuntimeError(
-                    "Extension {} not found!".format(ext_name)) from exc
+                    f"Extension {ext_name} not found!") from exc
