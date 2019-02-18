@@ -75,6 +75,12 @@ class GenerateToc(AbstractExtension):
         """Remember current path."""
         self._current_path = path
 
+    def process_ast_array(self, ast_array, parent_element):
+        """Unused."""
+
+    def process_ast_element(self, ast_element, ast_type, parent_element):
+        """Unused."""
+
     def post_process_file(self, _, title):
         """Add this section file to the TOC."""
         self._add_to_toc(title)

@@ -42,6 +42,12 @@ class WriteManifest(AbstractExtension):
     def pre_process_file(self, path):
         """Unused."""
 
+    def process_ast_array(self, ast_array, parent_element):
+        """Unused."""
+
+    def process_ast_element(self, ast_element, ast_type, parent_element):
+        """Unused."""
+
     def post_process_file(self, _, title):
         """Unused."""
 

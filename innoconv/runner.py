@@ -48,7 +48,7 @@ class InnoconvRunner():
 
         if not isdir(path):
             raise RuntimeError(
-                "Error: Directory {} does not exist".format(path))
+                f"Error: Directory {path} does not exist")
 
         for root, dirs, files in walk(path):
             # note: all dirs manipulation must happen in-place!
@@ -58,13 +58,13 @@ class InnoconvRunner():
             dirs.sort()  # sort section names
 
             # process content file
-            content_filename = '{}.md'.format(CONTENT_BASENAME)
+            content_filename = f'{CONTENT_BASENAME}.md'
             if content_filename in files:
                 filepath = join(root, content_filename)
                 self._process_file(filepath)
             else:
                 raise RuntimeError(
-                    "Found section without content file: {}".format(root))
+                    f"Found section without content file: {root}")
 
     def _process_file(self, filepath):
         # relative path
@@ -76,6 +76,7 @@ class InnoconvRunner():
         # convert file using pandoc
         self._notify_extensions('pre_process_file', rel_path)
         ast, title = to_ast(filepath)
+        self._walk_ast(ast)
         self._notify_extensions('post_process_file', ast, title)
 
         # write file content
@@ -85,6 +86,33 @@ class InnoconvRunner():
         logging.info("Wrote %s", filepath_out)
 
         return title
+
+    def _walk_ast(self, ast):
+        def _process_ast_element(ast_element, parent_element=None):
+            if isinstance(ast_element, list):
+                _process_ast_array(ast_element, parent_element)
+                return
+            try:
+                try:
+                    ast_type = ast_element['t']
+                except TypeError:
+                    ast_type = None
+                self._notify_extensions('process_ast_element', ast_element,
+                                        ast_type, parent_element)
+
+                for key in ast_element:
+                    _process_ast_element(ast_element[key],
+                                         parent_element=ast_element)
+            except TypeError:
+                pass
+
+        def _process_ast_array(ast_array, parent_element=None):
+            self._notify_extensions('process_ast_array',
+                                    ast_array, parent_element)
+            for ast_element in ast_array:
+                _process_ast_element(ast_element, parent_element)
+
+        _process_ast_element(ast)
 
     def _notify_extensions(self, event_name, *args, **kwargs):
         for ext in self._extensions:
@@ -97,4 +125,4 @@ class InnoconvRunner():
                 self._extensions.append(EXTENSIONS[ext_name](self._manifest))
             except (ImportError, KeyError) as exc:
                 raise RuntimeError(
-                    "Extension {} not found!".format(ext_name)) from exc
+                    f"Extension {ext_name} not found!") from exc

@@ -8,6 +8,7 @@ from unittest.mock import call, DEFAULT, patch
 from innoconv.extensions.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 from innoconv.runner import InnoconvRunner
+from innoconv.test.utils import get_para_ast, get_filler_content
 
 MANIFEST = Manifest({
     'title': {
@@ -74,6 +75,14 @@ TITLE = [
     },
 ]
 
+INNER_CONTENT_AST = [
+    get_filler_content()
+]
+
+CONTENT_AST = [
+    get_para_ast(INNER_CONTENT_AST)
+]
+
 
 @patch('builtins.open')
 @patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
@@ -128,7 +137,7 @@ class TestInnoconvRunner(unittest.TestCase):
 
 @patch('builtins.open')
 @patch('innoconv.runner.EXTENSIONS', {'my_ext': AbstractExtension})
-@patch('innoconv.runner.to_ast', return_value=(['content_ast'], TITLE))
+@patch('innoconv.runner.to_ast', return_value=(CONTENT_AST, TITLE))
 @patch('json.dump')
 @patch('innoconv.runner.walk', side_effect=walk_side_effect)
 @patch('innoconv.runner.makedirs')
@@ -152,6 +161,8 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         pre_conversion=DEFAULT,
         pre_process_file=DEFAULT,
         post_process_file=DEFAULT,
+        process_ast_array=DEFAULT,
+        process_ast_element=DEFAULT,
         post_conversion=DEFAULT,
         finish=DEFAULT,
     )
@@ -192,9 +203,32 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
                          call('en/section-2'))
 
         self.assertEqual(mocks['post_process_file'].call_count, 10)
+
+        self.assertEqual(mocks['process_ast_array'].call_count, 20)
+        self.assertEqual(mocks['process_ast_element'].call_count, 50)
+
         for i in range(0, 10):
             self.assertEqual(mocks['post_process_file'].call_args_list[i],
-                             call(['content_ast'], TITLE))
+                             call(CONTENT_AST, TITLE))
+            self.assertEqual(mocks['process_ast_array'].call_args_list[i*2],
+                             call(CONTENT_AST, None))
+            self.assertEqual(mocks['process_ast_array'].call_args_list[i*2+1],
+                             call(INNER_CONTENT_AST, CONTENT_AST[0]))
+            self.assertEqual(
+                mocks['process_ast_element'].call_args_list[i*5],
+                call(CONTENT_AST[0], 'Para', None))
+            self.assertEqual(
+                mocks['process_ast_element'].call_args_list[i*5+1],
+                call('Para', None, CONTENT_AST[0]))
+            self.assertEqual(
+                mocks['process_ast_element'].call_args_list[i*5+2],
+                call(INNER_CONTENT_AST[0], 'Str', CONTENT_AST[0]))
+            self.assertEqual(
+                mocks['process_ast_element'].call_args_list[i*5+3],
+                call('Str', None, INNER_CONTENT_AST[0]))
+            self.assertEqual(
+                mocks['process_ast_element'].call_args_list[i*5+4],
+                call('Lorem Ipsum', None, INNER_CONTENT_AST[0]))
 
         self.assertEqual(mocks['post_conversion'].call_count, 2)
         self.assertEqual(mocks['post_conversion'].call_args_list[0],

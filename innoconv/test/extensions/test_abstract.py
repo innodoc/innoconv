@@ -26,6 +26,9 @@ class TestAbstractExtension(unittest.TestCase):
             ('pre_conversion', ('en',)),
             ('pre_process_file', ('relpath',)),
             ('post_process_file', (['ast'], ['Foo Title'])),
+            ('process_ast_array', (['ast'], None)),
+            ('process_ast_element', ({'ast': 'element', 't': 'Type'}, 'Type',
+                                     None)),
             ('post_conversion', ('en',)),
             ('finish', ()),
         )

@@ -58,6 +58,27 @@ class AbstractExtension():
         """
         raise NotImplementedError()
 
+    def process_ast_array(self, ast_array, parent_element):
+        """Process an array of the ast before traversing it. Tha arraz can be
+        modified.
+
+        :param ast_array: The array from the ast
+        :param parent_element: The parent element for this ast array. None if
+        child of an array or root element.
+        """
+        raise NotImplementedError()
+
+    def process_ast_element(self, ast_element, ast_type, parent_element):
+        """Process an element from the ast before traversing it. The element
+        can be modified.
+
+        :param ast_element: The element from the ast
+        :param ast_type: The Type of the ast_element (or None)
+        :param parent_element: The parent element for this ast element. None if
+        child of an array or root element.
+        """
+        raise NotImplementedError()
+
     def post_conversion(self, language):
         """Conversion of a single language folder finished.
 

@@ -192,6 +192,12 @@ class CopyStatic(AbstractExtension):
         """Remember file path."""
         self._current_path = path
 
+    def process_ast_array(self, ast_array, parent_element):
+        """Unused."""
+
+    def process_ast_element(self, ast_element, ast_type, parent_element):
+        """Unused."""
+
     def post_process_file(self, ast, _):
         """Generate list of files to copy."""
         self._process_ast_array(ast)
