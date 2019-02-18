@@ -37,20 +37,6 @@ class JoinStrings(AbstractExtension):
         self.previous_element = None  # the element we merge to
 
     # content parsing
-
-    def _process_ast_element(self, ast_element):
-        """Process an element in the AST descending further down if
-        possible."""
-        self.previous_element = None   # Stop merging on new element
-        if isinstance(ast_element, list):
-            self._process_ast_array(ast_element)
-            return
-        try:
-            for key in ast_element:
-                self._process_ast_element(ast_element[key])
-        except TypeError:
-            pass
-
     def _process_ast_array(self, ast_array):
         """The first instance of mergeable content is stored in
         self.previous_element. Every subsequent instance of mergeable content
@@ -61,21 +47,22 @@ class JoinStrings(AbstractExtension):
                 return content_element['t'] in TYPES_TO_MERGE
             except (TypeError, KeyError):  # could be an invalid dictionary
                 return False
+
         self.previous_element = None
-        to_delete = set()
-        for pos, ast_element in enumerate(ast_array):
+        index = 0
+        while index < len(ast_array):
+            ast_element = ast_array[index]
             if is_string_or_space(ast_element):
                 if self.previous_element is None:
                     self._prepare_previous_element(ast_element)
                 else:
                     self._merge_to_previous_element(ast_element)
-                    to_delete.add(pos)
+                    del ast_array[index]
+                    index -= 1
             else:
-                self._process_ast_element(ast_element)
-        removed_items = 0  # remember number of deleted items to adjust index
-        for index in to_delete:
-            del ast_array[index - removed_items]
-            removed_items += 1
+                self.previous_element = None  # Stop merging on new element
+            index += 1
+
         # Necessary for when we finish an element list and go back to a list
         # that has been processed already which contained it.
         self.previous_element = None
@@ -106,14 +93,14 @@ class JoinStrings(AbstractExtension):
         """Unused."""
 
     def process_ast_array(self, ast_array, parent_element):
-        """Unused."""
+        """Process AST in-place."""
+        self._process_ast_array(ast_array)
 
     def process_ast_element(self, ast_element, ast_type, parent_element):
         """Unused."""
 
     def post_process_file(self, ast, _):
-        """Process AST in-place."""
-        self._process_ast_element(ast)
+        """Unused."""
 
     def post_conversion(self, language):
         """Unused."""
