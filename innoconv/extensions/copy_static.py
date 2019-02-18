@@ -84,30 +84,15 @@ class CopyStatic(AbstractExtension):
                 return True
         return False
 
-    def _process_ast_array(self, ast_array):
-        """Search every element in an AST array."""
-        if not isinstance(ast_array, list):
-            return
-        for element in ast_array:
-            self._process_ast_element(element)
-
-    def _process_ast_element(self, ast_element):
-        """Respond to elements that potentially reference static files."""
-        if isinstance(ast_element, list):
-            self._process_ast_array(ast_element)
-        elif isinstance(ast_element, dict):
-            if ast_element['t'] == 'Image':
-                self._process_image(ast_element)
-            elif ast_element['t'] == 'Link':
-                self._process_link(ast_element)
-            elif 'c' in ast_element:
-                self._process_ast_array(ast_element['c'])
+    def _process_ast_element(self, ast_element, ast_type):
+        if ast_type == 'Image':
+            self._process_image(ast_element)
+        elif ast_type == 'Link':
+            self._process_link(ast_element)
 
     def _process_link(self, link_element):
         """Links can reference local videos."""
         link = link_element['c'][2][0]
-        content = link_element['c'][1]
-        self._process_ast_array(content)
         if self._link_is_video(link_element):
             try:
                 link_element['c'][2][0] = self._add_static(link)
@@ -196,11 +181,11 @@ class CopyStatic(AbstractExtension):
         """Unused."""
 
     def process_ast_element(self, ast_element, ast_type, parent_element):
-        """Unused."""
+        """Generate list of files to copy."""
+        self._process_ast_element(ast_element, ast_type)
 
     def post_process_file(self, ast, _):
-        """Generate list of files to copy."""
-        self._process_ast_array(ast)
+        """Unused."""
 
     def post_conversion(self, language):
         """Unused."""

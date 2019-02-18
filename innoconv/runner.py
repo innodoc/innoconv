@@ -95,7 +95,7 @@ class InnoconvRunner():
             try:
                 try:
                     ast_type = ast_element['t']
-                except TypeError:
+                except (TypeError, KeyError):
                     ast_type = None
                 self._notify_extensions('process_ast_element', ast_element,
                                         ast_type, parent_element)
@@ -103,7 +103,7 @@ class InnoconvRunner():
                 for key in ast_element:
                     _process_ast_element(ast_element[key],
                                          parent_element=ast_element)
-            except TypeError:
+            except (TypeError, KeyError):
                 pass
 
         def _process_ast_array(ast_array, parent_element=None):
