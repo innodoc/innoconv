@@ -43,3 +43,38 @@ def to_ast(filepath):
             title += ' '
 
     return blocks, title
+
+
+def walk_ast(ast, func_element, func_array):
+    """Walks through an ast
+
+    :param ast: The ast to walk throuhg
+    :param func_element: callback for each element
+    :param func_array: callback for each array
+    """
+    def process_ast_element(ast_element, parent_element=None):
+        if isinstance(ast_element, list):
+            process_ast_array(ast_element, parent_element)
+            return
+        try:
+            try:
+                ast_type = ast_element['t']
+            except (TypeError, KeyError):
+                ast_type = None
+            func_element(ast_element, ast_type, parent_element)
+
+            for key in ast_element:
+                process_ast_element(ast_element[key],
+                                    parent_element=ast_element)
+        except (TypeError, KeyError):
+            pass
+
+    def process_ast_array(ast_array, parent_element=None):
+        func_array(ast_array, parent_element)
+        for ast_element in ast_array:
+            process_ast_element(ast_element, parent_element)
+
+    if isinstance(ast, list):
+        process_ast_array(ast)
+    else:
+        process_ast_element(ast)

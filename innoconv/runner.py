@@ -17,7 +17,7 @@ from os.path import abspath, dirname, isdir, join, sep
 
 from innoconv.constants import CONTENT_BASENAME
 from innoconv.extensions import EXTENSIONS
-from innoconv.utils import to_ast
+from innoconv.utils import to_ast, walk_ast
 
 
 class InnoconvRunner():
@@ -88,31 +88,13 @@ class InnoconvRunner():
         return title
 
     def _walk_ast(self, ast):
-        def _process_ast_element(ast_element, parent_element=None):
-            if isinstance(ast_element, list):
-                _process_ast_array(ast_element, parent_element)
-                return
-            try:
-                try:
-                    ast_type = ast_element['t']
-                except (TypeError, KeyError):
-                    ast_type = None
-                self._notify_extensions('process_ast_element', ast_element,
-                                        ast_type, parent_element)
-
-                for key in ast_element:
-                    _process_ast_element(ast_element[key],
-                                         parent_element=ast_element)
-            except (TypeError, KeyError):
-                pass
-
-        def _process_ast_array(ast_array, parent_element=None):
-            self._notify_extensions('process_ast_array',
-                                    ast_array, parent_element)
-            for ast_element in ast_array:
-                _process_ast_element(ast_element, parent_element)
-
-        _process_ast_element(ast)
+        func_element = (lambda element, ast_type, parent:
+                        self._notify_extensions(
+                            'process_ast_element', element, ast_type, parent))
+        func_array = (lambda array, parent:
+                      self._notify_extensions(
+                          'process_ast_array', array, parent))
+        walk_ast(ast, func_element, func_array)
 
     def _notify_extensions(self, event_name, *args, **kwargs):
         for ext in self._extensions:
