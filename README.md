@@ -10,7 +10,7 @@ Please refer to the [documentation](https://innoconv.readthedocs.io/) for instal
 
 ```sh
 # Install innoconv locally using pip
-$ python3 -m pip install --user innoconv
+$ pip install --user innoconv
 # Convert some content
 $ innoconv .
 ```
@@ -20,10 +20,7 @@ $ innoconv .
 ### Setup environment
 
 ```sh
-$ python3 -m venv venv
-$ . venv/bin/activate
-$ pip install -r requirements.txt
-$ ./setup.py develop
+$ pipenv install --dev
 ```
 
 ### Commands
