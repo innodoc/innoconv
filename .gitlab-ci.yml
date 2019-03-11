@@ -22,6 +22,7 @@ cache: &cache
 
 before_script:
   - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
+  - pip install pipenv
 
 install:
   stage: setup
@@ -29,7 +30,6 @@ install:
     - apk add build-base
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
-    - pip install pipenv
     - pipenv install --deploy --ignore-pipfile --dev
 
 linting:
@@ -38,6 +38,7 @@ linting:
   cache:
     <<: *cache
     paths:
+      - .pip-cache/
       - .venv
     policy: pull
 
@@ -48,6 +49,7 @@ unit tests:
   cache:
     <<: *cache
     paths:
+      - .pip-cache/
       - .venv
     policy: pull
 
@@ -58,5 +60,6 @@ integration tests:
     <<: *cache
     paths:
       - .local/bin/pandoc
+      - .pip-cache/
       - .venv
     policy: pull
