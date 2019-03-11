@@ -15,7 +15,7 @@ Sphinx = "*"
 
 [packages]
 PyYAML = "*"
-innoconv = {editable = true,path = "."}
+innoconv = {path = "."}
 
 [requires]
 python_version = "3.6"

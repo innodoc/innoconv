@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "59ab05836ddb19f7b22eb2de0eb49eb0515c5f8f66a880ceabcc1644a0ccc083"
+            "sha256": "0e77c0d61a8fae037b89a5f385d484117f896b4943274a6771fcce03f1460705"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -17,7 +17,6 @@
     },
     "default": {
         "innoconv": {
-            "editable": true,
             "path": "."
         },
         "pyyaml": {
