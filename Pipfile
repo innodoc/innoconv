@@ -19,3 +19,12 @@ innoconv = {editable = true,path = "."}
 
 [requires]
 python_version = "3.6"
+
+[scripts]
+lint = "pipenv run flake8 && pipenv run pylint"
+flake8 = "flake8 setup.py innoconv"
+pylint = "pylint --output-format=colorized setup.py innoconv"
+test = "green -vv -r innoconv"
+coverage = "pipenv run test && coverage html"
+integration_test = "green -vv integration_test"
+clean = "rm -rf htmlcov .coverage"

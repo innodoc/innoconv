@@ -1,4 +1,4 @@
-image: python:3.6-alpine
+image: python:alpine
 
 stages:
   - setup
@@ -8,11 +8,11 @@ cache: &cache
   key: default-innoconv
   paths:
     - .pip-cache/
-    - venv/
-    - .local/
+    - .local/bin/pandoc
+    - .local/share/virtualenvs/
 
 variables:
-  PANDOC_VERSION: "2.5"
+  PANDOC_VERSION: "2.7"
   # pip cache directory inside project since we can only cache local items
   PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
   GIT_SUBMODULE_STRATEGY: "normal"
@@ -26,43 +26,35 @@ install:
     - apk add build-base
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
-    - python -m venv venv
-    - source venv/bin/activate
-    - pip install --upgrade pip setuptools
-    - pip install -r requirements.txt
+    - pip install pipenv
+    - pipenv sync --dev
     - ./setup.py install
 
 linting:
   stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py lint
+  script: pipenv run lint
   cache:
     <<: *cache
     paths:
-      - venv/
+      - .local/share/virtualenvs/
     policy: pull
 
 unit tests:
   stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py test
+  script: pipenv run test
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
     <<: *cache
     paths:
-      - venv/
+      - .local/share/virtualenvs/
     policy: pull
 
 integration tests:
   stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py integration_test
+  script: pipenv run integration_test
   cache:
     <<: *cache
     paths:
-      - venv/
-      - .local/
+      - .local/bin/pandoc
+      - .local/share/virtualenvs/
     policy: pull
