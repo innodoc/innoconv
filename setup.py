@@ -178,7 +178,12 @@ def setup_package():
         },
         include_package_data=True,
         install_requires=['PyYAML'],
-        packages=find_packages(exclude=['integration_test']),
+        packages=find_packages(exclude=[
+            'test',
+            'test.*',
+            'integration_test',
+            'integration_test.*',
+        ]),
         python_requires='>=3.6.0',
         keywords=['innodoc', 'pandoc', 'markdown', 'education'],
         license=METADATA['license'],
