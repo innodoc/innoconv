@@ -8,10 +8,10 @@ from unittest.mock import call, patch
 
 from innoconv.extensions.copy_static import CopyStatic
 from innoconv.constants import STATIC_FOLDER
-from innoconv.test.utils import (
+from ..utils import (
     get_filler_content, get_image_ast, get_video_ast, get_generic_link_ast,
     get_para_ast, get_youtube_ast)
-from innoconv.test.extensions import SOURCE, DEST, PATHS, TestExtension
+from . import SOURCE, DEST, PATHS, TestExtension
 
 
 @patch('os.makedirs', return_value=True)

@@ -74,6 +74,14 @@ class PylintCommand(BaseCommand):
         self._run(['pylint', '--output-format=colorized'] + LINT_DIRS)
 
 
+class LintCommand(BaseCommand):
+    description = 'Run pylint on Python source files'
+
+    def run(self):
+        self._run_cmd(['flake8'])
+        self._run_cmd(['pylint'])
+
+
 class TestCommand(BaseCommand):
     description = 'Run test suite'
 
@@ -82,7 +90,7 @@ class TestCommand(BaseCommand):
     ]
 
     def initialize_options(self):
-        self.test_target = os.path.join(ROOT_DIR, 'innoconv')
+        self.test_target = os.path.join(ROOT_DIR, 'test')
 
     def run(self):
         self._run(['green', '-vv', '-r', self.test_target])
@@ -145,6 +153,7 @@ def setup_package():
             'coverage': CoverageCommand,
             'flake8': Flake8Command,
             'integration_test': IntegrationTestCommand,
+            'lint': LintCommand,
             'pylint': PylintCommand,
             'test': TestCommand,
             'upload': UploadCommand,

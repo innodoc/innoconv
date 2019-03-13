@@ -5,7 +5,7 @@
 from unittest.mock import call, patch
 
 from innoconv.extensions.write_manifest import WriteManifest
-from innoconv.test.extensions import DEST, TestExtension
+from . import DEST, TestExtension
 
 
 class TestWriteManifest(TestExtension):

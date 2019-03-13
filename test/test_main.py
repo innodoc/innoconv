@@ -7,7 +7,7 @@ from unittest.mock import call, DEFAULT, mock_open, patch
 from argparse import ArgumentParser, Namespace
 
 import innoconv.__main__
-from innoconv.test.utils import get_manifest
+from .utils import get_manifest
 
 DEFAULT_ARGS = {
     'verbose': True,
