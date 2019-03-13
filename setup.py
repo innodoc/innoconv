@@ -126,7 +126,7 @@ class UploadCommand(BaseCommand):
     def run(self):
         self.log.info('Building distribution files (universal)…')
         self._run_cmd(['clean'])
-        self._run_cmd(['sdist', 'bdist_wheel', '--universal'])
+        self._run_cmd(['sdist', 'bdist_wheel'])
         self.log.info('Uploading the package to PyPI via Twine…')
         self._run(['twine', 'upload', 'dist/*'])
         self.log.info('Pushing git tag…')
@@ -166,16 +166,10 @@ def setup_package():
                 'sphinx-rtd-theme',
                 'Sphinx',
             ],
-            'packaging': [
-                # https://dustingram.com/articles/2018/03/16/markdown-descriptions-on-pypi/
-                'setuptools>=38.6.0',
-                'twine>=1.11.0',
-                'wheel>=0.31.0',
-            ],
         },
         include_package_data=True,
         install_requires=['PyYAML'],
-        packages=find_packages(exclude=['*.test.*', '*.test']),
+        packages=find_packages(exclude=['integration_test']),
         python_requires='>=3.6.0',
         keywords=['innodoc', 'pandoc', 'markdown', 'education'],
         license=METADATA['license'],

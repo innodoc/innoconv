@@ -29,14 +29,14 @@ install:
     - python -m venv venv
     - source venv/bin/activate
     - pip install --upgrade pip setuptools
-    - pip install -r requirements.txt
     - ./setup.py install
 
 linting:
   stage: test
   script:
     - source venv/bin/activate
-    - ./setup.py lint
+    - ./setup.py pylint
+    - ./setup.py flake8
   cache:
     <<: *cache
     paths:
