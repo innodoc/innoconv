@@ -1,4 +1,4 @@
-"""Project metadata"""
+"""Project metadata."""
 
 __author__ = "Mirko Dietrich, innoCampus, TU Berlin"
 __author_email__ = "dietrich@math.tu-berlin.de"
