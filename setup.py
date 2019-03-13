@@ -51,12 +51,13 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
 
     def _run(self, command, err_msg='Command failed!', cwd=ROOT_DIR):
         self.log.info('Command %s', ' '.join(command))
-
         proc = subprocess.Popen(command, cwd=cwd, stderr=subprocess.STDOUT)
-
-        return_code = proc.wait(timeout=120)
+        return_code = proc.wait(timeout=240)
         if return_code != 0:
             raise RuntimeError(err_msg)
+
+    def _run_cmd(self, cmd):
+        self._run([sys.executable, 'setup.py'] + cmd)
 
 
 class Flake8Command(BaseCommand):
@@ -92,8 +93,8 @@ class CoverageCommand(BaseCommand):
 
     def run(self):
         if not os.path.isfile(os.path.join(ROOT_DIR, '.coverage')):
-            self.log.error(
-                'Run "./setup.py test" first to generate a ".coverage".')
+            self.log.error('No ".coverage" found. Running tests first…')
+            self._run_cmd(['test'])
         self._run(['coverage', 'html'])
 
 
@@ -116,6 +117,21 @@ class CleanCommand(clean, BaseCommand):
         super().run()
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'innoconv.egg-info')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'build')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'dist')])
+
+
+class UploadCommand(BaseCommand):
+    def run(self):
+        self.log.info('Building distribution files (universal)…')
+        self._run_cmd(['clean'])
+        self._run_cmd(['sdist', 'bdist_wheel', '--universal'])
+        self.log.info('Uploading the package to PyPI via Twine…')
+        self._run(['twine', 'upload', 'dist/*'])
+        self.log.info('Pushing git tag…')
+        self._run(['git', 'tag', f"v{METADATA['version']}"])
+        self._run(['git', 'push', '--tags'])
 
 
 def setup_package():
@@ -131,6 +147,7 @@ def setup_package():
             'integration_test': IntegrationTestCommand,
             'pylint': PylintCommand,
             'test': TestCommand,
+            'upload': UploadCommand,
         },
         description='Converter for interactive educational content.',
         entry_points={
@@ -138,10 +155,28 @@ def setup_package():
                 'innoconv = innoconv.__main__:main',
             ],
         },
+        extras_require={
+            'dev': [
+                'coverage',
+                'flake8',
+                'green',
+                'pydocstyle',
+                'pylint',
+                'sphinx-argparse',
+                'sphinx-rtd-theme',
+                'Sphinx',
+            ],
+            'packaging': [
+                # https://dustingram.com/articles/2018/03/16/markdown-descriptions-on-pypi/
+                'setuptools>=38.6.0',
+                'twine>=1.11.0',
+                'wheel>=0.31.0',
+            ],
+        },
         include_package_data=True,
-        install_requires=[],
-        packages=find_packages(exclude=["*.test.*", "*.test"]),
-        python_requires='>=3',
+        install_requires=['PyYAML'],
+        packages=find_packages(exclude=['*.test.*', '*.test']),
+        python_requires='>=3.6.0',
         keywords=['innodoc', 'pandoc', 'markdown', 'education'],
         license=METADATA['license'],
         long_description=LONG_DESCRIPTION,
@@ -150,18 +185,19 @@ def setup_package():
         zip_safe=False,
         project_urls={
             'Documentation': 'https://readthedocs.org/projects/innoconv/',
-            'Source': 'https://gitlab.tu-berlin.de/innodoc/innoconv',
         },
         classifiers=(
-            "Programming Language :: Python :: 3.6",
-            "License :: OSI Approved :: " +
-            "GNU General Public License v3 or later (GPLv3+)",
-            "Operating System :: POSIX :: Linux",
-            "Development Status :: 3 - Alpha",
-            "Environment :: Console",
-            "Intended Audience :: Education",
-            "Topic :: Education",
-            "Topic :: Text Processing :: Markup",
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.6',
+            'License :: OSI Approved :: ' +
+            'GNU General Public License v3 or later (GPLv3+)',
+            'Operating System :: POSIX :: Linux',
+            'Development Status :: 3 - Alpha',
+            'Environment :: Console',
+            'Intended Audience :: Education',
+            'Topic :: Education',
+            'Topic :: Text Processing :: Markup',
         ),
     )
 

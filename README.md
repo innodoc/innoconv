@@ -22,8 +22,7 @@ $ innoconv .
 ```sh
 $ python3 -m venv venv
 $ . venv/bin/activate
-$ pip install -r requirements.txt
-$ ./setup.py develop
+$ pip install -e .[dev]
 ```
 
 ### Commands
