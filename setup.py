@@ -69,7 +69,7 @@ class Flake8Command(BaseCommand):
 
     def run(self):
         """Run command."""
-        self._run(['flake8'] + LINT_DIRS)
+        self._run(['flake8', '--max-complexity=10'] + LINT_DIRS)
 
 
 class PylintCommand(BaseCommand):
@@ -211,8 +211,11 @@ def setup_package():
                 'coverage',
                 'flake8',
                 'green',
+                'mccabe',
                 'pydocstyle',
                 'pylint',
+            ],
+            'doc': [
                 'sphinx-argparse',
                 'sphinx-rtd-theme',
                 'Sphinx',
