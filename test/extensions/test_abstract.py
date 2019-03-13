@@ -5,7 +5,7 @@
 import unittest
 
 from innoconv.extensions.abstract import AbstractExtension
-from innoconv.test.utils import get_manifest
+from ..utils import get_manifest
 
 MANIFEST = get_manifest()
 
