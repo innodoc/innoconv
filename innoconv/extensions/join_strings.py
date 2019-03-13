@@ -1,10 +1,11 @@
 """
-This extension modifies the AST. It merges consecutive sequences of strings and
-spaces into a single string element.
+Merge consecutive sequences of strings and spaces into a single string element.
 
 The motivation behind this extension is to make the AST more readable and also
 to save space by compressing the representation. The actual appearance in a
 viewer should remain completely untouched.
+
+This extension modifies the AST.
 
 =======
 Example
@@ -27,20 +28,22 @@ TYPES_TO_MERGE = (STR_TYPE, 'Space', 'SoftBreak')
 
 
 class JoinStrings(AbstractExtension):
-    """This extension merges consecutive strings and spaces in the
-    AST."""
+    """Merge consecutive strings and spaces in the AST."""
 
     _helptext = "Merge sequences of strings and spaces in the AST."
 
     def __init__(self, *args, **kwargs):
+        """Initialize variables."""
         super(JoinStrings, self).__init__(*args, **kwargs)
         self.previous_element = None  # the element we merge to
 
     # content parsing
 
     def _process_ast_element(self, ast_element):
-        """Process an element in the AST descending further down if
-        possible."""
+        """Process a single element in the AST.
+
+        Descend further down if possible.
+        """
         self.previous_element = None   # Stop merging on new element
         if isinstance(ast_element, list):
             self._process_ast_array(ast_element)
@@ -52,11 +55,15 @@ class JoinStrings(AbstractExtension):
             pass
 
     def _process_ast_array(self, ast_array):
-        """The first instance of mergeable content is stored in
+        """
+        Iterate over elements in AST.
+
+        The first instance of mergeable content is stored in
         self.previous_element. Every subsequent instance of mergeable content
-        gets added to the first instance and finally removed"""
+        gets added to the first instance and finally removed.
+        """
         def is_string_or_space(content_element):
-            """Checks if an ast element is mergeable, i.e. string or space"""
+            """Check if an ast element is mergeable, i.e. String or Space."""
             try:
                 return content_element['t'] in TYPES_TO_MERGE
             except (TypeError, KeyError):  # could be an invalid dictionary
@@ -81,7 +88,7 @@ class JoinStrings(AbstractExtension):
         self.previous_element = None
 
     def _prepare_previous_element(self, content_element):
-        """Normalizes self.previous_element to always be a Str"""
+        """Normalize self.previous_element to always be a Str."""
         self.previous_element = content_element
         if self.previous_element['t'] != STR_TYPE:
             self.previous_element['t'] = STR_TYPE
