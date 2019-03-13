@@ -22,8 +22,7 @@ $ innoconv .
 ```sh
 $ python3 -m venv venv
 $ . venv/bin/activate
-$ pip install -r requirements.txt
-$ ./setup.py develop
+$ pip install -e .[dev]
 ```
 
 ### Commands
@@ -51,11 +50,12 @@ $ ./setup.py lint
 
 ```sh
 $ ./setup.py test
+$ ./setup.py integration_test
 ```
 
 #### Build HTML coverage report
 
-Do this after calling `./setup.py test`.
+A coverage report will be created in `./htmlcov`.
 
 ```sh
 $ ./setup.py coverage
@@ -63,8 +63,8 @@ $ ./setup.py coverage
 
 #### Documentation
 
-```sh
-$ ./setup.py build_doc
-```
+You can find the documentation in `./build/sphinx`.
 
-You can find the documentation in `build/sphinx`.
+```sh
+$ ./setup.py build_sphinx
+```
