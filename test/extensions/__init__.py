@@ -7,7 +7,7 @@ import unittest
 from os.path import join
 
 from innoconv.manifest import Manifest
-from innoconv.test.utils import get_filler_content
+from ..utils import get_filler_content
 
 SOURCE = '/source'
 DEST = '/destination'
