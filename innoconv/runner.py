@@ -24,6 +24,7 @@ class InnoconvRunner():
     """Convert content files in a directory tree."""
 
     def __init__(self, source_dir, output_dir, manifest, extensions):
+        """Set defaults and load extensions."""
         self._source_dir = source_dir
         self._output_dir = output_dir
         self._manifest = manifest
@@ -33,7 +34,6 @@ class InnoconvRunner():
 
     def run(self):
         """Start the conversion by iterating over language folders."""
-
         self._notify_extensions('start', self._output_dir, self._source_dir)
 
         for language in self._manifest.languages:

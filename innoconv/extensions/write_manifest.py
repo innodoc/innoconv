@@ -1,9 +1,9 @@
 """
-Every course needs a :class:`Manifest <innoconv.manifest.Manifest>`. A
-``manifest.json`` is written to the output folder.
+Extension that writes a ``manifest.json`` to the output folder.
 
-Additionally to the fields from the source manifest it can include a table
-of contents and a glossary.
+Every course needs a :class:`Manifest <innoconv.manifest.Manifest>`.
+Additionally to the fields from the source manifest it can include a table of
+contents and a glossary.
 """
 
 import json
@@ -17,9 +17,11 @@ from innoconv.manifest import ManifestEncoder
 
 class WriteManifest(AbstractExtension):
     """Write a manifest file when conversion is done."""
+
     _helptext = "Write a {}.json file.".format(MANIFEST_BASENAME)
 
     def __init__(self, *args, **kwargs):
+        """Initialize variables."""
         super(WriteManifest, self).__init__(*args, **kwargs)
         self._output_dir = None
 
