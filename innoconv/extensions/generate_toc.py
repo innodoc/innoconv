@@ -1,4 +1,6 @@
 """
+Extension that generates a table of contents.
+
 A table of contents is generated from the course sections and added to the
 :class:`Manifest <innoconv.manifest.Manifest>`.
 """
@@ -10,9 +12,11 @@ from innoconv.extensions.abstract import AbstractExtension
 
 class GenerateToc(AbstractExtension):
     """Generate a TOC from content sections."""
+
     _helptext = "Generate a table of contents."
 
     def __init__(self, *args, **kwargs):
+        """Initialize variables."""
         super(GenerateToc, self).__init__(*args, **kwargs)
         self._output_dir = None
         self._current_path = None

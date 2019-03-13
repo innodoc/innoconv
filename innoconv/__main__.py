@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """Main entry for the innoconv document converter."""
 
 import argparse
@@ -71,7 +70,7 @@ def get_arg_parser():
 
 
 def main(args=None):
-    """innoConv main entry point."""
+    """Read options and start the innoConv runner."""
     args = vars(get_arg_parser().parse_args())
     source_dir = os.path.abspath(args['source_dir'])
     output_dir = os.path.abspath(args['output_dir'])
@@ -111,7 +110,7 @@ def main(args=None):
 
 
 def init():
-    """Module init function."""
+    """Run main function and return exit code."""
     if __name__ == '__main__':
         sys.exit(main())
 

@@ -1,4 +1,8 @@
-"""The AbstractExtension is not meant to be instantiated directly."""
+"""
+Base class for all other extensions.
+
+The AbstractExtension is not meant to be instantiated directly.
+"""
 
 
 class AbstractExtension():
@@ -15,6 +19,7 @@ class AbstractExtension():
     _helptext = ''
 
     def __init__(self, manifest):
+        """Initialize variables."""
         self._manifest = manifest
 
     @classmethod

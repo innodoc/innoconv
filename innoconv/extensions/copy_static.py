@@ -1,4 +1,6 @@
 """
+Extension that copies static files.
+
 Content can include figures, images and videos. Static files can be included
 in a special folder named ``_static``. The files will be copied to the
 output directory automatically.
@@ -60,13 +62,16 @@ ACCEPTED_LINK_CLASSES = (
 
 
 class CopyStatic(AbstractExtension):
-    """Copy static files from the content source directory to the output
-    directory.
+    """Copy static files to the output folder.
+
+    This extension copies checks the AST for references to static files and
+    copies them from the content source directory to the output directory.
     """
 
     _helptext = "Copy static files to the output folder."
 
     def __init__(self, *args, **kwargs):
+        """Initialize variables."""
         super(CopyStatic, self).__init__(*args, **kwargs)
         self._source_dir = None
         self._output_dir = None
@@ -200,5 +205,5 @@ class CopyStatic(AbstractExtension):
         """Unused."""
 
     def finish(self):
-        """Finally copy the files."""
+        """Copy static files to the output folder."""
         self._copy_files()

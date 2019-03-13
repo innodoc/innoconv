@@ -7,7 +7,8 @@ from innoconv.constants import ENCODING
 
 
 def to_ast(filepath):
-    """Convert a file to abstract syntax tree using pandoc.
+    """
+    Convert a file to abstract syntax tree using pandoc.
 
     :param filepath: Path of file
     :type filepath: str
