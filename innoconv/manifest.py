@@ -62,6 +62,7 @@ class Manifest():
 
 class ManifestEncoder(json.JSONEncoder):
     """JSON encoder that can handle Manifest objects."""
+
     def default(self, o):
         """Return dict for Manifest objects."""
         # pylint: disable=method-hidden

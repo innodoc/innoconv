@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=missing-docstring
-
 """Define project commands."""
-
 
 import distutils.cmd
 from distutils.command.clean import clean
@@ -21,6 +18,7 @@ LINT_DIRS = [
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
+# Need to parse metadata manually as setup.py must not import innoconv
 METADATA_PATH = os.path.join(ROOT_DIR, 'innoconv', 'metadata.py')
 with open(METADATA_PATH, 'r') as metadata_file:
     METADATA = dict(
@@ -33,21 +31,25 @@ with open('README.md', 'r') as fh:
 
 
 def get_logger():
+    """Get logger instance for setup.py."""
     return logging.getLogger('setup.py')
 
 
 class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
+    """The base class for all custom commands."""
+
     user_options = []
 
     def __init__(self, *args, **kwargs):
+        """Get logger."""
         super().__init__(*args, **kwargs)
         self.log = get_logger()
 
     def initialize_options(self):
-        pass
+        """Set default values for options."""
 
     def finalize_options(self):
-        pass
+        """Post-process options."""
 
     def _run(self, command, err_msg='Command failed!', cwd=ROOT_DIR):
         self.log.info('Command %s', ' '.join(command))
@@ -61,53 +63,73 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
 
 
 class Flake8Command(BaseCommand):
-    description = 'Run flake8 on Python source files'
+    """Custom command that runs flake8 on source files."""
+
+    description = 'Run flake8 on Python source files.'
 
     def run(self):
+        """Run command."""
         self._run(['flake8', '--max-complexity=10'] + LINT_DIRS)
 
 
 class PylintCommand(BaseCommand):
+    """Custom command that runs pylint on source files."""
+
     description = 'Run pylint on Python source files'
 
     def run(self):
+        """Run command."""
         self._run(['pylint', '--output-format=colorized'] + LINT_DIRS)
 
 
 class PyDocStyleCommand(BaseCommand):
+    """Custom command that runs pydocstyle on source files."""
+
     description = 'Run pydocstyle on Python source files'
 
     def run(self):
+        """Run command."""
+#        self._run(['pydocstyle', '--ignore=D401'] + LINT_DIRS)
         self._run(['pydocstyle'] + LINT_DIRS)
 
 
 class LintCommand(BaseCommand):
-    description = 'Run pylint on Python source files'
+    """Custom command that runs all lint tools on source files."""
+
+    description = 'Run all lint tools on Python source files'
 
     def run(self):
+        """Run command."""
         self._run_cmd(['flake8'])
         self._run_cmd(['pylint'])
         self._run_cmd(['pydocstyle'])
 
 
 class TestCommand(BaseCommand):
-    description = 'Run test suite'
+    """Custom command that runs unit tests on source files."""
+
+    description = 'Run unit test suite'
 
     user_options = [
         ('test-target=', 't', 'Test target (module or path)'),
     ]
 
     def initialize_options(self):
+        """Set default values for option for test_target."""
         self.test_target = os.path.join(ROOT_DIR, 'test')
 
     def run(self):
+        """Run command."""
         self._run(['green', '-vv', '-r', self.test_target])
 
 
 class CoverageCommand(BaseCommand):
+    """Custom command that generates a HTML coverage report."""
+
     description = 'Generate HTML coverage report'
 
     def run(self):
+        """Run command."""
         if not os.path.isfile(os.path.join(ROOT_DIR, '.coverage')):
             self.log.error('No ".coverage" found. Running tests first…')
             self._run_cmd(['test'])
@@ -115,6 +137,8 @@ class CoverageCommand(BaseCommand):
 
 
 class IntegrationTestCommand(BaseCommand):
+    """Custom command that runs integration tests on source files."""
+
     description = 'Run integration test suite'
 
     user_options = [
@@ -122,14 +146,19 @@ class IntegrationTestCommand(BaseCommand):
     ]
 
     def initialize_options(self):
+        """Set default values for option for test_target."""
         self.test_target = os.path.join(ROOT_DIR, 'integration_test')
 
     def run(self):
+        """Run command."""
         self._run(['green', '-vv', self.test_target])
 
 
 class CleanCommand(clean, BaseCommand):
+    """Custom command that cleans all build files."""
+
     def run(self):
+        """Run command."""
         super().run()
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
@@ -139,7 +168,10 @@ class CleanCommand(clean, BaseCommand):
 
 
 class UploadCommand(BaseCommand):
+    """Custom command that uploads release to PyPI and tags it in git."""
+
     def run(self):
+        """Run command."""
         self.log.info('Building distribution files (universal)…')
         self._run_cmd(['clean'])
         self._run_cmd(['sdist', 'bdist_wheel'])
@@ -151,6 +183,7 @@ class UploadCommand(BaseCommand):
 
 
 def setup_package():
+    """Create package setup information."""
     setup(
         name='innoconv',
         version=METADATA['version'],
@@ -189,7 +222,7 @@ def setup_package():
             ],
         },
         include_package_data=True,
-        install_requires=['PyYAML>=3,<4'],
+        install_requires=['PyYAML>=3.13,<4'],
         packages=find_packages(exclude=[
             'test',
             'test.*',
