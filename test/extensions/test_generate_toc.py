@@ -3,7 +3,7 @@
 # pylint: disable=missing-docstring
 
 from innoconv.extensions.generate_toc import GenerateToc
-from innoconv.test.extensions import TestExtension
+from . import TestExtension
 
 PATHS = (
     (None, ()),

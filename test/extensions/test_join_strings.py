@@ -3,7 +3,7 @@
 # pylint: disable=missing-docstring
 
 from innoconv.extensions.join_strings import JoinStrings
-from innoconv.test.extensions import TestExtension
+from . import TestExtension
 
 PATHS = (
     ("Foo", ('foo',)),

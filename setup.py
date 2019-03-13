@@ -51,12 +51,13 @@ class BaseCommand(distutils.cmd.Command):  # pylint: disable=no-member
 
     def _run(self, command, err_msg='Command failed!', cwd=ROOT_DIR):
         self.log.info('Command %s', ' '.join(command))
-
         proc = subprocess.Popen(command, cwd=cwd, stderr=subprocess.STDOUT)
-
-        return_code = proc.wait(timeout=120)
+        return_code = proc.wait(timeout=240)
         if return_code != 0:
             raise RuntimeError(err_msg)
+
+    def _run_cmd(self, cmd):
+        self._run([sys.executable, 'setup.py'] + cmd)
 
 
 class Flake8Command(BaseCommand):
@@ -73,6 +74,22 @@ class PylintCommand(BaseCommand):
         self._run(['pylint', '--output-format=colorized'] + LINT_DIRS)
 
 
+class PyDocStyleCommand(BaseCommand):
+    description = 'Run pydocstyle on Python source files'
+
+    def run(self):
+        self._run(['pydocstyle'] + LINT_DIRS)
+
+
+class LintCommand(BaseCommand):
+    description = 'Run pylint on Python source files'
+
+    def run(self):
+        self._run_cmd(['flake8'])
+        self._run_cmd(['pylint'])
+        self._run_cmd(['pydocstyle'])
+
+
 class TestCommand(BaseCommand):
     description = 'Run test suite'
 
@@ -81,7 +98,7 @@ class TestCommand(BaseCommand):
     ]
 
     def initialize_options(self):
-        self.test_target = os.path.join(ROOT_DIR, 'innoconv')
+        self.test_target = os.path.join(ROOT_DIR, 'test')
 
     def run(self):
         self._run(['green', '-vv', '-r', self.test_target])
@@ -92,8 +109,8 @@ class CoverageCommand(BaseCommand):
 
     def run(self):
         if not os.path.isfile(os.path.join(ROOT_DIR, '.coverage')):
-            self.log.error(
-                'Run "./setup.py test" first to generate a ".coverage".')
+            self.log.error('No ".coverage" found. Running tests first…')
+            self._run_cmd(['test'])
         self._run(['coverage', 'html'])
 
 
@@ -116,6 +133,21 @@ class CleanCommand(clean, BaseCommand):
         super().run()
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'htmlcov')])
         self._run(['rm', '-rf', os.path.join(ROOT_DIR, '.coverage')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'innoconv.egg-info')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'build')])
+        self._run(['rm', '-rf', os.path.join(ROOT_DIR, 'dist')])
+
+
+class UploadCommand(BaseCommand):
+    def run(self):
+        self.log.info('Building distribution files (universal)…')
+        self._run_cmd(['clean'])
+        self._run_cmd(['sdist', 'bdist_wheel'])
+        self.log.info('Uploading the package to PyPI via Twine…')
+        self._run(['twine', 'upload', 'dist/*'])
+        self.log.info('Pushing git tag…')
+        self._run(['git', 'tag', f"v{METADATA['version']}"])
+        self._run(['git', 'push', '--tags'])
 
 
 def setup_package():
@@ -129,8 +161,11 @@ def setup_package():
             'coverage': CoverageCommand,
             'flake8': Flake8Command,
             'integration_test': IntegrationTestCommand,
+            'pydocstyle': PyDocStyleCommand,
+            'lint': LintCommand,
             'pylint': PylintCommand,
             'test': TestCommand,
+            'upload': UploadCommand,
         },
         description='Converter for interactive educational content.',
         entry_points={
@@ -138,10 +173,27 @@ def setup_package():
                 'innoconv = innoconv.__main__:main',
             ],
         },
+        extras_require={
+            'dev': [
+                'coverage',
+                'flake8',
+                'green',
+                'pydocstyle',
+                'pylint',
+                'sphinx-argparse',
+                'sphinx-rtd-theme',
+                'Sphinx',
+            ],
+        },
         include_package_data=True,
-        install_requires=[],
-        packages=find_packages(exclude=["*.test.*", "*.test"]),
-        python_requires='>=3',
+        install_requires=['PyYAML>=3,<4'],
+        packages=find_packages(exclude=[
+            'test',
+            'test.*',
+            'integration_test',
+            'integration_test.*',
+        ]),
+        python_requires='>=3.6.0',
         keywords=['innodoc', 'pandoc', 'markdown', 'education'],
         license=METADATA['license'],
         long_description=LONG_DESCRIPTION,
@@ -150,18 +202,19 @@ def setup_package():
         zip_safe=False,
         project_urls={
             'Documentation': 'https://readthedocs.org/projects/innoconv/',
-            'Source': 'https://gitlab.tu-berlin.de/innodoc/innoconv',
         },
         classifiers=(
-            "Programming Language :: Python :: 3.6",
-            "License :: OSI Approved :: " +
-            "GNU General Public License v3 or later (GPLv3+)",
-            "Operating System :: POSIX :: Linux",
-            "Development Status :: 3 - Alpha",
-            "Environment :: Console",
-            "Intended Audience :: Education",
-            "Topic :: Education",
-            "Topic :: Text Processing :: Markup",
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.6',
+            'License :: OSI Approved :: ' +
+            'GNU General Public License v3 or later (GPLv3+)',
+            'Operating System :: POSIX :: Linux',
+            'Development Status :: 3 - Alpha',
+            'Environment :: Console',
+            'Intended Audience :: Education',
+            'Topic :: Education',
+            'Topic :: Text Processing :: Markup',
         ),
     )
 
