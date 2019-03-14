@@ -13,7 +13,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
-    'sphinxarg.ext',
+    'sphinx_click.ext',
 ]
 
 templates_path = []
