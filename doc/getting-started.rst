@@ -13,17 +13,18 @@ Dependencies
 The only dependencies you have to provide yourself is Pandoc and the Python
 interpreter.
 
-Python 3.7
+Python 3.6
 ~~~~~~~~~~
 
-While other versions of Python might work, innoConv was tested with
-**Python 3.7**. Make sure you have it available.
+While other versions of Python might work, innoConv has been tested and
+developed with **Python 3.6**. It should be available on your Linux machine.
+Usually it's installed using your distribution package management.
 
 Pandoc
 ~~~~~~
 
 You need to make sure to have a recent version of the ``pandoc`` binary
-available in ``PATH`` (**Pandoc 2.2.1** at the time of writing). There are
+available in ``PATH`` (**Pandoc 2.7** at the time of writing). There are
 `several ways on installing Pandoc <https://pandoc.org/installing.html>`_.
 
 Installation
@@ -32,7 +33,23 @@ Installation
 Using pip
 ~~~~~~~~~
 
-TODO
+The easiest way to install innoConv is to use pip.
+
+Given you have a regular Python setup with pip available the following installs
+innoConv in your user directory (usually ``~/.local`` under Linux).
+
+.. code-block:: console
+
+  $ pip install --user innoconv
+
+For the ``innoconv`` command to work, make sure you have ``~/.local/bin`` in
+your ``$PATH``.
+
+For a system-wide installation you can omit the ``--user`` argument.
+
+.. code-block:: console
+
+  $ pip install innoconv
 
 In a virtual environment
 ~~~~~~~~~~~~~~~~~~~~~~~~
