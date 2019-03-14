@@ -8,22 +8,14 @@ cache: &cache
   key: default-innoconv
   paths:
     - .pip-cache/
-    - .local/
 
 variables:
-  PANDOC_VERSION: "2.7"
   PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
   GIT_SUBMODULE_STRATEGY: "normal"
 
 before_script:
-  - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
+  - source .bash_profile
 
 tox:
   stage: test
-  script:
-    - mkdir -p .local
-    - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
-    - pip install --upgrade pip
-    - pip install --upgrade setuptools
-    - pip install tox
-    - tox
+  script: tox
