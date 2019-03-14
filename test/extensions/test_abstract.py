@@ -10,17 +10,17 @@ from ..utils import get_manifest
 MANIFEST = get_manifest()
 
 
-class TestExtension(AbstractExtension):
+class MyCrazyExtension(AbstractExtension):
     # pylint: disable=W0223
     _helptext = "Foo bar"
 
 
 class TestAbstractExtension(unittest.TestCase):
     def test_helptext(self):
-        self.assertEqual(TestExtension.helptext(), "Foo bar")
+        self.assertEqual(MyCrazyExtension.helptext(), "Foo bar")
 
     def test_notimplemented(self):
-        test_extension = TestExtension(MANIFEST)
+        test_extension = MyCrazyExtension(MANIFEST)
         events = (
             ('start', ('source', 'output')),
             ('pre_conversion', ('en',)),

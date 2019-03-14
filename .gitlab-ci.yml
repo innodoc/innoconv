@@ -1,67 +1,72 @@
-image: python:3.6-alpine
+image: innodoc/pyenv-alpine
 
 stages:
-  - setup
   - test
+  - coverage
 
 # caching works only inside project directory
 cache: &cache
   key: default-innoconv
   paths:
-    - .pip-cache/
-    - venv/
-    - .local/
+    - .coverage*
+    - .tox
 
 variables:
-  PANDOC_VERSION: "2.7"
-  PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
   GIT_SUBMODULE_STRATEGY: "normal"
 
 before_script:
-  - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
+  - source $HOME/.bash_profile
 
-install:
-  stage: setup
-  script:
-    - apk add build-base
-    - mkdir -p .local
-    - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
-    - python -m venv venv
-    - source venv/bin/activate
-    - pip install --upgrade pip setuptools
-    - pip install .[dev]
-
-linting:
+py37-unit:
   stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py lint
+  script: tox -e py37-unit
+
+py37-integration:
+  stage: test
+  script: tox -e py37-integration
+
+py36-unit:
+  stage: test
+  script: tox -e py36-unit
+
+py36-integration:
+  stage: test
+  script: tox -e py36-integration
+
+py35-unit:
+  stage: test
+  script: tox -e py35-unit
+
+py35-integration:
+  stage: test
+  script: tox -e py35-integration
+
+py34-unit:
+  stage: test
+  script: tox -e py34-unit
+
+py34-integration:
+  stage: test
+  script: tox -e py34-integration
+
+lint:
+  stage: test
+  script: tox -e lint
   cache:
     <<: *cache
-    paths:
-      - venv/
     policy: pull
 
-unit tests:
+doc:
   stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py test
+  script: tox -e doc
+  cache:
+    <<: *cache
+    policy: pull
+
+coverage:
+  stage: coverage
+  script: tox -e cov-report
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
     <<: *cache
-    paths:
-      - venv/
-    policy: pull
-
-integration tests:
-  stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py integration_test
-  cache:
-    <<: *cache
-    paths:
-      - venv/
-      - .local/
     policy: pull

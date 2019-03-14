@@ -3,7 +3,7 @@
 # pylint: disable=missing-docstring
 
 import unittest
-from subprocess import run, PIPE
+from subprocess import call, PIPE
 from os.path import join
 import tempfile
 
@@ -17,8 +17,8 @@ class TestConversionFails(unittest.TestCase):
         """A conversion should fail on non-existent directory."""
         non_existent_dir = join('dir', 'does', 'not', 'exist')
         command = ['innoconv', '-o', self.output_dir, non_existent_dir]
-        job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
-        self.assertNotEqual(job.returncode, 0)
+        returncode = call(command, timeout=60, stdout=PIPE, stderr=PIPE)
+        self.assertNotEqual(returncode, 0)
 
     @unittest.skip('TODO')
     def test_langs_not_identical(self):
