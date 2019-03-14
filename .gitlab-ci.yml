@@ -14,7 +14,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: "normal"
 
 before_script:
-  - source .bash_profile
+  - source $HOME/.bash_profile
 
 tox:
   stage: test
