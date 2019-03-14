@@ -200,10 +200,10 @@ def setup_package():
             'test': TestCommand,
             'upload': UploadCommand,
         },
-        description='Converter for interactive educational content.',
+        description=METADATA['description'],
         entry_points={
             'console_scripts': [
-                'innoconv = innoconv.__main__:main',
+                'innoconv = innoconv.cli:cli',
             ],
         },
         extras_require={
@@ -216,13 +216,16 @@ def setup_package():
                 'pylint',
             ],
             'doc': [
-                'sphinx-argparse',
+                'sphinx-click',
                 'sphinx-rtd-theme',
                 'Sphinx',
             ],
         },
         include_package_data=True,
-        install_requires=['PyYAML>=3.13,<4'],
+        install_requires=[
+            'click>=7,<8',
+            'PyYAML>=3.13,<4',
+        ],
         packages=find_packages(exclude=[
             'test',
             'test.*',
@@ -239,7 +242,7 @@ def setup_package():
         project_urls={
             'Documentation': 'https://readthedocs.org/projects/innoconv/',
         },
-        classifiers=(
+        classifiers=[
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.6',
@@ -251,7 +254,7 @@ def setup_package():
             'Intended Audience :: Education',
             'Topic :: Education',
             'Topic :: Text Processing :: Markup',
-        ),
+        ],
     )
 
 

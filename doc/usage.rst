@@ -14,9 +14,5 @@ This will trigger the conversion for this content folder.
 Command line arguments
 ----------------------
 
-.. argparse::
-   :module: innoconv.__main__
-   :func: get_arg_parser
+.. click:: innoconv.cli:cli
    :prog: innoconv
-   :nodescription:
-   :noepilog:
