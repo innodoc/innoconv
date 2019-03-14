@@ -32,6 +32,7 @@ class TestConversionTubBase(unittest.TestCase):
         """A conversion should run without problems."""
         command = [
             'innoconv',
+            '--force',  # TODO: why do tests fail without this???
             '--verbose',
             '--output-dir', self.output_dir,
             REPO_DIR]

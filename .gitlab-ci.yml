@@ -1,7 +1,6 @@
-image: python:3.6-alpine
+image: innodoc/pyenv-alpine
 
 stages:
-  - setup
   - test
 
 # caching works only inside project directory
@@ -9,7 +8,6 @@ cache: &cache
   key: default-innoconv
   paths:
     - .pip-cache/
-    - venv/
     - .local/
 
 variables:
@@ -20,48 +18,13 @@ variables:
 before_script:
   - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
 
-install:
-  stage: setup
+tox:
+  stage: test
   script:
     - apk add build-base
     - mkdir -p .local
     - "[[ -e .local/bin/pandoc ]] || wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xvzf - --strip-components 1 -C .local"
-    - python -m venv venv
-    - source venv/bin/activate
-    - pip install --upgrade pip setuptools
-    - pip install .[dev]
-
-linting:
-  stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py lint
-  cache:
-    <<: *cache
-    paths:
-      - venv/
-    policy: pull
-
-unit tests:
-  stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py test
-  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
-  cache:
-    <<: *cache
-    paths:
-      - venv/
-    policy: pull
-
-integration tests:
-  stage: test
-  script:
-    - source venv/bin/activate
-    - ./setup.py integration_test
-  cache:
-    <<: *cache
-    paths:
-      - venv/
-      - .local/
-    policy: pull
+    - pip install --upgrade pip
+    - pip install --upgrade setuptools
+    - pip install tox
+    - tox
