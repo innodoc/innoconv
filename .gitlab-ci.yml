@@ -43,7 +43,7 @@ py35-integration:
 
 py34-unit:
   stage: test
-  script: tox -e py34-unit
+  script: pyenv local 3.4.9 && tox -e py34-unit
 
 py34-integration:
   stage: test
