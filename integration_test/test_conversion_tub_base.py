@@ -3,7 +3,7 @@
 # pylint: disable=missing-docstring
 
 import unittest
-from subprocess import run, PIPE
+from subprocess import Popen, PIPE
 from os import walk, sep, remove
 from os.path import isdir, join, isfile, realpath, dirname
 import json
@@ -36,13 +36,14 @@ class TestConversionTubBase(unittest.TestCase):
             '--verbose',
             '--output-dir', self.output_dir,
             REPO_DIR]
-        job = run(command, timeout=60, stdout=PIPE, stderr=PIPE)
-        stdout = job.stdout.decode('utf-8')
-        stderr = job.stderr.decode('utf-8')
-        if job.returncode != 0:
+        process = Popen(command, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = process.communicate(timeout=60)
+        stdout = stdout.decode('utf-8')
+        stderr = stderr.decode('utf-8')
+        if process.returncode != 0:
             print(stdout)
             print(stderr)
-        self.assertEqual(job.returncode, 0)
+        self.assertEqual(process.returncode, 0)
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
         self._test_content()
