@@ -8,7 +8,7 @@ stages:
 cache: &cache
   key: default-innoconv
   paths:
-    - .coverage
+    - .coverage*
     - .tox
 
 variables:
