@@ -8,40 +8,60 @@ stages:
 cache: &cache
   key: default-innoconv
   paths:
-    - .pip-cache/
     - .coverage
     - .tox
 
 variables:
-  PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
   GIT_SUBMODULE_STRATEGY: "normal"
 
 before_script:
   - source $HOME/.bash_profile
 
+py37-unit:
+  stage: test
+  script: tox -e py37-unit
+
+py37-integration:
+  stage: test
+  script: tox -e py37-integration
+
+py36-unit:
+  stage: test
+  script: tox -e py36-unit
+
+py36-integration:
+  stage: test
+  script: tox -e py36-integration
+
+py35-unit:
+  stage: test
+  script: tox -e py35-unit
+
+py35-integration:
+  stage: test
+  script: tox -e py35-integration
+
+py34-unit:
+  stage: test
+  script: tox -e py34-unit
+
+py34-integration:
+  stage: test
+  script: tox -e py34-integration
+
 lint:
   stage: test
   script: tox -e lint
+  cache:
+    <<: *cache
+    policy: pull
 
 doc:
   stage: test
   script: tox -e doc
-
-py37:
-  stage: test
-  script: tox -e py37
-
-py36:
-  stage: test
-  script: tox -e py36
-
-py35:
-  stage: test
-  script: tox -e py35
-
-py34:
-  stage: test
-  script: tox -e py34
+  cache:
+    <<: *cache
+    policy: pull
 
 coverage:
   stage: coverage
