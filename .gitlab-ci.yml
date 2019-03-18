@@ -2,12 +2,15 @@ image: innodoc/pyenv-alpine
 
 stages:
   - test
+  - coverage
 
 # caching works only inside project directory
 cache: &cache
   key: default-innoconv
   paths:
     - .pip-cache/
+    - .coverage
+    - .tox
 
 variables:
   PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.pip-cache"
@@ -16,6 +19,33 @@ variables:
 before_script:
   - source $HOME/.bash_profile
 
-tox:
+lint:
   stage: test
-  script: tox
+  script: tox -e lint
+
+doc:
+  stage: test
+  script: tox -e doc
+
+py37:
+  stage: test
+  script: tox -e py37
+
+py36:
+  stage: test
+  script: tox -e py36
+
+py35:
+  stage: test
+  script: tox -e py35
+
+py34:
+  stage: test
+  script: tox -e py34
+
+coverage:
+  stage: coverage
+  script: tox -e coverage-report
+  cache:
+    <<: *cache
+    policy: pull

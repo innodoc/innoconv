@@ -1,7 +1,5 @@
 """Unit tests for extensions."""
 
-# pylint: disable=missing-docstring
-
 from copy import deepcopy
 import unittest
 from os.path import join
@@ -20,6 +18,8 @@ PATHS = (
 
 
 class TestExtension(unittest.TestCase):
+    """Provide a base class for all extension tests."""
+
     @staticmethod
     def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS):
         if ast is None:

@@ -4,8 +4,9 @@
 import os
 import logging
 import re
+from shutil import rmtree
 import sys
-from setuptools import setup, find_packages
+from setuptools import Command, find_packages, setup
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -23,19 +24,34 @@ with open('README.md', 'r') as fh:
     LONG_DESCRIPTION = fh.read()
 
 
-# class UploadCommand(BaseCommand):
-#     """Custom command that uploads release to PyPI and tags it in git."""
-#
-#     def run(self):
-#         """Run command."""
-#         self.log.info('Building distribution files (universal)…')
-#         self._run_cmd(['clean'])
-#         self._run_cmd(['sdist', 'bdist_wheel'])
-#         self.log.info('Uploading the package to PyPI via Twine…')
-#         self._run(['twine', 'upload', 'dist/*'])
-#         self.log.info('Pushing git tag…')
-#         self._run(['git', 'tag', f"v{METADATA['version']}"])
-#         self._run(['git', 'push', '--tags'])
+class UploadCommand(Command):
+    """Custom command that uploads release to PyPI and tags it in git."""
+
+    def initialize_options(self):
+        """Initialize options."""
+
+    def finalize_options(self):
+        """Finalize options."""
+
+    def run(self):
+        """Run command."""
+        try:
+            self.status('Removing previous builds…')
+            rmtree(os.path.join(ROOT_DIR, 'dist'))
+        except OSError:
+            pass
+
+        self.status('Building Source and Wheel (universal) distribution…')
+        os.system('{0} setup.py sdist bdist_wheel'.format(sys.executable))
+
+        self.status('Uploading the package to PyPI via Twine…')
+        os.system('twine upload dist/*')
+
+        self.status('Pushing git tags…')
+        os.system('git tag v{0}'.format(METADATA['version']))
+        os.system('git push --tags')
+
+        sys.exit()
 
 
 def setup_package():
@@ -45,9 +61,9 @@ def setup_package():
         version=METADATA['version'],
         author=METADATA['author'],
         author_email=METADATA['author_email'],
-        # cmdclass={
-        #     'upload': UploadCommand,
-        # },
+        cmdclass={
+            'upload': UploadCommand,
+        },
         description=METADATA['description'],
         entry_points={
             'console_scripts': [
@@ -68,7 +84,8 @@ def setup_package():
             ],
             'test': [
                 'coverage',
-                'green',
+                'pytest',
+                'pytest-cov',
             ],
         },
         include_package_data=True,

@@ -22,14 +22,12 @@ $ innoconv .
 ```sh
 $ python3 -m venv venv
 $ . venv/bin/activate
-$ pip install -e .[dev]
+$ pip install -e .[doc,lint,test]
 ```
 
 ### Commands
 
 #### Build example content
-
-##### JSON
 
 Get the content source code and convert it to JSON.
 
@@ -43,14 +41,14 @@ $ innoconv tub_base
 Adhere to [PEP8](https://www.python.org/dev/peps/pep-0008/).
 
 ```sh
-$ ./setup.py lint
+$ tox -e lint
 ```
 
 #### Tests
 
 ```sh
-$ ./setup.py test
-$ ./setup.py integration_test
+$ tox -e py37-unit
+$ tox -e py37-integration
 ```
 
 #### Build HTML coverage report
@@ -58,13 +56,13 @@ $ ./setup.py integration_test
 A coverage report will be created in `./htmlcov`.
 
 ```sh
-$ ./setup.py coverage
+$ tox -e py37-unit,coverage-html
 ```
 
 #### Documentation
 
-You can find the documentation in `./build/sphinx`.
+You can find the documentation in `.tox/doc/tmp/html`.
 
 ```sh
-$ ./setup.py build_sphinx
+$ tox -e doc
 ```
