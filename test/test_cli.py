@@ -8,6 +8,7 @@ import logging
 from os.path import join, realpath
 from click.testing import CliRunner
 from click import BadParameter
+from yaml import YAMLError
 
 from innoconv.cli import cli
 from innoconv.constants import DEFAULT_EXTENSIONS, LOG_FORMAT
@@ -71,6 +72,14 @@ class TestCLI(unittest.TestCase):
         result = runner.invoke(cli, '--force .')
         self.assertIs(result.exit_code, 0)
 
+    def test_manifest_failures(self, _, __, ___, ____, manifest_from_dir):
+        for ext in (YAMLError, FileNotFoundError, RuntimeError):
+            with self.subTest(ext):
+                manifest_from_dir.side_effect = (ext,)
+                runner = CliRunner()
+                result = runner.invoke(cli, '.')
+                self.assertIsNot(result.exit_code, 0)
+
     def test_extensions(self, _, runner_init, *__):
         runner = CliRunner()
         result = runner.invoke(cli, '--extensions join_strings,copy_static .')
@@ -80,3 +89,14 @@ class TestCLI(unittest.TestCase):
             call(realpath('.'), realpath(join('.', 'innoconv_output')),
                  MANIFEST, ['join_strings', 'copy_static'])
         )
+
+    def test_unknown_extension(self, *_):
+        runner = CliRunner()
+        result = runner.invoke(cli, '--extensions bogus_extension .')
+        self.assertIsNot(result.exit_code, 0)
+
+    def test_innoconv_runner_failure(self, _, run, *__):
+        run.side_effect = (RuntimeError,)
+        runner = CliRunner()
+        result = runner.invoke(cli, '.')
+        self.assertIsNot(result.exit_code, 0)
