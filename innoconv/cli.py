@@ -5,9 +5,10 @@ import os
 import sys
 
 import click
+import yaml
 
 from innoconv.constants import (
-    DEFAULT_OUTPUT_DIR_BASE, DEFAULT_EXTENSIONS, MANIFEST_BASENAME, LOG_FORMAT)
+    DEFAULT_OUTPUT_DIR_BASE, DEFAULT_EXTENSIONS, LOG_FORMAT)
 from innoconv.extensions import EXTENSIONS
 from innoconv.manifest import Manifest
 from innoconv.metadata import __author__, __description__, __url__, __version__
@@ -31,13 +32,6 @@ warranty, not even for merchantability or fitness for a particular purpose.
 """.format('\n'.join(extlist), __author__, __url__)
 
 
-def _read_manifest_data(source_dir, file_ext):
-    filename = '{}.{}'.format(MANIFEST_BASENAME, file_ext)
-    filepath = os.path.join(source_dir, filename)
-    with open(filepath, 'r') as file:
-        return file.read()
-
-
 def _parse_extensions(_, __, value):
     extensions = value.split(',')
     for ext in extensions:
@@ -49,7 +43,7 @@ def _parse_extensions(_, __, value):
 class CustomEpilogCommand(click.Command):
     """Format epilog in a custom way."""
 
-    def format_epilog(self, ctx, formatter):
+    def format_epilog(self, _, formatter):
         """Format epilog while preserving newlines."""
         if self.epilog:
             formatter.write_paragraph()
@@ -102,16 +96,13 @@ def cli(verbose, force, extensions, output_dir, source_dir):
 
     # read course manifest
     try:
-        manifest_data = _read_manifest_data(source_dir, 'yml')
+        manifest = Manifest.from_directory(source_dir)
+    except yaml.YAMLError:
+        logging.critical('Could not parse manifest file!')
+        sys.exit(-3)
     except FileNotFoundError:
-        try:
-            manifest_data = _read_manifest_data(source_dir, 'yaml')
-        except FileNotFoundError:
-            logging.critical(
-                'Could not find manifest file in source directory!')
-            sys.exit(-2)
-    try:
-        manifest = Manifest.from_yaml(manifest_data)
+        logging.critical('Could not find manifest file in source directory!')
+        sys.exit(-3)
     except RuntimeError as exc:
         logging.critical(exc)
         sys.exit(-3)
@@ -125,3 +116,4 @@ def cli(verbose, force, extensions, output_dir, source_dir):
         logging.critical(msg)
         sys.exit(-4)
     logging.info('Build finished!')
+    sys.exit(0)

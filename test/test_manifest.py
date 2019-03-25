@@ -4,6 +4,8 @@
 
 import json
 import unittest
+from unittest.mock import call, mock_open, patch
+import yaml
 
 from innoconv.manifest import Manifest, ManifestEncoder
 
@@ -33,6 +35,42 @@ title:
   de: Foo Titel
   en: Foo Title
 """
+
+
+@patch('builtins.open', new_callable=mock_open, read_data=MINIMUM)
+class TestManifestFromDirectory(unittest.TestCase):
+    def test_yml_ext(self, mopen):
+        manifest = Manifest.from_directory('/path/to/content')
+        self.assertIsInstance(manifest, Manifest)
+        self.assertEqual(
+            mopen.call_args, call('/path/to/content/manifest.yml', 'r'))
+
+    def test_yaml_ext(self, mopen):
+        mopen.side_effect = (
+            FileNotFoundError,
+            mock_open(read_data=MINIMUM).return_value,
+        )
+        manifest = Manifest.from_directory('/path/to/content')
+        self.assertIsInstance(manifest, Manifest)
+        print(mopen.call_args_list)
+        self.assertEqual(mopen.call_args_list, [
+            call('/path/to/content/manifest.yml', 'r'),
+            call('/path/to/content/manifest.yaml', 'r'),
+        ])
+
+    def test_not_found(self, mopen):
+        mopen.side_effect = (
+            FileNotFoundError,
+            FileNotFoundError,
+        )
+        with self.assertRaises(FileNotFoundError):
+            Manifest.from_directory('/path/to/content')
+
+    def test_invalid_yaml(self, mopen):
+        invalid_yaml = '"This is no valid yaml'
+        mopen.side_effect = (mock_open(read_data=invalid_yaml).return_value,)
+        with self.assertRaises(yaml.YAMLError):
+            Manifest.from_directory('/path/to/content')
 
 
 class TestManifestFromYaml(unittest.TestCase):

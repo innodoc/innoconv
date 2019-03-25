@@ -21,7 +21,10 @@ Example
 """
 
 import json
+import os
 import yaml
+
+from innoconv.constants import MANIFEST_BASENAME
 
 
 class Manifest():
@@ -50,11 +53,34 @@ class Manifest():
         self.toc = []
 
     @classmethod
+    def from_directory(cls, dirpath):
+        """Read manifest from content directory.
+
+        :param dirpath: Full path to content directory.
+        :type dirpath: str
+
+        :rtype: Manifest
+        :returns: Manifest object
+        """
+        def _read_manifest_data(file_ext):
+            filename = '{}.{}'.format(MANIFEST_BASENAME, file_ext)
+            with open(os.path.join(dirpath, filename), 'r') as file:
+                return file.read()
+        try:
+            manifest_data = _read_manifest_data('yml')
+        except FileNotFoundError:
+            manifest_data = _read_manifest_data('yaml')
+        return cls.from_yaml(manifest_data)
+
+    @classmethod
     def from_yaml(cls, yaml_data):
         """Create a manifest from YAML data.
 
         :param yaml_data: YAML representation of a manifest
         :type yaml_data: str
+
+        :rtype: Manifest
+        :returns: Manifest object
         """
         data = yaml.safe_load(yaml_data)
         return Manifest(data)
