@@ -67,6 +67,3 @@ coverage:
   stage: coverage
   script: tox -e cov-report
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
-  cache:
-    <<: *cache
-    policy: pull
