@@ -1,33 +1,37 @@
-"""Unit tests for innoconv.__main__"""
-
-# pylint: disable=missing-docstring
+"""Unit tests for AbstractExtension."""
 
 import unittest
 
 from innoconv.extensions.abstract import AbstractExtension
-from ..utils import get_manifest
+from innoconv.manifest import Manifest
 
-MANIFEST = get_manifest()
+MANIFEST = Manifest({"title": {"en": "Foo Course Title"}, "languages": ("en",)})
 
 
 class MyCrazyExtension(AbstractExtension):
-    # pylint: disable=W0223
+    """Extension that serves for testing inheriting from AbstractExtension."""
+
+    # pylint: disable=abstract-method
     _helptext = "Foo bar"
 
 
 class TestAbstractExtension(unittest.TestCase):
+    """Test inheriting from AbstractExtension."""
+
     def test_helptext(self):
+        """Test extension help text."""
         self.assertEqual(MyCrazyExtension.helptext(), "Foo bar")
 
     def test_notimplemented(self):
+        """Test extension method interface."""
         test_extension = MyCrazyExtension(MANIFEST)
         events = (
-            ('start', ('source', 'output')),
-            ('pre_conversion', ('en',)),
-            ('pre_process_file', ('relpath',)),
-            ('post_process_file', (['ast'], ['Foo Title'])),
-            ('post_conversion', ('en',)),
-            ('finish', ()),
+            ("start", ("source", "output")),
+            ("pre_conversion", ("en",)),
+            ("pre_process_file", ("relpath",)),
+            ("post_process_file", (["ast"], ["Foo Title"])),
+            ("post_conversion", ("en",)),
+            ("finish", ()),
         )
         for method_name, method_args in events:
             with self.subTest(method=method_name):

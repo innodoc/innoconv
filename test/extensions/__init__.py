@@ -1,19 +1,19 @@
 """Unit tests for extensions."""
 
 from copy import deepcopy
-import unittest
 from os.path import join
+import unittest
 
 from innoconv.manifest import Manifest
 from ..utils import get_filler_content
 
-SOURCE = '/source'
-DEST = '/destination'
+SOURCE = "/source"
+DEST = "/destination"
 PATHS = (
     ("Welcome", ()),
-    ("Title 1", ('title-1',)),
-    ("Title 2", ('title-2',)),
-    ("Title 2-1", ('title-2', 'title-2-1')),
+    ("Title 1", ("title-1",)),
+    ("Title 2", ("title-2",)),
+    ("Title 2-1", ("title-2", "title-2-1")),
 )
 
 
@@ -21,16 +21,13 @@ class TestExtension(unittest.TestCase):
     """Provide a base class for all extension tests."""
 
     @staticmethod
-    def _run(extension, ast=None, languages=('en', 'de'), paths=PATHS):
+    def _run(extension, ast=None, languages=("en", "de"), paths=PATHS):
         if ast is None:
             ast = get_filler_content()
         title = {}
         for language in languages:
             title[language] = "Title ({})".format(language)
-        manifest = Manifest({
-            'languages': languages,
-            'title': title,
-        })
+        manifest = Manifest({"languages": languages, "title": title})
         ext = extension(manifest)
         ext.start(DEST, SOURCE)
         asts = []
