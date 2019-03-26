@@ -48,21 +48,20 @@ happen inside the section ``chapter01`` in the English language version.
 """  # noqa: E501
 
 import logging
-import os.path
 import os
+import os.path
 import shutil
 from urllib import parse
 
-from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import STATIC_FOLDER
+from innoconv.extensions.abstract import AbstractExtension
 
-ACCEPTED_LINK_CLASSES = (
-    'video-static',
-)
+ACCEPTED_LINK_CLASSES = ("video-static",)
 
 
 class CopyStatic(AbstractExtension):
-    """Copy static files to the output folder.
+    """
+    Copy static files to the output folder.
 
     This extension copies checks the AST for references to static files and
     copies them from the content source directory to the output directory.
@@ -85,7 +84,7 @@ class CopyStatic(AbstractExtension):
     def _link_is_video(link_element):
         """Check if video is marked as local."""
         for cssclass in ACCEPTED_LINK_CLASSES:
-            if cssclass in link_element['c'][0][1]:
+            if cssclass in link_element["c"][0][1]:
                 return True
         return False
 
@@ -101,69 +100,71 @@ class CopyStatic(AbstractExtension):
         if isinstance(ast_element, list):
             self._process_ast_array(ast_element)
         elif isinstance(ast_element, dict):
-            if ast_element['t'] == 'Image':
+            if ast_element["t"] == "Image":
                 self._process_image(ast_element)
-            elif ast_element['t'] == 'Link':
+            elif ast_element["t"] == "Link":
                 self._process_link(ast_element)
-            elif 'c' in ast_element:
-                self._process_ast_array(ast_element['c'])
+            elif "c" in ast_element:
+                self._process_ast_array(ast_element["c"])
 
     def _process_link(self, link_element):
         """Links can reference local videos."""
-        link = link_element['c'][2][0]
-        content = link_element['c'][1]
+        link = link_element["c"][2][0]
+        content = link_element["c"][1]
         self._process_ast_array(content)
         if self._link_is_video(link_element):
             try:
-                link_element['c'][2][0] = self._add_static(link)
+                link_element["c"][2][0] = self._add_static(link)
             except ValueError:
                 pass
 
     def _process_image(self, image_element):
-        link = image_element['c'][2][0]
+        link = image_element["c"][2][0]
         try:
-            image_element['c'][2][0] = self._add_static(link)
+            image_element["c"][2][0] = self._add_static(link)
         except ValueError:
             pass
 
     def _add_static(self, orig_path):
         """Remember paths to copy and rewrite URL."""
-        def _get_src_file_path(root_dir, _path, _sec_path, lang=''):
-            return os.path.join(
-                root_dir, lang, STATIC_FOLDER, _sec_path, _path)
 
-        def _get_dest_file_path(root_dir, _path, _sec_path, lang=''):
+        def _get_src_file_path(root_dir, _path, _sec_path, lang=""):
+            return os.path.join(root_dir, lang, STATIC_FOLDER, _sec_path, _path)
+
+        def _get_dest_file_path(root_dir, _path, _sec_path, lang=""):
             if lang:
-                lang = '_{}'.format(lang)
-            return os.path.join(
-                root_dir, STATIC_FOLDER, lang, _sec_path, _path)
+                lang = "_{}".format(lang)
+            return os.path.join(root_dir, STATIC_FOLDER, lang, _sec_path, _path)
 
         # skip remote resource
         if parse.urlparse(orig_path).scheme:
             raise ValueError()
 
         # relative to section?
-        if orig_path[0] == '/':
+        if orig_path[0] == "/":
             ref_path = orig_path[1:]
-            section_path = ''
+            section_path = ""
         else:
             ref_path = orig_path
             section_path = self._current_path[3:]  # strip language
             if section_path:
-                section_path = '{}/'.format(section_path.strip('/'))
+                section_path = "{}/".format(section_path.strip("/"))
 
         # localized version
         src = _get_src_file_path(
-            self._source_dir, ref_path, section_path, self._current_language)
+            self._source_dir, ref_path, section_path, self._current_language
+        )
         dst = _get_dest_file_path(
-            self._output_dir, ref_path, section_path, self._current_language)
-        rewritten = '_{}/{}{}'.format(
-            self._current_language, section_path, ref_path)
+            self._output_dir, ref_path, section_path, self._current_language
+        )
+        rewritten = "_{}/{}{}".format(
+            self._current_language, section_path, ref_path
+        )
         if not os.path.isfile(src):
             # common version
             src = _get_src_file_path(self._source_dir, ref_path, section_path)
             dst = _get_dest_file_path(self._output_dir, ref_path, section_path)
-            rewritten = '{}{}'.format(section_path, ref_path)
+            rewritten = "{}{}".format(section_path, ref_path)
             if not os.path.isfile(src):
                 msg = "Missing static file {}".format(orig_path)
                 raise RuntimeError(msg)

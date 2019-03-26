@@ -21,10 +21,10 @@ Example
 from innoconv.extensions.abstract import AbstractExtension
 
 #: Type that represents a string
-STR_TYPE = 'Str'
+STR_TYPE = "Str"
 
 #: Content types that are merged
-TYPES_TO_MERGE = (STR_TYPE, 'Space', 'SoftBreak')
+TYPES_TO_MERGE = (STR_TYPE, "Space", "SoftBreak")
 
 
 class JoinStrings(AbstractExtension):
@@ -40,11 +40,12 @@ class JoinStrings(AbstractExtension):
     # content parsing
 
     def _process_ast_element(self, ast_element):
-        """Process a single element in the AST.
+        """
+        Process a single element in the AST.
 
         Descend further down if possible.
         """
-        self.previous_element = None   # Stop merging on new element
+        self.previous_element = None  # Stop merging on new element
         if isinstance(ast_element, list):
             self._process_ast_array(ast_element)
             return
@@ -62,12 +63,14 @@ class JoinStrings(AbstractExtension):
         self.previous_element. Every subsequent instance of mergeable content
         gets added to the first instance and finally removed.
         """
+
         def is_string_or_space(content_element):
             """Check if an ast element is mergeable, i.e. String or Space."""
             try:
-                return content_element['t'] in TYPES_TO_MERGE
+                return content_element["t"] in TYPES_TO_MERGE
             except (TypeError, KeyError):  # could be an invalid dictionary
                 return False
+
         self.previous_element = None
         to_delete = set()
         for pos, ast_element in enumerate(ast_array):
@@ -90,16 +93,16 @@ class JoinStrings(AbstractExtension):
     def _prepare_previous_element(self, content_element):
         """Normalize self.previous_element to always be a Str."""
         self.previous_element = content_element
-        if self.previous_element['t'] != STR_TYPE:
-            self.previous_element['t'] = STR_TYPE
-            self.previous_element['c'] = ' '
+        if self.previous_element["t"] != STR_TYPE:
+            self.previous_element["t"] = STR_TYPE
+            self.previous_element["c"] = " "
 
     def _merge_to_previous_element(self, content_element):
-        if content_element['t'] == STR_TYPE:
-            self.previous_element['c'] += content_element['c']
+        if content_element["t"] == STR_TYPE:
+            self.previous_element["c"] += content_element["c"]
         else:
-            if not self.previous_element['c'].endswith(' '):
-                self.previous_element['c'] += ' '
+            if not self.previous_element["c"].endswith(" "):
+                self.previous_element["c"] += " "
 
     # extension events
 

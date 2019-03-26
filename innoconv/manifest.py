@@ -22,19 +22,21 @@ Example
 
 import json
 import os
+
 import yaml
 
 from innoconv.constants import MANIFEST_BASENAME
 
 
-class Manifest():
+class Manifest:
     """Represents course metadata."""
 
-    required_fields = ('title', 'languages')
-    optional_fields = ('keywords', 'custom_content')
+    required_fields = ("title", "languages")
+    optional_fields = ("keywords", "custom_content")
 
     def __init__(self, data):
-        """Initialize a manifest.
+        """
+        Initialize a manifest.
 
         :param data: A dict with the manifest fields as keys
         :type data: dict
@@ -43,7 +45,7 @@ class Manifest():
             try:
                 setattr(self, field, data[field])
             except KeyError:
-                msg = 'Required field {} not found in manifest!'.format(field)
+                msg = "Required field {} not found in manifest!".format(field)
                 raise RuntimeError(msg)
         for field in self.optional_fields:
             try:
@@ -54,7 +56,8 @@ class Manifest():
 
     @classmethod
     def from_directory(cls, dirpath):
-        """Read manifest from content directory.
+        """
+        Read manifest from content directory.
 
         :param dirpath: Full path to content directory.
         :type dirpath: str
@@ -62,19 +65,22 @@ class Manifest():
         :rtype: Manifest
         :returns: Manifest object
         """
+
         def _read_manifest_data(file_ext):
-            filename = '{}.{}'.format(MANIFEST_BASENAME, file_ext)
-            with open(os.path.join(dirpath, filename), 'r') as file:
+            filename = "{}.{}".format(MANIFEST_BASENAME, file_ext)
+            with open(os.path.join(dirpath, filename), "r") as file:
                 return file.read()
+
         try:
-            manifest_data = _read_manifest_data('yml')
+            manifest_data = _read_manifest_data("yml")
         except FileNotFoundError:
-            manifest_data = _read_manifest_data('yaml')
+            manifest_data = _read_manifest_data("yaml")
         return cls.from_yaml(manifest_data)
 
     @classmethod
     def from_yaml(cls, yaml_data):
-        """Create a manifest from YAML data.
+        """
+        Create a manifest from YAML data.
 
         :param yaml_data: YAML representation of a manifest
         :type yaml_data: str
@@ -105,6 +111,6 @@ class ManifestEncoder(json.JSONEncoder):
                 except AttributeError:
                     pass
             # extra fields
-            manifest_dict['toc'] = o.toc
+            manifest_dict["toc"] = o.toc
             return manifest_dict
         return super(ManifestEncoder, self).default(o)

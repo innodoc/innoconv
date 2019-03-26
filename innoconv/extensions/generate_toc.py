@@ -33,23 +33,20 @@ class GenerateToc(AbstractExtension):
             # find/create child leaf
             found = None
             for child in children:
-                if child['id'] == section_id:
+                if child["id"] == section_id:
                     found = child
                     try:
-                        children = child['children']
+                        children = child["children"]
                     except KeyError:
-                        children = child['children'] = []
+                        children = child["children"] = []
                         break
             # arrived at leaf -> add section
             if not found:
-                children.append({
-                    'id': section_id,
-                    'title': {
-                        self._language: title
-                    },
-                })
+                children.append(
+                    {"id": section_id, "title": {self._language: title}}
+                )
         if found:
-            found['title'][self._language] = title
+            found["title"][self._language] = title
 
     @staticmethod
     def _splitall(path):

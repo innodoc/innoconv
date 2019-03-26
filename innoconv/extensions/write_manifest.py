@@ -10,8 +10,8 @@ import json
 import logging
 from os.path import join
 
-from innoconv.extensions.abstract import AbstractExtension
 from innoconv.constants import MANIFEST_BASENAME
+from innoconv.extensions.abstract import AbstractExtension
 from innoconv.manifest import ManifestEncoder
 
 
@@ -26,9 +26,9 @@ class WriteManifest(AbstractExtension):
         self._output_dir = None
 
     def _write_manifest(self):
-        filename = '{}.json'.format(MANIFEST_BASENAME)
+        filename = "{}.json".format(MANIFEST_BASENAME)
         filepath = join(self._output_dir, filename)
-        with open(filepath, 'w') as out_file:
+        with open(filepath, "w") as out_file:
             json.dump(self._manifest, out_file, cls=ManifestEncoder)
         logging.info("Wrote manifest %s", filepath)
 

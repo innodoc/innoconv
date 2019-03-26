@@ -12,8 +12,8 @@ from innoconv.extensions.write_manifest import WriteManifest
 
 #: List of available extensions
 EXTENSIONS = {
-    'copy_static': CopyStatic,
-    'generate_toc': GenerateToc,
-    'join_strings': JoinStrings,
-    'write_manifest': WriteManifest,
+    "copy_static": CopyStatic,
+    "generate_toc": GenerateToc,
+    "join_strings": JoinStrings,
+    "write_manifest": WriteManifest,
 }
