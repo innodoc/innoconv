@@ -17,52 +17,62 @@ $ innoconv .
 
 ## Development
 
-### Setup environment
+### tox
 
-```sh
-$ python3 -m venv venv
-$ . venv/bin/activate
-$ pip install -e .[doc,lint,test]
-```
+Development for innoConv relies on [tox](https://tox.readthedocs.io/). It
+handles virtualenv creation, running linters and test suites across different
+Python versions and is also used in the CI pipeline.
+
+Make sure to have it installed.
 
 ### Commands
 
-#### Build example content
+For a exhaustive list of commands please have a look at `tox.ini`.
 
-Get the content source code and convert it to JSON.
+#### Using the innoconv command
+
+Use the following to convert the base course.
 
 ```sh
-$ git clone -b innoconv git@gitlab.tubit.tu-berlin.de:innodoc/tub_base
-$ innoconv tub_base
+$ git clone https://gitlab.tubit.tu-berlin.de/innodoc/tub_base.git
+$ tox -e venv -- innoconv tub_base
 ```
 
 #### Linting
 
-Adhere to [PEP8](https://www.python.org/dev/peps/pep-0008/).
+Adhere to [code style black](https://github.com/ambv/black) and
+[PEP8](https://www.python.org/dev/peps/pep-0008/).
 
 ```sh
-$ tox -e lint
+$ tox -e linters
 ```
 
 #### Tests
 
+Run unit and integration tests.
+
 ```sh
-$ tox -e py37-unit
-$ tox -e py37-integration
+$ tox -e py37-unit,py37-integration
 ```
 
-#### Build HTML coverage report
+#### HTML coverage report
 
-A coverage report will be created in `./htmlcov`.
+A coverage report will be created in `./htmlcov`. Look at it using a browser.
 
 ```sh
-$ tox -e py37-unit,cov-html
+$ tox -e py37-unit,cov-html,serve-cov
 ```
 
 #### Documentation
 
-You can find the documentation in `.tox/doc/tmp/html`.
+After building you can find the documentation in `docs/build/html`.
 
 ```sh
-$ tox -e doc
+$ tox -e docs
+```
+
+Serve the documentation to the browser for convenience.
+
+```sh
+$ tox -e serve-docs
 ```

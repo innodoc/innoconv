@@ -65,5 +65,7 @@ doc:
 
 coverage:
   stage: coverage
-  script: tox -e cov-report
+  script:
+    - tox -e cov-report
+    - rm .coverage
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'

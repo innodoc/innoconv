@@ -1,10 +1,11 @@
 *.pyc
 __pycache__
 .DS_Store
-venv
 .tox
+.cache
 
 # build
+doc/build
 build
 *.egg-info
 dist
