@@ -1,56 +1,73 @@
-image: innodoc/pyenv-alpine
+image: python:alpine
 
 stages:
   - test
-  - coverage
 
-# caching works only inside project directory
 cache: &cache
-  key: default-innoconv
+  key: "${CI_PROJECT_ID}-default"
   paths:
-    - .coverage*
+    - .pip-cache
     - .tox
+    - .pandoc
 
 variables:
-  GIT_SUBMODULE_STRATEGY: "normal"
+  PANDOC_VERSION: "2.7"
+  GIT_SUBMODULE_STRATEGY: "recursive"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
 
 before_script:
-  - source $HOME/.bash_profile
+  - >
+    if [ ! -f .pandoc/pandoc ]; then
+      mkdir -p .pandoc
+      wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xzf - --strip-components 2 -C .pandoc pandoc-${PANDOC_VERSION}/bin/pandoc
+    fi
+  - export PATH="${CI_PROJECT_DIR}/.pandoc:$PATH"
+  - pip install tox
 
 py37-unit:
   stage: test
+  image: python:3.7-alpine
   script: tox -e py37-unit
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
 
 py37-integration:
   stage: test
+  image: python:3.7-alpine
   script: tox -e py37-integration
 
 py36-unit:
   stage: test
+  image: python:3.6-alpine
   script: tox -e py36-unit
 
 py36-integration:
   stage: test
+  image: python:3.6-alpine
   script: tox -e py36-integration
 
 py35-unit:
   stage: test
+  image: python:3.5-alpine
   script: tox -e py35-unit
 
 py35-integration:
   stage: test
+  image: python:3.5-alpine
   script: tox -e py35-integration
 
 py34-unit:
   stage: test
+  image: python:3.4-alpine
   script: tox -e py34-unit
 
 py34-integration:
   stage: test
+  image: python:3.4-alpine
   script: tox -e py34-integration
 
 lint:
   stage: test
+  image: python:3.7-alpine
   script: tox -e lint
   cache:
     <<: *cache
@@ -58,14 +75,8 @@ lint:
 
 doc:
   stage: test
+  image: python:3.7-alpine
   script: tox -e doc
   cache:
     <<: *cache
     policy: pull
-
-coverage:
-  stage: coverage
-  script:
-    - tox -e cov-report
-    - rm .coverage
-  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
