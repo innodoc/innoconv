@@ -5,7 +5,7 @@ Prerequisites
 -------------
 
 innoConv is mainly used on Linux machines. It might work on Mac OS and
-Windows/Cygwin/WSL. You are invited to share experiences in doing so.
+Windows/Cygwin/WSL. You are invited to share your experiences.
 
 Dependencies
 ------------
@@ -13,19 +13,20 @@ Dependencies
 The only dependencies you have to provide yourself is Pandoc and the Python
 interpreter.
 
-Python 3.6
-~~~~~~~~~~
+Python 3
+~~~~~~~~
 
-While other versions of Python might work, innoConv has been tested and
-developed with **Python 3.6**. It should be available on your Linux machine.
-Usually it's installed using your distribution package management.
+innoConv is being tested and developed with **Python 3.4-3.7**.
+
+Python should be available on the majority of Linux machines nowadays. Usually
+it's being installed using a package manager.
 
 Pandoc
 ~~~~~~
 
-You need to make sure to have a recent version of the ``pandoc`` binary
-available in ``PATH`` (**Pandoc 2.7** at the time of writing). There are
-`several ways on installing Pandoc <https://pandoc.org/installing.html>`_.
+You need to make sure to have a recent version of the :program:`pandoc` binary
+available in :envvar:`$PATH` (version 2.7 at the time of writing). There are
+`several ways how to install Pandoc <https://pandoc.org/installing.html>`_.
 
 Installation
 ------------
@@ -33,17 +34,18 @@ Installation
 Using pip
 ~~~~~~~~~
 
-The easiest way to install innoConv is to use pip.
+The easiest way to install innoConv is to use :program:`pip`.
 
-Given you have a regular Python setup with pip available the following installs
-innoConv in your user directory (usually ``~/.local`` under Linux).
+Given you have a regular Python setup with :program:`pip` available the
+following installs innoConv in your user directory (usually :file:`~/.local`
+under Linux).
 
 .. code-block:: console
 
   $ pip install --user innoconv
 
-For the ``innoconv`` command to work, make sure you have ``~/.local/bin`` in
-your ``$PATH``.
+For the :program:`innoconv` command to work, make sure you have
+:file:`~/.local/bin` in your :envvar:`$PATH`.
 
 For a system-wide installation you can omit the ``--user`` argument.
 
@@ -62,13 +64,14 @@ activate a virtual environment in a location of your choice.
   $ python3 -m venv /path/to/venv
   $ source /path/to/venv/bin/activate
 
-Install innoConv in your virtual environment using pip.
+Install innoConv in your virtual environment using :program:`pip`.
 
 .. code-block:: console
 
   $ pip install innoconv
 
-If everything went fine you should now have access to the ``innoconv`` command.
+If everything went fine you should now have access to the :program:`innoconv`
+command.
 
 The next time you login to your shell make sure to activate your virtual
-environment before using ``innoconv``.
+environment before using :program:`innoconv`.

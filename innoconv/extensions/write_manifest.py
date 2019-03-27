@@ -1,5 +1,5 @@
 """
-Extension that writes a ``manifest.json`` to the output folder.
+Extension that writes a :file:`manifest.json` to the output folder.
 
 Every course needs a :class:`Manifest <innoconv.manifest.Manifest>`.
 Additionally to the fields from the source manifest it can include a table of

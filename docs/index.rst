@@ -7,7 +7,7 @@ Table of contents
 .. toctree::
   :maxdepth: 4
 
-  what-is-innoconv
+  about
   getting-started
   usage
   modules

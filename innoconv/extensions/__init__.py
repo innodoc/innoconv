@@ -1,8 +1,14 @@
 """
 innoConv extensions.
 
-Extensions are a way of extending the functionality of innoConv in a modular
-way. They can be enabled on a one-by-one basis.
+Extensions are a way of separating concerns of the conversion process into
+independent modules. They can be enabled on a one-by-one basis as not all
+features are needed in all cases.
+
+Extensions interface with
+:class:`InnoconvRunner <innoconv.runner.InnoconvRunner>` through a set of
+methods defined in
+:class:`AbstractExtension <innoconv.extensions.abstract.AbstractExtension>`.
 """
 
 from innoconv.extensions.copy_static import CopyStatic

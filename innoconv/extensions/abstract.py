@@ -1,7 +1,8 @@
 """
 Base class for all other extensions.
 
-The AbstractExtension is not meant to be instantiated directly.
+The AbstractExtension is not instantiated directly but serves as super-class to
+all extensions.
 """
 
 
@@ -13,8 +14,8 @@ class AbstractExtension:
     document the available events that are triggered during the conversion
     process.
 
-    Extension classes should have a ``_helptext`` attribute. It is shown in the
-    CLI as a brief summary what the extension accomplishes.
+    Extension classes should have a :py:attr:`_helptext` attribute. It's used
+    to display a brief summary.
     """
 
     _helptext = ""

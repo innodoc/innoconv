@@ -3,7 +3,7 @@ Merge consecutive sequences of strings and spaces into a single string element.
 
 The motivation behind this extension is to make the AST more readable and also
 to save space by compressing the representation. The actual appearance in a
-viewer should remain completely untouched.
+viewer remains identical.
 
 This extension modifies the AST.
 
@@ -11,12 +11,9 @@ This extension modifies the AST.
 Example
 =======
 
-+--------+----------------------------------------------------------------------+
-| Before | ``{"t": "Str", "c": "Foo"},{"t": "Space"},{"t": "Str", "c": "b!"}]`` |
-+--------+----------------------------------------------------------------------+
-| After  | ``{"t": "Str", "c": "Foo b!"}]``                                     |
-+--------+----------------------------------------------------------------------+
-"""  # noqa: E501
+``{"t":"Str","c":"Foo"},{"t":"Space"},{"t":"Str","c":"bar"}]`` →
+``{"t":"Str","c":"Foo bar"}]``
+"""
 
 from innoconv.extensions.abstract import AbstractExtension
 
