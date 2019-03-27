@@ -1,0 +1,152 @@
+\documentclass{standalone}
+\usepackage{fontawesome}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,backgrounds,calc,fit,shadows,positioning}
+
+% document shape
+\makeatletter
+\pgfdeclareshape{document}{
+  \inheritsavedanchors[from=rectangle] % this is nearly a rectangle
+  \inheritanchorborder[from=rectangle]
+  \inheritanchor[from=rectangle]{center}
+  \inheritanchor[from=rectangle]{north}
+  \inheritanchor[from=rectangle]{south}
+  \inheritanchor[from=rectangle]{west}
+  \inheritanchor[from=rectangle]{east}
+  % ... and possibly more
+  \backgroundpath{% this is new
+  % store lower right in xa/ya and upper right in xb/yb
+  \southwest \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+  \northeast \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+  % compute corner of ‘‘flipped page’’
+  \pgf@xc=\pgf@xb \advance\pgf@xc by-10pt % this should be a parameter
+  \pgf@yc=\pgf@yb \advance\pgf@yc by-10pt
+  % construct main path
+  \pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+  \pgfpathlineto{\pgfpoint{\pgf@xa}{\pgf@yb}}
+  \pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yb}}
+  \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yc}}
+  \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+  \pgfpathclose
+  % add little corner
+  \pgfpathmoveto{\pgfpoint{\pgf@xc}{\pgf@yb}}
+  \pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yc}}
+  \pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yc}}
+  \pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yc}}
+  }
+}
+\makeatother
+
+\tikzstyle{document_base}=[
+  align=center,
+  draw=black!35,
+  fill=white,
+  minimum height=28.2mm,
+  minimum width=20mm,
+  shape=document,
+  thick,
+]
+
+\tikzstyle{document}=[
+  document_base,
+  drop shadow,
+]
+
+\tikzstyle{arrow}=[-{Latex[length=2mm,width=2mm]},thick]
+
+\begin{document}
+
+% program style
+\tikzstyle{program_base}=[
+  align=center,
+  draw=blue!50,
+  fill=blue!10,
+  inner sep=5mm,
+  rectangle,
+  rounded corners=2mm,
+  thick,
+]
+
+% other styles
+\tikzstyle{bgbox}=[
+  fill=yellow!20,
+  rectangle,
+]
+\tikzstyle{levelline}=[
+  dashed,
+  draw=black!20,
+  ultra thick,
+]
+\tikzstyle{row_label}=[rotate=90]
+
+% variants
+\tikzstyle{document_id}=[
+  document_base,
+  drop shadow,
+]
+\tikzstyle{program_id}=[
+  program_base,
+  drop shadow,
+]
+\tikzstyle{bgbox_id}=[
+  bgbox,
+]
+\tikzstyle{arrow_id}=[
+  arrow,
+]
+
+\begin{tikzpicture}
+
+  \newcommand{\rowlabel}[1]{\huge #1}
+  \newcommand{\fileext}[1]{\large\texttt{.#1}}
+
+  % source level
+  \node[document_id]                                      (doc_markdown)          {\fileext{md}};
+
+  % IR level
+  \node[program_id,below=of doc_markdown]                 (prog_innoconv)         {innoConv};
+  \node[document_id,below=of prog_innoconv]               (doc_json)              {\fileext{json}};
+
+  % presentation level
+  \node[below=of doc_json]                                (prog_dummy)            {};
+  \node[program_id,left=of prog_dummy,anchor=north east]  (prog_webapp)           {{\Huge\faLaptop}\\Web app};
+  \node[program_id,right=of prog_dummy,anchor=north west] (prog_app)              {{\Huge\faMobile}\\Mobile app};
+  \node[document_id,below=of prog_dummy]                  (doc_pdf)               {\fileext{pdf}};
+
+  % arrows
+  \path[arrow_id] % innoDoc
+    (doc_markdown)    edge node (arr_north) {} (prog_innoconv)
+    (prog_innoconv)   edge node             {} (doc_json)
+    (doc_json)        edge node (arr_south) {} (prog_webapp)
+    (doc_json)        edge node             {} (prog_app)
+    (doc_json)        edge node             {} (doc_pdf);
+
+  % level labels
+  \begin{scope}
+    \node[row_label] at (-50mm,    1mm) {\rowlabel{Source}};
+    \node[row_label] at (-50mm,  -50mm) {\rowlabel{Intermediate}};
+    \node[row_label] at (-50mm, -109mm) {\rowlabel{Presentation}};
+  \end{scope}
+
+  % background layer
+  \begin{scope}[on background layer={anchor=west}]
+    % bg box
+    \node[
+      bgbox,
+      fit=(doc_markdown)(prog_webapp)(prog_app)(doc_pdf),
+      inner sep=10mm,
+    ] (bgbox) {};
+    % level separator lines
+    \draw let
+      \p1 = (arr_north),
+      \p2 = (arr_south)
+    in
+      (bgbox.west |- 0, \y1) -- (bgbox.east |- 0, \y1) [levelline]
+      (bgbox.west |- 0, \y2) -- (bgbox.east |- 0, \y2) [levelline];
+  \end{scope}
+
+\end{tikzpicture}
+
+\end{document}
