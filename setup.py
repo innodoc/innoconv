@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """Define project commands."""
 
-import logging
 import os
 import re
-from shutil import rmtree
 import sys
 
-from setuptools import Command, find_packages, setup
+from setuptools import find_packages, setup
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 # Need to parse metadata manually as setup.py must not import innoconv
 METADATA_PATH = os.path.join(ROOT_DIR, "innoconv", "metadata.py")
@@ -27,36 +23,6 @@ with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 
-class UploadCommand(Command):
-    """Custom command that uploads release to PyPI and tags it in git."""
-
-    def initialize_options(self):
-        """Initialize options."""
-
-    def finalize_options(self):
-        """Finalize options."""
-
-    def run(self):
-        """Run command."""
-        try:
-            self.status("Removing previous builds…")
-            rmtree(os.path.join(ROOT_DIR, "dist"))
-        except OSError:
-            pass
-
-        self.status("Building Source and Wheel (universal) distribution…")
-        os.system("{0} setup.py sdist bdist_wheel".format(sys.executable))
-
-        self.status("Uploading the package to PyPI via Twine…")
-        os.system("twine upload dist/*")
-
-        self.status("Pushing git tags…")
-        os.system("git tag v{0}".format(METADATA["version"]))
-        os.system("git push --tags")
-
-        sys.exit()
-
-
 def setup_package():
     """Create package setup information."""
     setup(
@@ -64,7 +30,6 @@ def setup_package():
         version=METADATA["version"],
         author=METADATA["author"],
         author_email=METADATA["author_email"],
-        cmdclass={"upload": UploadCommand},
         description=METADATA["description"],
         entry_points={"console_scripts": ["innoconv = innoconv.cli:cli"]},
         include_package_data=True,
