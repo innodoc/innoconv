@@ -10,6 +10,7 @@ Table of contents
   about
   getting-started
   usage
+  content-creation
   modules
 
 Indices and tables

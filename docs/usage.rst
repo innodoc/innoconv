@@ -3,9 +3,9 @@
 How to use innoConv
 ===================
 
-The principle way of using innoConv is using its command-line interface (CLI)
+The principle way of using innoConv is the :abbr:`CLI (Command-line interface)`
 :program:`innoconv`. Another option is to use innoConv in a
-:ref:`programmatic way <innoconv-as-a-library>` as a Python library.
+:ref:`programmatic way <innoconv-as-a-library>` as Python library.
 
 Run the converter on your content directory.
 
@@ -13,10 +13,15 @@ Run the converter on your content directory.
 
   $ innoconv /path/to/my/content
 
-This will trigger the conversion and store the result in a folder
-:file:`innoconv_output`. According to Unix philosophy you will not see any
-messages if the conversion was successful. Though you might pass the
-``--verbose`` flag to change this behaviour.
+This will trigger a conversion and store the result in a folder
+:file:`innoconv_output`. A return code other than ``0`` indicates an
+unsuccessful run.
+
+.. note::
+
+  According to Unix convention you will not see any messages if the
+  conversion was successful. Though you might pass the
+  :option:`--verbose <innoconv --verbose>` flag to change this behavior.
 
 Command line arguments
 ----------------------

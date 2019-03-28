@@ -1,5 +1,5 @@
 click==7.0
 PyYAML==3.13
-Sphinx==1.8.5
+Sphinx==2.0.0
 sphinx-click==2.0.1
 sphinx-rtd-theme==0.4.3

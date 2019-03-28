@@ -1,49 +1,66 @@
 What is innoConv?
 =================
 
-innoConv is a converter for educational content.
+*innoConv is a converter for educational content.*
 
-It transforms content into an intermediate format (JSON) that can be displayed
-with a :ref:`innodoc-compatible viewer <viewers>`.
+The software transforms source content into an intermediate
+`JSON <https://www.json.org/>`_ representation that can be displayed with the
+help of an :ref:`innodoc-compatible viewer <viewers>`.
 
-Course structure
-----------------
+It takes plain-text files as a source. These are written in the
+`Markdown language <https://daringfireball.net/projects/markdown/>`_ and
+stored in a particular
+:ref:`directory structure <directory-and-file-structure>` reflecting the
+sections and subsections of the work.
 
-TODO
+.. seealso::
 
-- :file:`toc.md`
-- language directories
-  - chapters and sections in sub-directories
-  - :file:`content.md`
+  Check out the :ref:`example course <example-course>` to see how it looks
+  like.
 
-Example course
---------------
+Features
+--------
 
-There's an example course. It's a comprehensive demonstration of what is
-possible with innoConv.
+Common features as basic text formatting, links, tables, lists, etc. are
+already provided by Markdown out-of-the-box.
 
-It serves the following purposes:
+While staying as close to traditional Markdown as possible innoConv supports
+a variety of additional constructs. Many of them are targeted specifically at
+the creation of educational content.
 
-* Showcase the capabilities and features
-* Reference for course authors
-* Case for automatic software tests
+These include
 
-It can also serve as a starting point for trying out innoConv before writing
-your own content.
-
-Links
-~~~~~
-
-* `Demo course live version <https://tub_base.innocampus.tu-berlin.de/>`_
-* `Content source repository <https://gitlab.tu-berlin.de/innodoc/tub_base>`_
+* :ref:`localization`
+* Math formulas
+* Images and videos
+* :ref:`Interactive exercises <interactive-exercises>`
+* :ref:`pgf-tikz`
+* Table of contents
+* :ref:`Inter-section references <xrefs>`
+* :ref:`glossary`
 
 innoDoc
 -------
 
-innoConv is one part in a software package called
-`innoDoc <https://www.innocampus.tu-berlin.de/en/projects/innodoc/>`_.
+innoConv is a part in the software package
+`innoDoc <https://www.innocampus.tu-berlin.de/en/projects/innodoc/>`_. It
+handles the translation of source content to the an intermediate JSON
+represenation.
 
-.. image:: figures/overview.*
+.. figure:: figures/overview.*
+  :alt: innoDoc overview
+  :align: center
+
+  Overview of the innoDoc software architecture.
+
+innoConv does neither have any busisness with how content is displayed nor
+helps in its creation. Instead it leaves these tasks completely to others in
+the processing chain.
+
+.. seealso::
+
+  See section :doc:`Content creation <content-creation>` for a in-depth
+  discussion on how to write course content.
 
 .. _viewers:
 
@@ -57,3 +74,8 @@ innodoc-webapp
 
 innodoc-app
   `React Native-based Smartphone App <https://gitlab.tu-berlin.de/innodoc/innodoc-app>`_
+
+.. note::
+
+  Configuration and deployment of viewers is not the scope of this document.
+  Please refer to the respective documentation.
