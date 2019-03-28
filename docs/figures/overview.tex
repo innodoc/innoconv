@@ -12,9 +12,13 @@
   \inheritanchorborder[from=rectangle]
   \inheritanchor[from=rectangle]{center}
   \inheritanchor[from=rectangle]{north}
-  \inheritanchor[from=rectangle]{south}
-  \inheritanchor[from=rectangle]{west}
+  \inheritanchor[from=rectangle]{north east}
   \inheritanchor[from=rectangle]{east}
+  \inheritanchor[from=rectangle]{south east}
+  \inheritanchor[from=rectangle]{south}
+  \inheritanchor[from=rectangle]{south west}
+  \inheritanchor[from=rectangle]{west}
+  \inheritanchor[from=rectangle]{north west}
   % ... and possibly more
   \backgroundpath{% this is new
   % store lower right in xa/ya and upper right in xb/yb
@@ -39,6 +43,8 @@
 }
 \makeatother
 
+\definecolor{progblue}{RGB}{41,128,185}
+
 \tikzstyle{document_base}=[
   align=center,
   draw=black!35,
@@ -61,8 +67,8 @@
 % program style
 \tikzstyle{program_base}=[
   align=center,
-  draw=blue!50,
-  fill=blue!10,
+  draw=progblue,
+  fill=progblue!10,
   inner sep=5mm,
   rectangle,
   rounded corners=2mm,
@@ -71,7 +77,6 @@
 
 % other styles
 \tikzstyle{bgbox}=[
-  fill=yellow!20,
   rectangle,
 ]
 \tikzstyle{levelline}=[
@@ -110,10 +115,9 @@
   \node[document_id,below=of prog_innoconv]               (doc_json)              {\fileext{json}};
 
   % presentation level
-  \node[below=of doc_json]                                (prog_dummy)            {};
-  \node[program_id,left=of prog_dummy,anchor=north east]  (prog_webapp)           {{\Huge\faLaptop}\\Web app};
-  \node[program_id,right=of prog_dummy,anchor=north west] (prog_app)              {{\Huge\faMobile}\\Mobile app};
-  \node[document_id,below=of prog_dummy]                  (doc_pdf)               {\fileext{pdf}};
+  \node[program_id,below left=of doc_json,anchor=north east]  (prog_webapp)           {{\Huge\faLaptop}\\Web app};
+  \node[program_id,below right=of doc_json,anchor=north west] (prog_app)              {{\Huge\faMobile}\\Mobile app};
+  \node[document_id,below=of doc_json]                  (doc_pdf)               {\fileext{pdf}};
 
   % arrows
   \path[arrow_id] % innoDoc
@@ -125,9 +129,9 @@
 
   % level labels
   \begin{scope}
-    \node[row_label] at (-50mm,    1mm) {\rowlabel{Source}};
-    \node[row_label] at (-50mm,  -50mm) {\rowlabel{Intermediate}};
-    \node[row_label] at (-50mm, -109mm) {\rowlabel{Presentation}};
+    \node[row_label] at (-55mm,    1mm) {\rowlabel{Source}};
+    \node[row_label] at (-55mm,  -50mm) {\rowlabel{Intermediate}};
+    \node[row_label] at (-55mm, -109mm) {\rowlabel{Presentation}};
   \end{scope}
 
   % background layer
