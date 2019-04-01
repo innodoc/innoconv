@@ -178,8 +178,7 @@ class TestJoinStrings(TestExtension):
 
     def test_special_array(self):
         """Test a problematic case in an actual conversion (1)."""
-        examples = ([0, 1, 2], [{"t": "InlineMath"}, "\\frac12>\\frac23"])
-        for given in examples:
+        for given in ([0, 1, 2], [{"t": "InlineMath"}, "\\frac12>\\frac23"]):
             with self.subTest(given):
                 ast = self._run(ast=given)
                 self.assertEqual(ast, given)

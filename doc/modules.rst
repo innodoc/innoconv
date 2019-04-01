@@ -11,6 +11,7 @@ Module overview
   innoconv.extensions.copy_static
   innoconv.extensions.generate_toc
   innoconv.extensions.join_strings
+  innoconv.extensions.tikz2svg
   innoconv.extensions.write_manifest
   innoconv.manifest
   innoconv.runner

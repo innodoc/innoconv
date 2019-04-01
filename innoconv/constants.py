@@ -11,6 +11,7 @@ DEFAULT_EXTENSIONS = (
     "join_strings",
     "copy_static",
     "generate_toc",
+    "tikz2svg",
     "write_manifest",
 )
 

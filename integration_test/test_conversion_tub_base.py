@@ -49,9 +49,17 @@ class TestConversionTubBase(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
-        self._test_content()
         self._test_verbose_output(stderr)
-        self._test_copy_static(stderr)
+        with self.subTest(extension="copystatic"):
+            self._test_copy_static(stderr)
+        with self.subTest(extension="generate_toc"):
+            self._test_generate_toc(stderr)
+        with self.subTest(extension="join_strings"):
+            self._test_content()
+        with self.subTest(extension="tikz2svg"):
+            self._test_tikz2svg(stderr)
+        with self.subTest(extension="write_manifest"):
+            self._test_write_manifest(stderr)
 
     def _test_converted_folders_present(self):
         for lang in ("de", "en"):
@@ -123,13 +131,21 @@ class TestConversionTubBase(unittest.TestCase):
         )
 
     def _test_verbose_output(self, stderr):
-        self.assertIn(
-            join(
-                "de", "02-elements", "03-links-and-formatting", "content.json"
-            ),
-            stderr,
-        )
-        self.assertIn(
-            join("de", "02-elements", "04-quotes", "content.json"), stderr
-        )
+        for section in ("03-links-and-formatting", "04-quotes"):
+            with self.subTest(section):
+                path = join("de", "02-elements", section, "content.json")
+                self.assertIn(path, stderr)
         self.assertIn("Build finished!", stderr)
+
+    @unittest.skip("TODO")
+    def _test_tikz2svg(self, stderr):
+        # test content in tub_base has to be prepared
+        pass
+
+    @unittest.skip("TODO")
+    def _test_generate_toc(self, stderr):
+        pass
+
+    @unittest.skip("TODO")
+    def _test_write_manifest(self, stderr):
+        pass
