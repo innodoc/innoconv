@@ -20,7 +20,7 @@ MANIFEST = Manifest(data={"title": "Foo title", "languages": ["en"]})
 @patch("os.path.exists", return_value=False)
 @patch("innoconv.cli.InnoconvRunner.run")
 @patch("innoconv.cli.InnoconvRunner.__init__", return_value=None)
-@patch("innoconv.cli.logging.basicConfig")
+@patch("innoconv.cli.coloredlogs.install")
 class TestCLI(unittest.TestCase):
     """Test the command-line interface argument parsing."""
 
@@ -31,13 +31,13 @@ class TestCLI(unittest.TestCase):
         self.assertIs(result.exit_code, 0)
         self.assertIn("Usage: ", result.output)
 
-    def test_defaults(self, logging_basicconfig, runner_init, run, *__):
+    def test_defaults(self, coloredlogs_install, runner_init, run, *__):
         """Test the default arguments."""
         runner = CliRunner()
         result = runner.invoke(cli, ".")
         self.assertEqual(
-            logging_basicconfig.call_args_list,
-            [call(level=logging.WARNING, format=LOG_FORMAT)],
+            coloredlogs_install.call_args_list,
+            [call(level=logging.WARNING, fmt=LOG_FORMAT)],
         )
         self.assertEqual(
             runner_init.call_args,
@@ -51,14 +51,14 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(run.call_args_list, [call()])
         self.assertIs(result.exit_code, 0)
 
-    def test_verbose(self, logging_basicconfig, *_):
+    def test_verbose(self, coloredlogs_install, *_):
         """Test the verbose flag."""
         runner = CliRunner()
         result = runner.invoke(cli, "--verbose .")
         self.assertIs(result.exit_code, 0)
         self.assertEqual(
-            logging_basicconfig.call_args_list,
-            [call(level=logging.INFO, format=LOG_FORMAT)],
+            coloredlogs_install.call_args_list,
+            [call(level=logging.INFO, fmt=LOG_FORMAT)],
         )
 
     def test_custom_outputdir(self, _, runner_init, *__):

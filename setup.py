@@ -33,7 +33,11 @@ def setup_package():
         description=METADATA["description"],
         entry_points={"console_scripts": ["innoconv = innoconv.cli:cli"]},
         include_package_data=True,
-        install_requires=["click>=7,<8", "PyYAML>=3.13,<4"],
+        install_requires=[
+            "click>=7,<8",
+            "coloredlogs>=10,<11",
+            "PyYAML>=3.13,<4",
+        ],
         packages=find_packages(
             exclude=["test", "test.*", "integration_test", "integration_test.*"]
         ),

@@ -5,6 +5,7 @@ import os
 import sys
 
 import click
+import coloredlogs
 import yaml
 
 from innoconv.constants import (
@@ -92,7 +93,7 @@ class CustomEpilogCommand(click.Command):
 def cli(verbose, force, extensions, output_dir, source_dir):
     """Instantiate and start an InnoconvRunner."""
     log_level = logging.INFO if verbose else logging.WARNING
-    logging.basicConfig(level=log_level, format=LOG_FORMAT)
+    coloredlogs.install(level=log_level, fmt=LOG_FORMAT)
 
     # check output directory
     if os.path.exists(output_dir) and not force:
