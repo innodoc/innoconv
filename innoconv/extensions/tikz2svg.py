@@ -6,6 +6,14 @@ in the static folder of the output directory.
 
 Ti\ *k*\Z code blocks are replaced by image elements.
 
+.. note::
+
+    In order to use this extension you need to have the following installed on
+    your system:
+
+    * LaTeX distribution with PGF/Ti\ *k*\Z
+    * `pdf2svg <https://github.com/dawbarton/pdf2svg>`_
+
 -------
 Example
 -------
@@ -37,7 +45,7 @@ from hashlib import md5
 from logging import critical, info
 from os import mkdir
 from os.path import join
-from shutil import copytree
+from shutil import copytree, rmtree
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
 
@@ -176,7 +184,11 @@ class Tikz2Svg(AbstractExtension):
                 self._run(cmd, tmp_dir)
             # copy SVG files
             tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
-            copytree(svg_path, tikz_path)
+            try:
+                copytree(svg_path, tikz_path)
+            except FileExistsError:
+                rmtree(tikz_path)
+                copytree(svg_path, tikz_path)
 
     # extension events
 
