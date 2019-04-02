@@ -1,12 +1,11 @@
 """Unit tests for innoconv.manifest."""
 
-import json
 import unittest
 from unittest.mock import call, mock_open, patch
 
 import yaml
 
-from innoconv.manifest import Manifest, ManifestEncoder
+from innoconv.manifest import Manifest
 
 MINIMUM = """
 title:
@@ -125,27 +124,3 @@ class TestManifestFromYaml(unittest.TestCase):
             with self.subTest(data):
                 with self.assertRaises(RuntimeError):
                     Manifest.from_yaml(data)
-
-
-class UnknownFooClassForEncoder:
-    """A class that's unknown to the ManifestEncoder."""
-
-
-class TestManifestEncoder(unittest.TestCase):
-    """Test the ManifestEncoder."""
-
-    def test_encoder(self):
-        """Ensure the encoder properly handles manifest fields."""
-        manifest = Manifest.from_yaml(KEYWORDS)
-        manifest_str = json.dumps(manifest, cls=ManifestEncoder)
-        manifest_dict = json.loads(manifest_str)
-        self.assertEqual(manifest_dict["languages"], ["en", "de"])
-        self.assertEqual(manifest_dict["title"]["de"], "Foo Titel")
-        self.assertEqual(manifest_dict["title"]["en"], "Foo Title")
-        self.assertEqual(manifest_dict["keywords"], ["foo", "bar", "baz"])
-        self.assertNotIn("custom_content", manifest_dict)
-
-    def test_encoder_fail(self):
-        """Ensure a TypeError is raised for an unknown object."""
-        with self.assertRaises(TypeError):
-            json.dumps(UnknownFooClassForEncoder(), cls=ManifestEncoder)

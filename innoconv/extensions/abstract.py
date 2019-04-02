@@ -22,12 +22,22 @@ class AbstractExtension:
 
     def __init__(self, manifest):
         """Initialize variables."""
+        self._extensions = []
         self._manifest = manifest
 
     @classmethod
     def helptext(cls):
         """Return a brief summary of what the extension is doing."""
         return cls._helptext
+
+    def extension_list(self, extensions):
+        """
+        Receive list of active extension instances.
+
+        :param extensions: List of all active extension instances
+        :type extensions: list
+        """
+        self._extensions = extensions
 
     def start(self, output_dir, source_dir):
         """

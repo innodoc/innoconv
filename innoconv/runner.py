@@ -94,6 +94,7 @@ class InnoconvRunner:
             func(*args, **kwargs)
 
     def _load_extensions(self, extensions):
+        # load extensions
         for ext_name in extensions:
             try:
                 self._extensions.append(EXTENSIONS[ext_name](self._manifest))
@@ -101,3 +102,5 @@ class InnoconvRunner:
                 raise RuntimeError(
                     "Extension {} not found!".format(ext_name)
                 ) from exc
+        # pass extension list to extenions
+        self._notify_extensions("extension_list", self._extensions)

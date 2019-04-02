@@ -1,17 +1,18 @@
 """Unit tests for WriteManifest."""
 
-import unittest
 from unittest.mock import call, patch
 
+from innoconv.extensions.abstract import AbstractExtension
 from innoconv.extensions.write_manifest import WriteManifest
+from innoconv.manifest import Manifest
 from . import DEST, TestExtension
 
 
+@patch("json.dump")
+@patch("builtins.open")
 class TestWriteManifest(TestExtension):
     """Test the WriteManifest extension."""
 
-    @patch("json.dump")
-    @patch("builtins.open")
     def test_write_manifest(self, mock_open, mock_dump):
         """Test the creation of a manifest file in the destination directory."""
         self._run(WriteManifest)
@@ -20,12 +21,32 @@ class TestWriteManifest(TestExtension):
             mock_open.call_args, call("{}/manifest.json".format(DEST), "w")
         )
         self.assertIs(mock_dump.call_count, 1)
-        manifest = mock_dump.call_args[0][0]
-        self.assertEqual(manifest.title["en"], "Title (en)")
-        self.assertEqual(manifest.title["de"], "Title (de)")
-        self.assertEqual(manifest.languages, ("en", "de"))
+        manifest_dict = mock_dump.call_args[0][0]
+        self.assertEqual(manifest_dict["title"]["en"], "Title (en)")
+        self.assertEqual(manifest_dict["title"]["de"], "Title (de)")
+        self.assertEqual(manifest_dict["languages"], ("en", "de"))
 
-    # TODO: implement missing test (#41)
-    @unittest.skip("TODO")
-    def test_write_manifest_ignore_fields(self, mock_open, mock_dump):
-        """Ensure specific fields are ignored in output manifest."""
+    def test_custom_field(self, _, mock_dump):
+        """Test inclusion of custom field from other extension."""
+        # pylint: disable=abstract-method
+
+        class ExtA(AbstractExtension):
+            """Extension that does not write custom fields."""
+
+        class ExtB(AbstractExtension):
+            """Extension that writes a custom field."""
+
+            @staticmethod
+            def manifest_fields():
+                """Provide custom manifest field."""
+                return {"otherfield": "foo bar"}
+
+        languages = ("en", "de")
+        manifest = Manifest(
+            {"languages": languages, "title": {"en": "Title", "de": "Titel"}}
+        )
+        ext = WriteManifest(manifest)
+        ext.extension_list([ExtA(manifest), ExtB(manifest)])
+        self._run(ext, languages=languages, manifest=manifest)
+        manifest_dict = mock_dump.call_args[0][0]
+        self.assertEqual(manifest_dict["otherfield"], "foo bar")

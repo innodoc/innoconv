@@ -20,8 +20,7 @@ class TestGenerateToc(TestExtension):
     def test_generate_toc(self):
         """Test the TOC generation for a section tree."""
         generate_toc, _ = self._run(GenerateToc, paths=PATHS)
-        manifest = generate_toc._manifest  # pylint: disable=protected-access
-        toc = manifest.toc
+        toc = generate_toc._toc  # pylint: disable=protected-access
         self.assertIs(len(toc), 2)
         self.assertEqual(toc[0]["id"], "title-1")
         self.assertEqual(toc[0]["title"]["de"], "Title 1 de")
@@ -60,3 +59,6 @@ class TestGenerateToc(TestExtension):
         self.assertEqual(toc[1]["children"][0]["id"], "title-2-1")
         self.assertEqual(toc[1]["children"][0]["title"]["de"], "Title 2-1 de")
         self.assertEqual(toc[1]["children"][0]["title"]["en"], "Title 2-1 en")
+
+        manifest_fields = generate_toc.manifest_fields()
+        self.assertIs(manifest_fields["toc"], toc)

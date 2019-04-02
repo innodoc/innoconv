@@ -10,7 +10,13 @@ class TestJoinStrings(TestExtension):
     """Test the JoinStrings extension."""
 
     @staticmethod
-    def _run(extension=JoinStrings, ast=None, languages=("en",), paths=PATHS):
+    def _run(
+        extension=JoinStrings,
+        ast=None,
+        languages=("en",),
+        paths=PATHS,
+        manifest=None,
+    ):
         _, [ast] = TestExtension._run(
             extension, ast, languages=languages, paths=paths
         )
