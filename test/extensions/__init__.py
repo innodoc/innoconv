@@ -22,13 +22,16 @@ class TestExtension(unittest.TestCase):
     """Provide a base class for all extension tests."""
 
     @staticmethod
-    def _run(extension, ast=None, languages=("en", "de"), paths=PATHS):
+    def _run(
+        extension, ast=None, languages=("en", "de"), paths=PATHS, manifest=None
+    ):
         if ast is None:
             ast = get_filler_content()
         title = {}
         for language in languages:
             title[language] = "Title ({})".format(language)
-        manifest = Manifest({"languages": languages, "title": title})
+        if manifest is None:
+            manifest = Manifest({"languages": languages, "title": title})
         ext = extension(manifest)
         ext.start(DEST, SOURCE)
         asts = []

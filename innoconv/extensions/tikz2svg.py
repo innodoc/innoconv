@@ -58,6 +58,8 @@ TEX_FILE_TEMPLATE = r"""
 CMD_PDFLATEX = "pdflatex -halt-on-error -jobname {} -file-line-error --"
 CMD_PDF2SVG = "pdf2svg {} {}"
 TIKZ_FOLDER = "_tikz"
+TIKZ_FILENAME = "tikz_{}"
+TIKZ_IMG_TAG_ALT = "TikZ Image"
 
 
 class Tikz2Svg(AbstractExtension):
@@ -92,7 +94,7 @@ class Tikz2Svg(AbstractExtension):
 
     @staticmethod
     def _get_tikz_name(tikz_hash):
-        return "tikz_{}".format(tikz_hash)
+        return TIKZ_FILENAME.format(tikz_hash)
 
     def _tikz_found(self, element, caption=None):
         """Remember TikZ code and replace with image."""
@@ -104,13 +106,12 @@ class Tikz2Svg(AbstractExtension):
         element["c"] = [
             ["", [], []],
             caption or [],
-            [join(TIKZ_FOLDER, filename), "TikZ Image"],
+            [join(TIKZ_FOLDER, filename), TIKZ_IMG_TAG_ALT],
         ]
         info("Found TikZ image {}".format(filename))
 
     def _parse_tikz(self, elem, parent):
         try:
-            # pylint: disable=bad-continuation
             if (
                 parent
                 and parent["t"] == "Div"
@@ -156,12 +157,12 @@ class Tikz2Svg(AbstractExtension):
                 # generate tex document
                 try:
                     preamble = self._manifest.tikz_preamble
-                    # as this template is used with .format() we need to escape
-                    # all curly brackets
-                    preamble.replace("{", "{{")
-                    preamble.replace("}", "}}")
                 except AttributeError:
                     preamble = ""
+                # as this template is used with .format() we need to escape
+                # curly brackets
+                preamble.replace("{", "{{")
+                preamble.replace("}", "}}")
                 texdoc = TEX_FILE_TEMPLATE.format(
                     tikz_code=tikz_code, preamble=preamble
                 )
