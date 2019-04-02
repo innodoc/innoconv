@@ -12,7 +12,7 @@ from os.path import join
 
 from innoconv.constants import MANIFEST_BASENAME
 from innoconv.extensions.abstract import AbstractExtension
-from innoconv.manifest import ManifestEncoder
+from innoconv.manifest import Manifest
 
 
 class WriteManifest(AbstractExtension):
@@ -26,10 +26,26 @@ class WriteManifest(AbstractExtension):
         self._output_dir = None
 
     def _write_manifest(self):
+        manifest_dict = {}
+        for field in Manifest.required_fields:
+            manifest_dict[field] = getattr(self._manifest, field)
+        # optional fields
+        for field in Manifest.optional_fields:
+            try:
+                manifest_dict[field] = getattr(self._manifest, field)
+            except AttributeError:
+                pass
+        # extra fields from extensions
+        for ext in self._extensions:
+            try:
+                manifest_dict.update(ext.manifest_fields())
+            except AttributeError:
+                pass
+        # write file
         filename = "{}.json".format(MANIFEST_BASENAME)
         filepath = join(self._output_dir, filename)
         with open(filepath, "w") as out_file:
-            json.dump(self._manifest, out_file, cls=ManifestEncoder)
+            json.dump(manifest_dict, out_file)
         logging.info("Wrote manifest %s", filepath)
 
     # extension events

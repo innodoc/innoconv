@@ -21,13 +21,14 @@ class GenerateToc(AbstractExtension):
         self._output_dir = None
         self._current_path = None
         self._language = None
+        self._toc = []
 
     def _add_to_toc(self, title):
         path_components = self._splitall(self._current_path)
         path_components.pop(0)  # language folder
         if not path_components:  # skip root section
             return
-        children = self._manifest.toc
+        children = self._toc
         while path_components:
             section_id = path_components.pop(0)
             # find/create child leaf
@@ -85,3 +86,7 @@ class GenerateToc(AbstractExtension):
 
     def finish(self):
         """Unused."""
+
+    def manifest_fields(self):
+        """Add `toc` field to manifest."""
+        return {"toc": self._toc}

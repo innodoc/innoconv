@@ -4,6 +4,7 @@ from copy import deepcopy
 from os.path import join
 import unittest
 
+from innoconv.extensions.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 from ..utils import get_filler_content
 
@@ -32,7 +33,15 @@ class TestExtension(unittest.TestCase):
             title[language] = "Title ({})".format(language)
         if manifest is None:
             manifest = Manifest({"languages": languages, "title": title})
-        ext = extension(manifest)
+        try:
+            if issubclass(extension, AbstractExtension):
+                ext = extension(manifest)
+            else:
+                raise ValueError(
+                    "extension not a sub-class of AbstractExtension!"
+                )
+        except TypeError:
+            ext = extension
         ext.start(DEST, SOURCE)
         asts = []
         for language in languages:
