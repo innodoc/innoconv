@@ -1,4 +1,4 @@
-image: python:alpine
+image: innodoc/innoconv-ci
 
 stages:
   - test
@@ -14,70 +14,57 @@ variables:
   GIT_SUBMODULE_STRATEGY: "recursive"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
 
-.default: &default
-  stage: test
-  image: python:3.7-alpine
-  before_script:
-    - pip install tox
-
-.integration: &integration
-  <<: *default
-  image: innodoc/innoconv-ci
-  before_script:
-    - source $HOME/.bash_profile
+before_script:
+  - source $HOME/.bash_profile
 
 py37-unit:
-  <<: *default
+  stage: test
   script: tox -e py37-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
 
 py37-integration:
-  <<: *integration
+  stage: test
   script: tox -e py37-integration
 
 py36-unit:
-  <<: *default
-  image: python:3.6-alpine
+  stage: test
   script: tox -e py36-unit
 
 py36-integration:
-  <<: *integration
+  stage: test
   script: tox -e py36-integration
 
 py35-unit:
-  <<: *default
-  image: python:3.5-alpine
+  stage: test
   script: tox -e py35-unit
 
 py35-integration:
-  <<: *integration
+  stage: test
   script: tox -e py35-integration
 
 py34-unit:
-  <<: *default
-  image: python:3.4-alpine
+  stage: test
   script: tox -e py34-unit
 
 py34-integration:
-  <<: *integration
+  stage: test
   script: tox -e py34-integration
 
 lint:
-  <<: *default
+  stage: test
   script: tox -e linters
   cache:
     <<: *cache
     policy: pull
 
 doc:
-  <<: *default
+  stage: test
   script: tox -e docs
   cache:
     <<: *cache
     policy: pull
 
 pypi-upload:
-  <<: *default
   stage: release
   script:
     - if echo "$CI_COMMIT_TAG" | grep -qvE "$SEMVER_REGEXP"; then echo "Not a semver tag. Happily skipping..."; exit 0; fi
