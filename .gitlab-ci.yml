@@ -9,82 +9,76 @@ cache: &cache
   paths:
     - .pip-cache
     - .tox
-    - .pandoc
 
 variables:
-  PANDOC_VERSION: "2.7"
   GIT_SUBMODULE_STRATEGY: "recursive"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
 
-before_script:
-  - >
-    if [ ! -f .pandoc/pandoc ]; then
-      mkdir -p .pandoc
-      wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xzf - --strip-components 2 -C .pandoc pandoc-${PANDOC_VERSION}/bin/pandoc
-    fi
-  - export PATH="${CI_PROJECT_DIR}/.pandoc:$PATH"
-  - pip install tox
-
-py37-unit:
+.default: &default
   stage: test
   image: python:3.7-alpine
+  before_script:
+    - pip install tox
+
+.integration: &integration
+  <<: *default
+  image: innodoc/innoconv-ci
+  before_script:
+    - source $HOME/.bash_profile
+
+py37-unit:
+  <<: *default
   script: tox -e py37-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
 
 py37-integration:
-  stage: test
-  image: python:3.7-alpine
+  <<: *integration
   script: tox -e py37-integration
 
 py36-unit:
-  stage: test
+  <<: *default
   image: python:3.6-alpine
   script: tox -e py36-unit
 
 py36-integration:
-  stage: test
-  image: python:3.6-alpine
+  <<: *integration
   script: tox -e py36-integration
 
 py35-unit:
-  stage: test
+  <<: *default
   image: python:3.5-alpine
   script: tox -e py35-unit
 
 py35-integration:
-  stage: test
-  image: python:3.5-alpine
+  <<: *integration
   script: tox -e py35-integration
 
 py34-unit:
-  stage: test
+  <<: *default
   image: python:3.4-alpine
   script: tox -e py34-unit
 
 py34-integration:
-  stage: test
-  image: python:3.4-alpine
+  <<: *integration
   script: tox -e py34-integration
 
 lint:
-  stage: test
-  image: python:3.7-alpine
+  <<: *default
   script: tox -e lint
   cache:
     <<: *cache
     policy: pull
 
 doc:
-  stage: test
-  image: python:3.7-alpine
+  <<: *default
   script: tox -e doc
   cache:
     <<: *cache
     policy: pull
 
 pypi-upload:
+  <<: *default
   stage: release
-  image: python:3.7-alpine
   script:
     - if echo "$CI_COMMIT_TAG" | grep -qvE "$SEMVER_REGEXP"; then echo "Not a semver tag. Happily skipping..."; exit 0; fi
     - tox -e release
