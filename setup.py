@@ -5,7 +5,7 @@ import os
 import re
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
