@@ -1,7 +1,7 @@
-innoconv.extensions.write_manifest
+innoconv.ext.write_manifest
 ==================================
 
-.. automodule:: innoconv.extensions.write_manifest
+.. automodule:: innoconv.ext.write_manifest
 
 .. autoclass:: WriteManifest
   :members: start, finish

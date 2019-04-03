@@ -55,7 +55,7 @@ import shutil
 from urllib import parse
 
 from innoconv.constants import STATIC_FOLDER
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 
 ACCEPTED_LINK_CLASSES = ("video-static",)
 

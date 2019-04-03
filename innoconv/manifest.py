@@ -6,7 +6,7 @@ at the content root directory.
 
 There is also a representation in JSON format. It is generated automatically
 by the extension
-:class:`WriteManifest <innoconv.extensions.write_manifest.WriteManifest>`
+:class:`WriteManifest <innoconv.ext.write_manifest.WriteManifest>`
 and copied to the output folder.
 
 Other extensions may add custom fields to the output manifest by implementing

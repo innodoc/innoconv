@@ -13,7 +13,7 @@ from innoconv.constants import (
     DEFAULT_OUTPUT_DIR_BASE,
     LOG_FORMAT,
 )
-from innoconv.extensions import EXTENSIONS
+from innoconv.ext import EXTENSIONS
 from innoconv.manifest import Manifest
 from innoconv.metadata import __author__, __description__, __url__, __version__
 from innoconv.runner import InnoconvRunner

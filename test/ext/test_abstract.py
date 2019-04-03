@@ -2,7 +2,7 @@
 
 import unittest
 
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 
 MANIFEST = Manifest({"title": {"en": "Foo Course Title"}, "languages": ("en",)})

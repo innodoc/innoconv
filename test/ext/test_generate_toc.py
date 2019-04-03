@@ -1,6 +1,6 @@
 """Unit tests for GenerateToc."""
 
-from innoconv.extensions.generate_toc import GenerateToc
+from innoconv.ext.generate_toc import GenerateToc
 from . import TestExtension
 
 PATHS = (

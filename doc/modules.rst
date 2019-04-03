@@ -6,13 +6,13 @@ Module overview
 
   innoconv.cli
   innoconv.constants
-  innoconv.extensions
-  innoconv.extensions.abstract
-  innoconv.extensions.copy_static
-  innoconv.extensions.generate_toc
-  innoconv.extensions.join_strings
-  innoconv.extensions.tikz2svg
-  innoconv.extensions.write_manifest
+  innoconv.ext
+  innoconv.ext.abstract
+  innoconv.ext.copy_static
+  innoconv.ext.generate_toc
+  innoconv.ext.join_strings
+  innoconv.ext.tikz2svg
+  innoconv.ext.write_manifest
   innoconv.manifest
   innoconv.runner
   innoconv.utils

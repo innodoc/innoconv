@@ -7,7 +7,7 @@ A table of contents is generated from the course sections and added to the
 
 from os.path import split
 
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 
 
 class GenerateToc(AbstractExtension):

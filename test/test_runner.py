@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import call, DEFAULT, patch
 
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 from innoconv.runner import InnoconvRunner
 
@@ -120,9 +120,7 @@ class TestInnoconvRunner(unittest.TestCase):
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
 @patch("innoconv.runner.makedirs")
 @patch("innoconv.runner.isdir", return_value=True)
-@patch(
-    "innoconv.extensions.abstract.AbstractExtension.__init__", return_value=None
-)
+@patch("innoconv.ext.abstract.AbstractExtension.__init__", return_value=None)
 class TestInnoconvRunnerExtensions(unittest.TestCase):
     """Test runner interfacing properly with extensions."""
 
@@ -139,7 +137,7 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
             InnoconvRunner("/src", "/out", MANIFEST, extensions)
 
     @patch.multiple(
-        "innoconv.extensions.abstract.AbstractExtension",
+        "innoconv.ext.abstract.AbstractExtension",
         start=DEFAULT,
         pre_conversion=DEFAULT,
         pre_process_file=DEFAULT,

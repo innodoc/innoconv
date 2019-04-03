@@ -1,6 +1,6 @@
 """Unit tests for JoinStrings."""
 
-from innoconv.extensions.join_strings import JoinStrings
+from innoconv.ext.join_strings import JoinStrings
 from . import TestExtension
 
 PATHS = (("Foo", ("foo",)),)

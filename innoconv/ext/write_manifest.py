@@ -11,7 +11,7 @@ import logging
 from os.path import join
 
 from innoconv.constants import MANIFEST_BASENAME
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 
 

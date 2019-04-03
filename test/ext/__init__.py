@@ -4,7 +4,7 @@ from copy import deepcopy
 from os.path import join
 import unittest
 
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 from ..utils import get_filler_content
 
