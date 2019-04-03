@@ -15,7 +15,7 @@ Example
 ``{"t":"Str","c":"Foo bar"}]``
 """
 
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 
 #: Type that represents a string
 STR_TYPE = "Str"

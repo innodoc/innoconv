@@ -5,7 +5,7 @@ from os.path import join
 from unittest.mock import call, patch
 
 from innoconv.constants import STATIC_FOLDER
-from innoconv.extensions.copy_static import CopyStatic
+from innoconv.ext.copy_static import CopyStatic
 from . import DEST, PATHS, SOURCE, TestExtension
 from ..utils import (
     get_filler_content,

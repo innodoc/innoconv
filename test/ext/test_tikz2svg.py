@@ -5,7 +5,7 @@ from hashlib import md5
 from os.path import join
 from unittest.mock import call, MagicMock, patch
 
-from innoconv.extensions.tikz2svg import (
+from innoconv.ext.tikz2svg import (
     Tikz2Svg,
     TIKZ_FILENAME,
     TIKZ_FOLDER,
@@ -38,15 +38,13 @@ IMAGE_BLOCK = get_image_ast(
 
 
 @patch(
-    "innoconv.extensions.tikz2svg.TemporaryDirectory",
+    "innoconv.ext.tikz2svg.TemporaryDirectory",
     return_value=MagicMock(__enter__=MagicMock(return_value="")),
 )
-@patch("innoconv.extensions.tikz2svg.mkdir")
-@patch("innoconv.extensions.tikz2svg.rmtree")
-@patch("innoconv.extensions.tikz2svg.copytree")
-@patch(
-    "innoconv.extensions.tikz2svg.Popen", return_value=MagicMock(returncode=0)
-)
+@patch("innoconv.ext.tikz2svg.mkdir")
+@patch("innoconv.ext.tikz2svg.rmtree")
+@patch("innoconv.ext.tikz2svg.copytree")
+@patch("innoconv.ext.tikz2svg.Popen", return_value=MagicMock(returncode=0))
 class TestTikz2Svg(TestExtension):
     """Test the Tikz2Svg extension."""
 

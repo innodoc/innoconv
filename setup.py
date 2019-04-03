@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Define project commands."""
+"""setuptools packaging."""
 
 import os
 import re
@@ -38,9 +38,7 @@ def setup_package():
             "coloredlogs>=10,<11",
             "PyYAML>=3.13,<4",
         ],
-        packages=find_packages(
-            exclude=["test", "test.*", "integration_test", "integration_test.*"]
-        ),
+        packages=["innoconv", "innoconv.ext"],
         python_requires=">=3.4.0",
         keywords=["innodoc", "pandoc", "markdown", "education"],
         license=METADATA["license"],
@@ -55,13 +53,21 @@ def setup_package():
             "Development Status :: 4 - Beta",
             "Environment :: Console",
             "Intended Audience :: Education",
+            "Intended Audience :: End Users/Desktop",
+            "Intended Audience :: Science/Research",
             "License :: OSI Approved"
             " :: GNU General Public License v3 or later (GPLv3+)",
             "Operating System :: POSIX :: Linux",
-            "Programming Language :: Python :: 3",
             "Programming Language :: Python",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3 :: Only",
+            "Programming Language :: Python :: 3.4",
+            "Programming Language :: Python :: 3.5",
+            "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: 3.7",
             "Topic :: Education",
             "Topic :: Text Processing :: Markup",
+            "Topic :: Scientific/Engineering",
         ],
     )
 

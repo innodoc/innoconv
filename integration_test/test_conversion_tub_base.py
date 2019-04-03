@@ -12,7 +12,7 @@ from innoconv.constants import (
     MANIFEST_BASENAME,
     STATIC_FOLDER,
 )
-from innoconv.extensions.tikz2svg import TIKZ_FOLDER
+from innoconv.ext.tikz2svg import TIKZ_FOLDER
 
 REPO_DIR = join(dirname(realpath(__file__)), "tub_base")
 OUTPUT_CONTENT_FILENAME = "{}.json".format(CONTENT_BASENAME)

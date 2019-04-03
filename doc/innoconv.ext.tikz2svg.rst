@@ -1,7 +1,7 @@
-innoconv.extensions.tikz2svg
+innoconv.ext.tikz2svg
 ============================
 
-.. automodule:: innoconv.extensions.tikz2svg
+.. automodule:: innoconv.ext.tikz2svg
 
 .. autoclass:: Tikz2Svg
   :members: start, post_process_file, finish

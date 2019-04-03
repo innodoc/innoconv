@@ -2,8 +2,8 @@
 
 from unittest.mock import call, patch
 
-from innoconv.extensions.abstract import AbstractExtension
-from innoconv.extensions.write_manifest import WriteManifest
+from innoconv.ext.abstract import AbstractExtension
+from innoconv.ext.write_manifest import WriteManifest
 from innoconv.manifest import Manifest
 from . import DEST, TestExtension
 

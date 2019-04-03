@@ -8,14 +8,14 @@ features are needed in all cases.
 Extensions interface with
 :class:`InnoconvRunner <innoconv.runner.InnoconvRunner>` through a set of
 methods defined in
-:class:`AbstractExtension <innoconv.extensions.abstract.AbstractExtension>`.
+:class:`AbstractExtension <innoconv.ext.abstract.AbstractExtension>`.
 """
 
-from innoconv.extensions.copy_static import CopyStatic
-from innoconv.extensions.generate_toc import GenerateToc
-from innoconv.extensions.join_strings import JoinStrings
-from innoconv.extensions.tikz2svg import Tikz2Svg
-from innoconv.extensions.write_manifest import WriteManifest
+from innoconv.ext.copy_static import CopyStatic
+from innoconv.ext.generate_toc import GenerateToc
+from innoconv.ext.join_strings import JoinStrings
+from innoconv.ext.tikz2svg import Tikz2Svg
+from innoconv.ext.write_manifest import WriteManifest
 
 #: List of available extensions
 EXTENSIONS = {

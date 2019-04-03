@@ -7,7 +7,7 @@ These are converted one-by-one to JSON. Under the hood is uses
 
 It receives a list of extensions that are instantiated and notified upon
 certain events. The events are documented in
-:class:`AbstractExtension <innoconv.extensions.abstract.AbstractExtension>`.
+:class:`AbstractExtension <innoconv.ext.abstract.AbstractExtension>`.
 """
 
 import json
@@ -16,7 +16,7 @@ from os import makedirs, walk
 from os.path import abspath, dirname, isdir, join, sep
 
 from innoconv.constants import CONTENT_BASENAME
-from innoconv.extensions import EXTENSIONS
+from innoconv.ext import EXTENSIONS
 from innoconv.utils import to_ast
 
 

@@ -50,7 +50,7 @@ from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
 
 from innoconv.constants import ENCODING, STATIC_FOLDER
-from innoconv.extensions.abstract import AbstractExtension
+from innoconv.ext.abstract import AbstractExtension
 
 TEX_FILE_TEMPLATE = r"""
 \documentclass{{standalone}}
