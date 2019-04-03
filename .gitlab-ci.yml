@@ -9,20 +9,32 @@ cache: &cache
   paths:
     - .pip-cache
     - .tox
-    - .pandoc
+    - .local
 
 variables:
   PANDOC_VERSION: "2.7"
+  PDF2SVG_VERSION: "0.2.3"
   GIT_SUBMODULE_STRATEGY: "recursive"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
 
 before_script:
+  - apk add --no-cache texlive-full
   - >
-    if [ ! -f .pandoc/pandoc ]; then
-      mkdir -p .pandoc
-      wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xzf - --strip-components 2 -C .pandoc pandoc-${PANDOC_VERSION}/bin/pandoc
+    if [ ! -f .local/bin/pandoc ]; then
+      mkdir -p .local/bin
+      wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz | tar -xzf - --strip-components 2 -C .local/bin pandoc-${PANDOC_VERSION}/bin/pandoc
     fi
-  - export PATH="${CI_PROJECT_DIR}/.pandoc:$PATH"
+  - >
+    if [ ! -f .local/bin/pdf2svg ]; then
+      apk add --no-cache build-base cairo-dev poppler-dev
+      wget -qO- https://github.com/dawbarton/pdf2svg/archive/v${PDF2SVG_VERSION}.tar.gz | tar -xzf - -C /tmp
+      cd /tmp/pdf2svg-${PDF2SVG_VERSION}
+      ./configure --prefix="${CI_PROJECT_DIR}/.local"
+      make
+      strip pdf2svg
+      make install
+    fi
+  - export PATH="${CI_PROJECT_DIR}/.local/bin:$PATH"
   - pip install tox
 
 py37-unit:
