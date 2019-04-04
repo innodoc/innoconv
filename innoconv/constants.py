@@ -29,3 +29,6 @@ LOG_FORMAT = "%(levelname)s:%(filename)s %(message)s"
 
 #: Static folder name
 STATIC_FOLDER = "_static"
+
+#: CLI exit codes
+EXIT_CODES = {"SUCCESS": 0, "MANIFEST_ERROR": 10, "RUNNER_ERROR": 11}

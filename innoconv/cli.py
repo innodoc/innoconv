@@ -11,6 +11,7 @@ import yaml
 from innoconv.constants import (
     DEFAULT_EXTENSIONS,
     DEFAULT_OUTPUT_DIR_BASE,
+    EXIT_CODES,
     LOG_FORMAT,
 )
 from innoconv.ext import EXTENSIONS
@@ -42,7 +43,9 @@ def _parse_extensions(_, __, value):
     extensions = value.split(",")
     for ext in extensions:
         if ext not in EXTENSIONS.keys():
-            raise click.BadParameter("Extension not found: {}".format(ext))
+            raise click.BadOptionUsage(
+                "-e", "Extension not found: {}".format(ext)
+            )
     return extensions
 
 
@@ -97,9 +100,10 @@ def cli(verbose, force, extensions, output_dir, source_dir):
 
     # check output directory
     if os.path.exists(output_dir) and not force:
-        raise click.BadParameter(
+        raise click.FileError(
+            output_dir,
             "Output directory {} already exists. "
-            "To overwrite use --force.".format(output_dir)
+            "To overwrite use --force.".format(output_dir),
         )
 
     # read course manifest
@@ -107,13 +111,13 @@ def cli(verbose, force, extensions, output_dir, source_dir):
         manifest = Manifest.from_directory(source_dir)
     except yaml.YAMLError:
         logging.critical("Could not parse manifest file!")
-        sys.exit(-3)
+        sys.exit(EXIT_CODES["MANIFEST_ERROR"])
     except FileNotFoundError:
         logging.critical("Could not find manifest file in source directory!")
-        sys.exit(-3)
+        sys.exit(EXIT_CODES["MANIFEST_ERROR"])
     except RuntimeError as exc:
         logging.critical(exc)
-        sys.exit(-3)
+        sys.exit(EXIT_CODES["MANIFEST_ERROR"])
 
     # start runner
     try:
@@ -122,6 +126,6 @@ def cli(verbose, force, extensions, output_dir, source_dir):
     except RuntimeError as error:
         msg = "Something went wrong: {}".format(error)
         logging.critical(msg)
-        sys.exit(-4)
+        sys.exit(EXIT_CODES["RUNNER_ERROR"])
     logging.info("Build finished!")
-    sys.exit(0)
+    sys.exit(EXIT_CODES["SUCCESS"])

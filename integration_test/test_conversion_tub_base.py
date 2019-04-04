@@ -2,10 +2,8 @@
 
 import json
 from os import listdir, sep, walk
-from os.path import dirname, isdir, isfile, join, realpath
+from os.path import isdir, isfile, join
 from subprocess import PIPE, Popen
-from tempfile import TemporaryDirectory
-import unittest
 
 from innoconv.constants import (
     CONTENT_BASENAME,
@@ -13,22 +11,17 @@ from innoconv.constants import (
     STATIC_FOLDER,
 )
 from innoconv.ext.tikz2svg import TIKZ_FOLDER
+from . import BaseConversionTest, REPO_DIR
 
-REPO_DIR = join(dirname(realpath(__file__)), "tub_base")
 OUTPUT_CONTENT_FILENAME = "{}.json".format(CONTENT_BASENAME)
 
 
-class TestConversionTubBase(unittest.TestCase):
-    """Test conversion of tub_base course."""
+class TestConversionTubBase(BaseConversionTest):
+    """
+    Test conversion of tub_base course.
 
-    def setUp(self):
-        """Prepare temp dirs and create extra file."""
-        self.tmp_dir = TemporaryDirectory(prefix="innoconv-test-output-")
-        self.output_dir = join(self.tmp_dir.name, "innoconv_output")
-
-    def tearDown(self):
-        """Clean up temp dirs and extra file."""
-        self.tmp_dir.cleanup()
+    Extensive test of innoConv features combined including extensions.
+    """
 
     def test_conversion(self):
         """A conversion should run without problems."""
@@ -37,8 +30,6 @@ class TestConversionTubBase(unittest.TestCase):
             "--verbose",
             "--output-dir",
             self.output_dir,
-            "--extensions",
-            "join_strings,copy_static,generate_toc,tikz2svg,write_manifest",
             REPO_DIR,
         ]
         process = Popen(command, stdout=PIPE, stderr=PIPE)
