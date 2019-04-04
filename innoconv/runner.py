@@ -30,20 +30,20 @@ class InnoconvRunner:
         self._manifest = manifest
         self._extensions = []
         self._load_extensions(extensions)
-        self._toc = None
+        self._sections = []
 
     def run(self):
         """Start the conversion by iterating over language folders."""
         self._notify_extensions("start", self._output_dir, self._source_dir)
 
-        for language in self._manifest.languages:
+        for i, language in enumerate(self._manifest.languages):
             self._notify_extensions("pre_conversion", language)
-            self._convert_language_folder(language)
+            self._convert_language_folder(language, i)
             self._notify_extensions("post_conversion", language)
 
         self._notify_extensions("finish")
 
-    def _convert_language_folder(self, language):
+    def _convert_language_folder(self, language, lang_num):
         path = abspath(join(self._source_dir, language))
 
         if not isdir(path):
@@ -51,6 +51,7 @@ class InnoconvRunner:
                 "Error: Directory {} does not exist".format(path)
             )
 
+        section_num = 0
         for root, dirs, files in walk(path):
             # note: all dirs manipulation must happen in-place!
             for i, directory in enumerate(dirs):
@@ -62,15 +63,36 @@ class InnoconvRunner:
             content_filename = "{}.md".format(CONTENT_BASENAME)
             if content_filename in files:
                 filepath = join(root, content_filename)
-                self._process_file(filepath)
+                self._process_file(filepath, lang_num, section_num)
+                section_num += 1
             else:
                 raise RuntimeError(
                     "Found section without content file: {}".format(root)
                 )
 
-    def _process_file(self, filepath):
+        if section_num != len(self._sections):
+            raise RuntimeError(
+                "Inconsistent directory structure detected: "
+                "Language {} is missing sections.".format(language)
+            )
+
+    def _process_file(self, filepath, lang_num, section_num):
         # relative path
         rel_path = dirname(filepath.replace(self._source_dir, "").lstrip(sep))
+
+        section_name = rel_path[3:]  # strip language
+        if lang_num == 0:
+            # record sections for first language
+            self._sections.append(section_name)
+        else:
+            # ensure sections are identical for all languages
+            if self._sections[section_num] != section_name:
+                raise RuntimeError(
+                    "Inconsistent directory structure detected: {}".format(
+                        section_name
+                    )
+                )
+
         # full filepath
         output_filename = "{}.json".format(CONTENT_BASENAME)
         filepath_out = join(self._output_dir, rel_path, output_filename)

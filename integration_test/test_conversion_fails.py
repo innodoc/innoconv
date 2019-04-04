@@ -3,7 +3,6 @@
 from os import mkdir
 from os.path import join
 from subprocess import call, PIPE
-from unittest import skip
 
 from click import FileError, UsageError
 
@@ -61,7 +60,6 @@ class TestConversionFailMissingManifest(BaseConversionTest):
         self.assertEqual(exit_code, EXIT_CODES["MANIFEST_ERROR"])
 
 
-@skip("TODO: Not implemented!")
 class TestConversionFailDirectoryStructure(BaseConversionTest):
     """
     Test detection of inconsistent content directory structure.
@@ -72,8 +70,16 @@ class TestConversionFailDirectoryStructure(BaseConversionTest):
 
     def test_inconsistent_folders(self):
         """A conversion should fail on inconsistent content directories."""
-        ignore = ("en/02-elements/03-links-and-formatting/02-links",)
-        repo_copy = self._copy_repo(ignore)
+
+        def _ignore(path, _):
+            if (
+                "en/02-elements/03-links-and-formatting/02-links/01-references"
+                in path
+            ):
+                return ["content.md"]
+            return []
+
+        repo_copy = self._copy_repo(_ignore)
         command = ["innoconv", "-o", self.output_dir, repo_copy]
         exit_code = call(command, timeout=60, stdout=PIPE, stderr=PIPE)
         self.assertEqual(exit_code, EXIT_CODES["RUNNER_ERROR"])

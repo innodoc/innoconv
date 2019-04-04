@@ -28,9 +28,8 @@ class BaseConversionTest(TestCase):
 
     def _copy_repo(self, ignore=None):
         """Create a copy of the content repository."""
-        git_ignore = (".git",)
-        ignore = git_ignore if ignore is None else ignore + git_ignore
+        ignore = ignore if callable(ignore) else ignore_patterns(*ignore)
         rand = "".join(choices(string.ascii_lowercase + string.digits, k=8))
         repo_copy_dir = join(self.tmp_dir.name, "repo-copy-{}".format(rand))
-        copytree(REPO_DIR, repo_copy_dir, ignore=ignore_patterns(*ignore))
+        copytree(REPO_DIR, repo_copy_dir, ignore=ignore)
         return repo_copy_dir
