@@ -5,9 +5,9 @@ These tests run the innoconv CLI and inspect its results.
 """
 
 from os.path import dirname, join, realpath
-from random import choices
+from random import choice
 from shutil import copytree, ignore_patterns
-import string
+from string import ascii_lowercase, digits
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
@@ -29,7 +29,7 @@ class BaseConversionTest(TestCase):
     def _copy_repo(self, ignore=None):
         """Create a copy of the content repository."""
         ignore = ignore if callable(ignore) else ignore_patterns(*ignore)
-        rand = "".join(choices(string.ascii_lowercase + string.digits, k=8))
+        rand = "".join(choice(ascii_lowercase + digits) for _ in range(8))
         repo_copy_dir = join(self.tmp_dir.name, "repo-copy-{}".format(rand))
         copytree(REPO_DIR, repo_copy_dir, ignore=ignore)
         return repo_copy_dir
