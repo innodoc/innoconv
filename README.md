@@ -12,7 +12,7 @@ Please refer to the [documentation](https://innoconv.readthedocs.io/) for instal
 # Install innoconv locally using pip
 $ pip install --user innoconv
 # Convert some content
-$ innoconv .
+$ innoconv /path/to/content
 ```
 
 ## Development
@@ -27,15 +27,20 @@ Make sure to have it installed.
 
 ### Commands
 
-For a exhaustive list of commands please have a look at `tox.ini`.
+For an exhaustive list of commands please have a look at `tox.ini`.
 
-#### Using the innoconv command
+#### Using the innoconv command (dev version)
 
-Use the following to convert the base course.
+Spawn a shell in a development environment.
 
 ```sh
-$ git clone https://gitlab.tubit.tu-berlin.de/innodoc/tub_base.git
-$ tox -e venv -- innoconv tub_base
+$ tox -e shell
+```
+
+Or directly start your current development version.
+
+```sh
+$ tox -e shell -- innoconv /path/to/content
 ```
 
 #### Linting
@@ -57,7 +62,7 @@ $ tox -e py37-unit,py37-integration
 
 #### HTML coverage report
 
-A coverage report will be created in `./htmlcov`. Look at it using a browser.
+A coverage report will be created in `./htmlcov` and served via HTTP.
 
 ```sh
 $ tox -e py37-unit,cov-html,serve-cov
@@ -65,14 +70,9 @@ $ tox -e py37-unit,cov-html,serve-cov
 
 #### Documentation
 
-After building you can find the documentation in `docs/build/html`.
+After building you can find the documentation in `docs/build/html` and look at
+it using a browser.
 
 ```sh
-$ tox -e docs
-```
-
-Serve the documentation to the browser for convenience.
-
-```sh
-$ tox -e serve-docs
+$ tox -e docs,serve-docs
 ```
