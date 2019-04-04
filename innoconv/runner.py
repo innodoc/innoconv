@@ -72,7 +72,7 @@ class InnoconvRunner:
 
         if section_num != len(self._sections):
             raise RuntimeError(
-                "Inconsistent directory structure detected: "
+                "Inconsistent directory structure: "
                 "Language {} is missing sections.".format(language)
             )
 
@@ -86,11 +86,16 @@ class InnoconvRunner:
             self._sections.append(section_name)
         else:
             # ensure sections are identical for all languages
-            if self._sections[section_num] != section_name:
-                raise RuntimeError(
-                    "Inconsistent directory structure detected: {}".format(
-                        section_name
+            try:
+                if self._sections[section_num] != section_name:
+                    raise RuntimeError(
+                        "Inconsistent directory structure: "
+                        "Section {} differs.".format(rel_path)
                     )
+            except IndexError:
+                raise RuntimeError(
+                    "Inconsistent directory structure: "
+                    "Extra section {} present.".format(rel_path)
                 )
 
         # full filepath

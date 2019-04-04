@@ -37,10 +37,68 @@ def walk_side_effect(path):
     )
 
 
-def walk_side_effect_error(path):
-    """Simulate a traversal in a defective content directory."""
+def walk_side_effect_missing_content_file(path):
+    """Simulate a traversal with a content file missing."""
     lang = path[-2:]
     return iter([("/src/{}".format(lang), ["section-1", "section-2"], [])])
+
+
+def walk_side_effect_extra_section(path):
+    """Simulate a traversal with an extra section for one language."""
+    lang = path[-2:]
+    if lang == "de":
+        return iter(
+            [
+                ("/src/de", ["section-1"], ["content.md"]),
+                ("/src/de/section-1", [], ["content.md"]),
+            ]
+        )
+    return iter(
+        [
+            ("/src/en", ["section-1", "section-2"], ["content.md"]),
+            ("/src/en/section-1", [], ["content.md"]),
+            ("/src/en/section-2", [], ["content.md"]),
+        ]
+    )
+
+
+def walk_side_effect_section_missing(path):
+    """Simulate a traversal with a missing section for one language."""
+    lang = path[-2:]
+    if lang == "de":
+        return iter(
+            [
+                ("/src/de", ["section-1", "section-2"], ["content.md"]),
+                ("/src/de/section-1", [], ["content.md"]),
+                ("/src/de/section-2", [], ["content.md"]),
+            ]
+        )
+    return iter(
+        [
+            ("/src/en", ["section-1"], ["content.md"]),
+            ("/src/en/section-1", [], ["content.md"]),
+        ]
+    )
+
+
+def walk_side_effect_section_differs(path):
+    """Simulate a traversal with different sections for both languages."""
+    lang = path[-2:]
+    if lang == "de":
+        return iter(
+            [
+                ("/src/de", ["section-1", "section-2"], ["content.md"]),
+                ("/src/de/section-1", [], ["content.md"]),
+                ("/src/de/section-2", [], ["content.md"]),
+            ]
+        )
+    return iter(
+        [
+            ("/src/en", ["section-1", "section-b"], ["content.md"]),
+            ("/src/en/section-1", [], ["content.md"]),
+            ("/src/en/section-b", [], ["content.md"]),
+        ]
+    )
 
 
 TITLE = [
@@ -101,7 +159,28 @@ class TestInnoconvRunner(unittest.TestCase):
     def test_run_content_file_missing(self, *args):
         """Ensure RuntimeError is raised on missing content file."""
         _, _, walk, *_ = args
-        walk.side_effect = walk_side_effect_error
+        walk.side_effect = walk_side_effect_missing_content_file
+        with self.assertRaises(RuntimeError):
+            self.runner.run()
+
+    def test_run_content_extra_section(self, *args):
+        """Ensure RuntimeError is raised on extra section in one language."""
+        _, _, walk, *_ = args
+        walk.side_effect = walk_side_effect_extra_section
+        with self.assertRaises(RuntimeError):
+            self.runner.run()
+
+    def test_run_content_section_missing(self, *args):
+        """Ensure RuntimeError is raised if section missing in one language."""
+        _, _, walk, *_ = args
+        walk.side_effect = walk_side_effect_section_missing
+        with self.assertRaises(RuntimeError):
+            self.runner.run()
+
+    def test_run_content_section_differs(self, *args):
+        """Ensure RuntimeError is raised if a section differs."""
+        _, _, walk, *_ = args
+        walk.side_effect = walk_side_effect_section_differs
         with self.assertRaises(RuntimeError):
             self.runner.run()
 
