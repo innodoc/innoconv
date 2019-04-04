@@ -24,7 +24,7 @@ class TestConversionTubBase(unittest.TestCase):
     def setUp(self):
         """Prepare temp dirs and create extra file."""
         self.tmp_dir = TemporaryDirectory(prefix="innoconv-test-output-")
-        self.output_dir = self.tmp_dir.name
+        self.output_dir = join(self.tmp_dir.name, "innoconv_output")
 
     def tearDown(self):
         """Clean up temp dirs and extra file."""
@@ -34,7 +34,6 @@ class TestConversionTubBase(unittest.TestCase):
         """A conversion should run without problems."""
         command = [
             "innoconv",
-            "--force",  # TODO: why do tests fail without this???
             "--verbose",
             "--output-dir",
             self.output_dir,
