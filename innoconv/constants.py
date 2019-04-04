@@ -8,9 +8,10 @@ DEFAULT_OUTPUT_DIR_BASE = os.path.join(".", "innoconv_output")
 
 #: Default enabled extensions
 DEFAULT_EXTENSIONS = (
-    "join_strings",
     "copy_static",
     "generate_toc",
+    "join_strings",
+    "tikz2svg",
     "write_manifest",
 )
 
