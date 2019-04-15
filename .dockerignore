@@ -1,0 +1,14 @@
+doc
+integration_test
+test
+.git
+.editorconfig
+.gitignore
+.gitlab-ci.yml
+.gitmodules
+.pylintrc
+Dockerfile
+LICENSE.txt
+rtd-requirements.txt
+tox.ini
+.DS_Store

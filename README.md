@@ -6,6 +6,16 @@ Converter for interactive educational content.
 
 Please refer to the [documentation](https://innoconv.readthedocs.io/) for installation and usage.
 
+## Requirements
+
+- [Python >=3.4](https://www.python.org/)
+- [Pandoc](https://pandoc.org/)
+
+For Ti*k*z support:
+
+- [LaTeX](https://www.latex-project.org/)
+- [pdf2svg](https://github.com/dawbarton/pdf2svg)
+
 ## Quickstart
 
 ```sh
@@ -13,6 +23,20 @@ Please refer to the [documentation](https://innoconv.readthedocs.io/) for instal
 $ pip install --user innoconv
 # Convert some content
 $ innoconv /path/to/content
+```
+
+## Docker
+
+The Docker image has all dependencies bundled and works out-of-the-box. Using
+the image like this allows you to call `innoconv` inside a container.
+
+```sh
+$ docker run \
+  -v $(pwd)/innoconv_output:/output \
+  -v $(pwd)/tub_base:/content:ro \
+  -u `id -u $USER` \
+  innodoc/innoconv \
+  --force --output-dir /output /content
 ```
 
 ## Development
