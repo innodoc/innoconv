@@ -11,7 +11,7 @@ Please refer to the [documentation](https://innoconv.readthedocs.io/) for instal
 - [Python >=3.4](https://www.python.org/)
 - [Pandoc](https://pandoc.org/)
 
-For Ti*k*z support:
+For Ti<i>k</i>z support:
 
 - [LaTeX](https://www.latex-project.org/)
 - [pdf2svg](https://github.com/dawbarton/pdf2svg)
@@ -27,8 +27,17 @@ $ innoconv /path/to/content
 
 ## Docker
 
-The Docker image has all dependencies bundled and works out-of-the-box. Using
-the image like this allows you to call `innoconv` inside a container.
+The [Docker image](https://hub.docker.com/r/innodoc/innoconv) has all
+dependencies bundled and works out-of-the-box. It allows you to call the
+`innoconv` command inside a container.
+
+```sh
+$ docker run innodoc/innoconv --help
+```
+
+For a useful conversion you have to share your content and output folder
+between host and container. Also make sure to set the user ID and use the
+`--force` flag.
 
 ```sh
 $ docker run \
@@ -36,7 +45,9 @@ $ docker run \
   -v $(pwd)/tub_base:/content:ro \
   -u `id -u $USER` \
   innodoc/innoconv \
-  --force --output-dir /output /content
+    --force \
+    --output-dir /output \
+    /content
 ```
 
 ## Development
