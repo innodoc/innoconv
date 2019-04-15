@@ -93,11 +93,10 @@ class Tikz2Svg(AbstractExtension):
         if pipe.returncode != 0:
             critical(cmd)
             critical("Error: {}".format(pipe.returncode))
-            critical("Printing program output for debugging:")
+            critical("Printing program stdout:")
             critical(pipe.stdout.read().decode(ENCODING))
-            if stdin:
-                critical("Printing STDIN:")
-                critical(stdin)
+            critical("Printing program stderr:")
+            critical(pipe.stderr.read().decode(ENCODING))
             raise RuntimeError("Tikz2Pdf: Error converting to PDF!")
 
     @staticmethod
