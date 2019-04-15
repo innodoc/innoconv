@@ -13,7 +13,7 @@ certain events. The events are documented in
 import json
 import logging
 from os import makedirs, walk
-from os.path import abspath, dirname, isdir, join, sep
+from os.path import abspath, dirname, isdir, join, relpath
 
 from innoconv.constants import CONTENT_BASENAME
 from innoconv.ext import EXTENSIONS
@@ -77,9 +77,7 @@ class InnoconvRunner:
             )
 
     def _process_file(self, filepath, lang_num, section_num):
-        # relative path
-        rel_path = dirname(filepath.replace(self._source_dir, "").lstrip(sep))
-
+        rel_path = dirname(relpath(filepath, self._source_dir))
         section_name = rel_path[3:]  # strip language
         if lang_num == 0:
             # record sections for first language
