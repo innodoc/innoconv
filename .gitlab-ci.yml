@@ -66,6 +66,7 @@ Build image:
     - docker push "$IMAGE_RELEASE_TAG"
   only:
     - master
+    - tags
 
 # tox-based tests
 
