@@ -86,8 +86,7 @@ RUN set -xe && \
       /home/innoconv/.cache \
       /tmp/*
 
-VOLUME /content /output
-
+VOLUME /content
 WORKDIR /content
 USER innoconv
 ENTRYPOINT ["innoconv"]
