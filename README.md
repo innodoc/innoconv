@@ -35,19 +35,15 @@ dependencies bundled and works out-of-the-box. It allows you to call the
 $ docker run innodoc/innoconv --help
 ```
 
-For a useful conversion you have to share your content and output folder
-between host and container. Also make sure to set the user ID and use the
-`--force` flag.
+For passing content into and receiving the result from the container, you can
+use a volume.
 
 ```sh
+$ cd /path/to/content
 $ docker run \
-  -v $(pwd)/innoconv_output:/output \
-  -v $(pwd)/tub_base:/content:ro \
-  -u `id -u $USER` \
-  innodoc/innoconv \
-    --force \
-    --output-dir /output \
-    /content
+  -v $(pwd):/content \
+  -u $(id -u $USER) \
+  innodoc/innoconv .
 ```
 
 ## Development
