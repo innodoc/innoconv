@@ -20,7 +20,12 @@ TEMP = "/temp"
 
 
 class TestExtension(unittest.TestCase):
-    """Provide a base class for all extension tests."""
+    """
+    Provide a base class for all extension tests.
+
+    This basically simulates a run without using
+    :class:`InnoconvRunner <innoconv.runner.InnoconvRunner>`.
+    """
 
     @staticmethod
     def _run(

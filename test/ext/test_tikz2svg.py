@@ -52,14 +52,16 @@ class TestTikz2Svg(TestExtension):
         self, mock_popen, mock_ct, mock_rmtree, mock_mkdir, mock_td
     ):
         """Test successful lifecycle."""
-        input_ast = [{"c": [deepcopy(TIKZ_BLOCK)]}]
-        _, asts = self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
+        input_ast = [deepcopy(TIKZ_BLOCK)]
+        _, asts = self._run(
+            Tikz2Svg, input_ast, languages=("en",), paths=PATHS
+        )
         self.assertTrue(mock_td.called)
         self.assertTrue(mock_ct.called)
         self.assertTrue(mock_mkdir.called)
         self.assertFalse(mock_rmtree.called)
         self.assertEqual(mock_popen.call_count, 2)
-        image = asts[0][0]["c"][0]
+        image = asts[0][0]
         self.assertEqual(image["t"], "Image")
         filename = "{}.svg".format(TIKZ_FILENAME.format(TIKZ_HASH))
         imgpath = "{}/{}".format(TIKZ_FOLDER, filename)
@@ -77,7 +79,9 @@ class TestTikz2Svg(TestExtension):
                 "t": "Div",
             }
         ]
-        _, asts = self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
+        _, asts = self._run(
+            Tikz2Svg, input_ast, languages=("en",), paths=PATHS
+        )
         div = asts[0][0]
         self.assertEqual(div["t"], "Div")
         self.assertIn("figure", div["c"][0][1])
@@ -93,7 +97,7 @@ class TestTikz2Svg(TestExtension):
             "tikz_preamble": TIKZ_PREAMBLE,
         }
         manifest = Manifest(manifest_data)
-        input_ast = [{"c": [deepcopy(TIKZ_BLOCK)]}]
+        input_ast = [deepcopy(TIKZ_BLOCK)]
         self._run(Tikz2Svg, input_ast, paths=PATHS, manifest=manifest)
         written = mock_popen.return_value.stdin.write.call_args[0][0].decode()
         self.assertIn(TIKZ_PREAMBLE, written)
@@ -101,7 +105,7 @@ class TestTikz2Svg(TestExtension):
     def test_directory_overwrite(self, _, mock_ct, mock_rmtree, *__):
         """Test overwriting of exisiting files."""
         mock_ct.side_effect = (FileExistsError, None)
-        input_ast = [{"c": [deepcopy(TIKZ_BLOCK)]}]
+        input_ast = [deepcopy(TIKZ_BLOCK)]
         self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
         self.assertEqual(mock_ct.call_count, 2)
         self.assertEqual(
@@ -121,7 +125,7 @@ class TestTikz2Svg(TestExtension):
         rv_orig = mock_popen.return_value.returncode
         try:
             mock_popen.return_value.returncode = 1
-            input_ast = [{"c": [deepcopy(TIKZ_BLOCK)]}]
+            input_ast = [deepcopy(TIKZ_BLOCK)]
             with self.assertRaises(RuntimeError):
                 self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
         finally:

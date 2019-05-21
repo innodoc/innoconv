@@ -81,12 +81,6 @@ class GenerateToc(AbstractExtension):
         """Add this section file to the TOC."""
         self._add_to_toc(title)
 
-    def post_conversion(self, language):
-        """Unused."""
-
-    def finish(self):
-        """Unused."""
-
     def manifest_fields(self):
         """Add `toc` field to manifest."""
         return {"toc": self._toc}

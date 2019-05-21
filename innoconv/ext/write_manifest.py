@@ -54,18 +54,6 @@ class WriteManifest(AbstractExtension):
         """Remember output directory."""
         self._output_dir = output_dir
 
-    def pre_conversion(self, language):
-        """Unused."""
-
-    def pre_process_file(self, path):
-        """Unused."""
-
-    def post_process_file(self, _, title):
-        """Unused."""
-
-    def post_conversion(self, language):
-        """Unused."""
-
     def finish(self):
         """Output course manifest."""
         self._write_manifest()

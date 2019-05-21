@@ -51,6 +51,7 @@ from tempfile import TemporaryDirectory
 
 from innoconv.constants import ENCODING, STATIC_FOLDER
 from innoconv.ext.abstract import AbstractExtension
+from innoconv.traverse_ast import TraverseAst
 
 TEX_FILE_TEMPLATE = r"""
 \documentclass{{standalone}}
@@ -132,24 +133,6 @@ class Tikz2Svg(AbstractExtension):
             pass
         self._tikz_found(elem)
 
-    def _process_ast_element(self, elem, parent=None):
-        """Process an element form the AST and traverse its children."""
-
-        if isinstance(elem, list):
-            for child in elem:
-                self._process_ast_element(child, parent)
-            return
-        try:
-            try:
-                if elem["t"] == "CodeBlock" and "tikz" in elem["c"][0][1]:
-                    self._parse_tikz(elem, parent)
-            except (TypeError, KeyError):
-                pass
-            for key in elem:
-                self._process_ast_element(elem[key], elem)
-        except TypeError:
-            pass
-
     def _render_and_copy_tikz(self):
         info("Compiling {} TikZ images.".format(len(self._tikz_images)))
         if not self._tikz_images:
@@ -190,6 +173,14 @@ class Tikz2Svg(AbstractExtension):
                 rmtree(tikz_path)
                 copytree(svg_path, tikz_path)
 
+    def process_element(self, elem, parent):
+        """Respond to AST element."""
+        try:
+            if elem["t"] == "CodeBlock" and "tikz" in elem["c"][0][1]:
+                self._parse_tikz(elem, parent)
+        except (TypeError, KeyError):
+            pass
+
     # extension events
 
     def start(self, output_dir, source_dir):
@@ -197,18 +188,9 @@ class Tikz2Svg(AbstractExtension):
         self._tikz_images = dict()
         self._output_dir = output_dir
 
-    def pre_conversion(self, _):
-        """Unused."""
-
-    def pre_process_file(self, _):
-        """Unused."""
-
     def post_process_file(self, ast, _):
         """Find TikZ images in AST and replace with image tags."""
-        self._process_ast_element(ast)
-
-    def post_conversion(self, _):
-        """Unused."""
+        TraverseAst(self.process_element).traverse(ast)
 
     def finish(self):
         """Render images and copy SVG files to the static folder."""

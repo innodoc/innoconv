@@ -56,8 +56,9 @@ from urllib import parse
 
 from innoconv.constants import STATIC_FOLDER
 from innoconv.ext.abstract import AbstractExtension
+from innoconv.traverse_ast import TraverseAst
 
-ACCEPTED_LINK_CLASSES = ("video-static",)
+VIDEO_CLASS = "video-static"
 
 
 class CopyStatic(AbstractExtension):
@@ -81,39 +82,10 @@ class CopyStatic(AbstractExtension):
 
     # content parsing
 
-    @staticmethod
-    def _link_is_video(link_element):
-        """Check if video is marked as local."""
-        for cssclass in ACCEPTED_LINK_CLASSES:
-            if cssclass in link_element["c"][0][1]:
-                return True
-        return False
-
-    def _process_ast_array(self, ast_array):
-        """Search every element in an AST array."""
-        if not isinstance(ast_array, list):
-            return
-        for element in ast_array:
-            self._process_ast_element(element)
-
-    def _process_ast_element(self, ast_element):
-        """Respond to elements that potentially reference static files."""
-        if isinstance(ast_element, list):
-            self._process_ast_array(ast_element)
-        elif isinstance(ast_element, dict):
-            if ast_element["t"] == "Image":
-                self._process_image(ast_element)
-            elif ast_element["t"] == "Link":
-                self._process_link(ast_element)
-            elif "c" in ast_element:
-                self._process_ast_array(ast_element["c"])
-
     def _process_link(self, link_element):
-        """Links can reference local videos."""
+        """Check if link is a video reference."""
         link = link_element["c"][2][0]
-        content = link_element["c"][1]
-        self._process_ast_array(content)
-        if self._link_is_video(link_element):
+        if VIDEO_CLASS in link_element["c"][0][1]:
             try:
                 link_element["c"][2][0] = self._add_static(link)
             except ValueError:
@@ -130,12 +102,16 @@ class CopyStatic(AbstractExtension):
         """Remember paths to copy and rewrite URL."""
 
         def _get_src_file_path(root_dir, _path, _sec_path, lang=""):
-            return os.path.join(root_dir, lang, STATIC_FOLDER, _sec_path, _path)
+            return os.path.join(
+                root_dir, lang, STATIC_FOLDER, _sec_path, _path
+            )
 
         def _get_dest_file_path(root_dir, _path, _sec_path, lang=""):
             if lang:
                 lang = "_{}".format(lang)
-            return os.path.join(root_dir, STATIC_FOLDER, lang, _sec_path, _path)
+            return os.path.join(
+                root_dir, STATIC_FOLDER, lang, _sec_path, _path
+            )
 
         # skip remote resource
         if parse.urlparse(orig_path).scheme:
@@ -184,6 +160,13 @@ class CopyStatic(AbstractExtension):
             logging.info(" %s -> %s", src, dst)
             shutil.copyfile(src, dst)
 
+    def process_element(self, elem, _):
+        """Respond to AST element."""
+        if elem["t"] == "Image":
+            self._process_image(elem)
+        elif elem["t"] == "Link":
+            self._process_link(elem)
+
     # extension events
 
     def start(self, output_dir, source_dir):
@@ -200,11 +183,8 @@ class CopyStatic(AbstractExtension):
         self._current_path = path
 
     def post_process_file(self, ast, _):
-        """Generate list of files to copy."""
-        self._process_ast_array(ast)
-
-    def post_conversion(self, language):
-        """Unused."""
+        """Find all static files in AST."""
+        TraverseAst(self.process_element).traverse(ast)
 
     def finish(self):
         """Copy static files to the output folder."""

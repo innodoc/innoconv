@@ -281,7 +281,11 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
             )
 
         self.assertEqual(mocks["post_conversion"].call_count, 2)
-        self.assertEqual(mocks["post_conversion"].call_args_list[0], call("de"))
-        self.assertEqual(mocks["post_conversion"].call_args_list[1], call("en"))
+        self.assertEqual(
+            mocks["post_conversion"].call_args_list[0], call("de")
+        )
+        self.assertEqual(
+            mocks["post_conversion"].call_args_list[1], call("en")
+        )
 
         self.assertEqual(mocks["finish"].call_count, 1)

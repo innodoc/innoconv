@@ -5,13 +5,14 @@ import unittest
 from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 
-MANIFEST = Manifest({"title": {"en": "Foo Course Title"}, "languages": ("en",)})
+MANIFEST = Manifest(
+    {"title": {"en": "Foo Course Title"}, "languages": ("en",)}
+)
 
 
 class MyCrazyExtension(AbstractExtension):
     """Extension that serves for testing inheriting from AbstractExtension."""
 
-    # pylint: disable=abstract-method
     _helptext = "Foo bar"
 
 
@@ -22,19 +23,18 @@ class TestAbstractExtension(unittest.TestCase):
         """Test extension help text."""
         self.assertEqual(MyCrazyExtension.helptext(), "Foo bar")
 
-    def test_notimplemented(self):
+    def test_methods(self):
         """Test extension method interface."""
         test_extension = MyCrazyExtension(MANIFEST)
         events = (
-            ("start", ("source", "output")),
-            ("pre_conversion", ("en",)),
-            ("pre_process_file", ("relpath",)),
-            ("post_process_file", (["ast"], ["Foo Title"])),
-            ("post_conversion", ("en",)),
-            ("finish", ()),
+            "extension_list",
+            "start",
+            "pre_conversion",
+            "pre_process_file",
+            "post_process_file",
+            "post_conversion",
+            "finish",
         )
-        for method_name, method_args in events:
+        for method_name in events:
             with self.subTest(method=method_name):
-                with self.assertRaises(NotImplementedError):
-                    func = getattr(test_extension, method_name)
-                    func(*method_args)
+                self.assertTrue(callable(getattr(test_extension, method_name)))

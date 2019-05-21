@@ -15,4 +15,5 @@ Module overview
   innoconv.ext.write_manifest
   innoconv.manifest
   innoconv.runner
+  innoconv.traverse_ast
   innoconv.utils

@@ -27,14 +27,10 @@ class TestJoinStrings(TestExtension):
         examples = (
             [{"t": "Str", "c": "A"}],
             [{"t": "Str", "c": "A B"}],
-            [],
-            [{"t": "Foo", "c": "Bar"}],
-            [{"t": "Foo", "c": "Bar"}, {"t": "Dim", "c": "Sum"}],
-            [[]],
-            [{}],
-            [{"t": "Foo", "c": []}],
-            [{"t": "Foo", "c": [{"t": "Str", "c": "A"}]}],
-            {},
+            [{"t": "Str", "c": "Bar"}],
+            [{"t": "Str", "c": "BarSum"}],
+            [{"t": "Str", "c": ""}],
+            [{"t": "Plain", "c": [{"t": "Str", "c": "A"}]}],
         )
         for given in examples:
             with self.subTest(given):
@@ -70,7 +66,11 @@ class TestJoinStrings(TestExtension):
 
     def test_complete_a(self):
         """Test concatenation of two Str separated by a Space."""
-        given = [{"t": "Str", "c": "A"}, {"t": "Space"}, {"t": "Str", "c": "B"}]
+        given = [
+            {"t": "Str", "c": "A"},
+            {"t": "Space"},
+            {"t": "Str", "c": "B"},
+        ]
         ast = self._run(JoinStrings, given)
         self.assertEqual(ast, [{"t": "Str", "c": "A B"}])
 
@@ -88,16 +88,16 @@ class TestJoinStrings(TestExtension):
         self.assertEqual(ast, [{"t": "Str", "c": "A B B"}])
 
     def test_ignore_unknown_a(self):
-        """Ensure ignoring of an unknown element type (variant A)."""
+        """Ensure ignoring of an element type (variant A)."""
         given = [
             {"t": "Str", "c": "A"},
             {"t": "Space"},
-            {"t": "Foo", "c": "Bar"},
+            {"t": "Plain", "c": []},
             {"t": "Str", "c": "B"},
         ]
         expected = [
             {"t": "Str", "c": "A "},
-            {"t": "Foo", "c": "Bar"},
+            {"t": "Plain", "c": []},
             {"t": "Str", "c": "B"},
         ]
         ast = self._run(ast=given)
@@ -108,15 +108,15 @@ class TestJoinStrings(TestExtension):
         given = [
             {"t": "Str", "c": "A"},
             {"t": "Space"},
-            {"t": "Foo", "c": "Bar"},
+            {"t": "Plain", "c": []},
             {"t": "Str", "c": "B"},
-            {"t": "Foo", "c": "Bar"},
+            {"t": "Plain", "c": []},
         ]
         expected = [
             {"t": "Str", "c": "A "},
-            {"t": "Foo", "c": "Bar"},
+            {"t": "Plain", "c": []},
             {"t": "Str", "c": "B"},
-            {"t": "Foo", "c": "Bar"},
+            {"t": "Plain", "c": []},
         ]
         ast = self._run(ast=given)
         self.assertEqual(ast, expected)
@@ -152,7 +152,7 @@ class TestJoinStrings(TestExtension):
                         "c": [
                             {"t": "Str", "c": "A"},
                             {"t": "Space"},
-                            {"t": "Foo", "c": "Bar"},
+                            {"t": "Plain", "c": []},
                             {"t": "Str", "c": "B"},
                         ],
                     },
@@ -171,7 +171,7 @@ class TestJoinStrings(TestExtension):
                         "t": "Strong",
                         "c": [
                             {"t": "Str", "c": "A "},
-                            {"t": "Foo", "c": "Bar"},
+                            {"t": "Plain", "c": []},
                             {"t": "Str", "c": "B"},
                         ],
                     },
@@ -184,10 +184,11 @@ class TestJoinStrings(TestExtension):
 
     def test_special_array(self):
         """Test a problematic case in an actual conversion (1)."""
-        for given in ([0, 1, 2], [{"t": "InlineMath"}, "\\frac12>\\frac23"]):
-            with self.subTest(given):
-                ast = self._run(ast=given)
-                self.assertEqual(ast, given)
+        given = [
+            {"t": "Math", "c": [{"t": "InlineMath"}, "\\frac12>\\frac23"]}
+        ]
+        ast = self._run(ast=given)
+        self.assertEqual(ast, given)
 
     def test_special_array2(self):
         """Test a problematic case in an actual conversion (2)."""

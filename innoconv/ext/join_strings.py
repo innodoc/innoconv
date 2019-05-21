@@ -103,21 +103,6 @@ class JoinStrings(AbstractExtension):
 
     # extension events
 
-    def start(self, output_dir, source_dir):
-        """Unused."""
-
-    def pre_conversion(self, language):
-        """Unused."""
-
-    def pre_process_file(self, path):
-        """Unused."""
-
     def post_process_file(self, ast, _):
         """Process AST in-place."""
         self._process_ast_element(ast)
-
-    def post_conversion(self, language):
-        """Unused."""
-
-    def finish(self):
-        """Unused."""

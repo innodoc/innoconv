@@ -51,7 +51,6 @@ class AbstractExtension:
         :param source_dir: Content source directory
         :type source_dir: str
         """
-        raise NotImplementedError()
 
     def pre_conversion(self, language):
         """
@@ -60,7 +59,6 @@ class AbstractExtension:
         :param language: Language that is currently being converted.
         :type language: str
         """
-        raise NotImplementedError()
 
     def pre_process_file(self, path):
         """
@@ -69,7 +67,6 @@ class AbstractExtension:
         :param path: Output path
         :type path: str
         """
-        raise NotImplementedError()
 
     def post_process_file(self, ast, title):
         """
@@ -80,7 +77,6 @@ class AbstractExtension:
         :param title: Section title (localized)
         :type title: str
         """
-        raise NotImplementedError()
 
     def post_conversion(self, language):
         """
@@ -89,8 +85,6 @@ class AbstractExtension:
         :param language: Language that is currently being converted.
         :type language: str
         """
-        raise NotImplementedError()
 
     def finish(self):
         """Conversion finished."""
-        raise NotImplementedError()

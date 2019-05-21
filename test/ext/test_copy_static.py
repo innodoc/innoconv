@@ -8,7 +8,7 @@ from innoconv.constants import STATIC_FOLDER
 from innoconv.ext.copy_static import CopyStatic
 from . import DEST, PATHS, SOURCE, TestExtension
 from ..utils import (
-    get_filler_content,
+    get_complex_ast,
     get_generic_link_ast,
     get_image_ast,
     get_para_ast,
@@ -51,31 +51,7 @@ class TestCopyStatic(TestExtension):
 
     def test_example(self, copyfile, *_):
         """Test a somewhat complex example."""
-        ast = [
-            get_para_ast(),
-            get_para_ast([get_image_ast("/present.png", "Image Present")]),
-            get_para_ast(
-                [get_para_ast([get_image_ast("/subfolder/present.mp4")])]
-            ),
-            get_para_ast(
-                [
-                    get_para_ast(get_para_ast()),
-                    get_para_ast([get_filler_content()]),
-                    get_image_ast("/localizable.gif", "", "Description!"),
-                    get_image_ast("example_video.ogv"),
-                ]
-            ),
-            get_image_ast("https://www.example.com/example.png"),
-            get_para_ast(
-                [
-                    get_generic_link_ast(
-                        [get_image_ast("example_image.jpg")],
-                        "http://www.tu-berlin.de",
-                    )
-                ]
-            ),
-        ]
-        _, asts = self._run(CopyStatic, ast, languages=("en",))
+        _, asts = self._run(CopyStatic, get_complex_ast(), languages=("en",))
         self.assertEqual(copyfile.call_count, 11)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
@@ -95,7 +71,8 @@ class TestCopyStatic(TestExtension):
                     "_en/{}example_video.ogv".format(jpath),
                 )
                 self.assertEqual(
-                    asts[i][4]["c"][2][0], "https://www.example.com/example.png"
+                    asts[i][4]["c"][2][0],
+                    "https://www.example.com/example.png",
                 )
                 self.assertEqual(
                     asts[i][5]["c"][0]["c"][1][0]["c"][2][0],
@@ -284,7 +261,7 @@ class TestCopyStatic(TestExtension):
         ast = [
             get_para_ast(),
             get_para_ast([get_image_ast("/present.png")]),
-            get_para_ast([[get_para_ast()]]),
+            get_para_ast([get_para_ast()]),
             get_para_ast([get_para_ast([get_para_ast()]), get_para_ast()]),
         ]
         _, asts = self._run(CopyStatic, ast)
