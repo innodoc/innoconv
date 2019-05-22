@@ -38,6 +38,7 @@ class TraverseAst:
     }
 
     def __init__(self, func):
+        """Initialize TraverseAst."""
         self._func = func
 
     @staticmethod

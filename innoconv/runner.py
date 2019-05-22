@@ -38,6 +38,7 @@ class InnoconvRunner:
     """
 
     def __init__(self, source_dir, output_dir, manifest, extensions):
+        """Initialize InnoconvRunner."""
         self._source_dir = source_dir
         self._output_dir = output_dir
         self._manifest = manifest

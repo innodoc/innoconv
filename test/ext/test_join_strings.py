@@ -66,11 +66,7 @@ class TestJoinStrings(TestExtension):
 
     def test_complete_a(self):
         """Test concatenation of two Str separated by a Space."""
-        given = [
-            {"t": "Str", "c": "A"},
-            {"t": "Space"},
-            {"t": "Str", "c": "B"},
-        ]
+        given = [{"t": "Str", "c": "A"}, {"t": "Space"}, {"t": "Str", "c": "B"}]
         ast = self._run(JoinStrings, given)
         self.assertEqual(ast, [{"t": "Str", "c": "A B"}])
 
@@ -184,9 +180,7 @@ class TestJoinStrings(TestExtension):
 
     def test_special_array(self):
         """Test a problematic case in an actual conversion (1)."""
-        given = [
-            {"t": "Math", "c": [{"t": "InlineMath"}, "\\frac12>\\frac23"]}
-        ]
+        given = [{"t": "Math", "c": [{"t": "InlineMath"}, "\\frac12>\\frac23"]}]
         ast = self._run(ast=given)
         self.assertEqual(ast, given)
 

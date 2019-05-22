@@ -94,9 +94,7 @@ def get_complex_ast():
     return [
         get_para_ast(),
         get_para_ast([get_image_ast("/present.png", "Image Present")]),
-        get_para_ast(
-            [get_para_ast([get_image_ast("/subfolder/present.mp4")])]
-        ),
+        get_para_ast([get_para_ast([get_image_ast("/subfolder/present.mp4")])]),
         get_para_ast(
             [
                 get_para_ast(get_para_ast()),

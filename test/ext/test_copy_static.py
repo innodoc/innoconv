@@ -71,8 +71,7 @@ class TestCopyStatic(TestExtension):
                     "_en/{}example_video.ogv".format(jpath),
                 )
                 self.assertEqual(
-                    asts[i][4]["c"][2][0],
-                    "https://www.example.com/example.png",
+                    asts[i][4]["c"][2][0], "https://www.example.com/example.png"
                 )
                 self.assertEqual(
                     asts[i][5]["c"][0]["c"][1][0]["c"][2][0],
