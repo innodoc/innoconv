@@ -1,7 +1,6 @@
-image: "$CI_REGISTRY_IMAGE/ci"
-
 stages:
   - build
+  - build-ci
   - test
   - release
 
@@ -25,7 +24,7 @@ before_script:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
   IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  IMAGE_CI_TAG: $CI_REGISTRY_IMAGE/ci:latest
+  IMAGE_CI_TAG: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG
   IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
 
 .docker-base: &docker-base
@@ -42,18 +41,6 @@ before_script:
 
 # Docker build
 
-Build CI image:
-  <<: *docker-base
-  stage: build
-  script:
-    - docker pull "$IMAGE_TAG" || true
-    - docker pull "$IMAGE_CI_TAG" || true
-    - docker pull "$IMAGE_RELEASE_TAG" || true
-    - docker build --pull --cache-from "$IMAGE_TAG" --cache-from "$IMAGE_RELEASE_TAG" --cache-from "$IMAGE_CI_TAG" --tag "$IMAGE_CI_TAG" --build-arg INNOCONV_IMAGE="$CI_REGISTRY_IMAGE" -f Dockerfile.ci .
-    - docker push "$IMAGE_CI_TAG"
-  only:
-    - master
-
 Build image:
   <<: *docker-base
   stage: build
@@ -62,49 +49,75 @@ Build image:
     - docker pull "$IMAGE_RELEASE_TAG" || true
     - docker build --pull --cache-from "$IMAGE_TAG" --cache-from "$IMAGE_RELEASE_TAG" --tag "$IMAGE_TAG" .
     - docker push "$IMAGE_TAG"
+
+Push master image:
+  <<: *docker-base
+  stage: build
+  script:
+    - docker pull "$IMAGE_TAG" || true
     - docker tag "$IMAGE_TAG" "$IMAGE_RELEASE_TAG"
     - docker push "$IMAGE_RELEASE_TAG"
   only:
     - master
-    - tags
+
+# Docker CI build
+
+Build CI image:
+  <<: *docker-base
+  stage: build-ci
+  script:
+    - docker pull "$IMAGE_TAG" || true
+    - docker pull "$IMAGE_CI_TAG" || true
+    - docker pull "$IMAGE_RELEASE_TAG" || true
+    - docker build --pull --cache-from "$IMAGE_TAG" --cache-from "$IMAGE_RELEASE_TAG" --cache-from "$IMAGE_CI_TAG" --tag "$IMAGE_CI_TAG" --build-arg INNOCONV_IMAGE="$IMAGE_TAG" -f Dockerfile.ci .
+    - docker push "$IMAGE_CI_TAG"
 
 # tox-based tests
 
 Python 3.7 unit tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py37-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
 
 Python 3.7 integration tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py37-integration
 
 Python 3.6 unit tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py36-unit
 
 Python 3.6 integration tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py36-integration
 
 Python 3.5 unit tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py35-unit
 
 Python 3.5 integration tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py35-integration
 
 Python 3.4 unit tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py34-unit
 
 Python 3.4 integration tests:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e py34-integration
 
 Linting:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e linters
   cache:
     <<: *cache
@@ -112,6 +125,7 @@ Linting:
 
 Documentation:
   stage: test
+  image: "$IMAGE_CI_TAG"
   script: tox -e docs
   cache:
     <<: *cache

@@ -1,32 +1,33 @@
-FROM python:3.7-alpine
+ARG BASE_IMAGE=python:3.7-alpine
+FROM $BASE_IMAGE AS build
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
-ENV PANDOC_VERSION 2.7
+ENV PANDOC_VERSION 2.7.2
 ENV PDF2SVG_VERSION 0.2.3
-ENV PATH "/usr/local/texlive/2018/bin/x86_64-linuxmusl:${PATH}"
 
 RUN set -xe && \
     apk update && \
     apk upgrade && \
     apk add --no-cache \
       build-base \
-      cairo \
-      poppler-glib
-
-# add user/group to run as
-RUN set -xe && \
-    addgroup -S innoconv && \
-    adduser -S -g innoconv innoconv
+      cairo-dev \
+      perl \
+      poppler-dev \
+      wget \
+      xz
 
 # install TeX Live with PGF/TikZ
 RUN set -xe && \
     mkdir /tmp/install-tl-unx && \
-    apk add --no-cache \
-      perl \
-      xz \
-      wget && \
     wget -qO- http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
-      | tar -xvzf - --strip-components=1 -C /tmp/install-tl-unx && \
+      | tar -xzf - --strip-components=1 -C /tmp/install-tl-unx && \
+    cat /tmp/install-tl-unx/release-texlive.txt \
+      | head -n1 \
+      | grep -oE '\d{4}' \
+      > /tmp/tex-version.txt && \
+    echo "export PATH=/usr/local/texlive/$(cat /tmp/tex-version.txt)/bin/x86_64-linuxmusl:${PATH}" \
+      > /etc/profile.d/tex_path.sh && \
+    export PATH=/usr/local/texlive/$(cat /tmp/tex-version.txt)/bin/x86_64-linuxmusl:${PATH} && \
     printf "%s\n" \
       "selected_scheme scheme-minimal" \
       "option_doc 0" \
@@ -39,52 +40,49 @@ RUN set -xe && \
       standalone \
       xcolor \
       xkeyval && \
-    rm -rf \
-      /tmp/install-tl-unx \
-      /usr/local/texlive/2018/tlpkg && \
-    find /usr/local/texlive/2018 -name '*.log' -exec rm '{}' \; && \
-    apk del \
-      perl \
-      xz \
-      wget
+    rm -rf /usr/local/texlive/$(cat /tmp/tex-version.txt)/tlpkg && \
+    find /usr/local/texlive/$(cat /tmp/tex-version.txt) -name '*.log' -exec rm '{}' \;
 
 # install pdf2svg
 RUN set -xe && \
-    apk add --no-cache \
-      cairo-dev \
-      poppler-dev && \
     wget -qO- https://github.com/dawbarton/pdf2svg/archive/v${PDF2SVG_VERSION}.tar.gz \
       | tar -xzf - -C /tmp && \
     cd /tmp/pdf2svg-${PDF2SVG_VERSION} && \
     ./configure --prefix=/usr/local && \
     make && \
     strip pdf2svg && \
-    make install && \
-    rm -rf /tmp/pdf2svg-${PDF2SVG_VERSION} && \
-    apk del \
-      cairo-dev \
-      poppler-dev
+    make install
 
 # install pandoc
 RUN wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz \
     | tar -xzf - --strip-components 2 -C /usr/local/bin pandoc-${PANDOC_VERSION}/bin/pandoc
 
-# install innoconv
-WORKDIR /tmp/innodoc-webapp
-COPY --chown=innoconv:innoconv . ./
-RUN set -xe && \
-    ./setup.py install && \
-    rm -rf /tmp/innodoc-webapp
+FROM $BASE_IMAGE
 
-# clean up
 RUN set -xe && \
-    apk del \
-      build-base && \
-    rm -rf \
-      /var/cache/apk/* \
-      /usr/share/man \
-      /home/innoconv/.cache \
-      /tmp/*
+    apk update && \
+    apk upgrade && \
+    apk add --no-cache \
+      cairo \
+      poppler-glib
+
+# install innoconv
+COPY . /tmp/innoconv
+RUN set -xe && \
+    cd /tmp/innoconv && \
+    ./setup.py install && \
+    rm -rf /tmp/innoconv
+
+# add user/group to run as
+RUN set -xe && \
+    addgroup -S innoconv && \
+    adduser -S -g innoconv innoconv
+
+COPY --from=build /etc/profile.d/tex_path.sh /etc/profile.d
+COPY --from=build /usr/local/bin /usr/local/bin
+COPY --from=build /usr/local/texlive /usr/local/texlive
+
+RUN rm -rf /var/cache/apk
 
 VOLUME /content
 WORKDIR /content
