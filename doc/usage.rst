@@ -23,6 +23,8 @@ unsuccessful run.
   conversion was successful. Though you might pass the
   :option:`--verbose <innoconv --verbose>` flag to change this behavior.
 
+.. _command-line-arguments:
+
 Command line arguments
 ----------------------
 

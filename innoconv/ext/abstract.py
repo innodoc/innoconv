@@ -16,6 +16,9 @@ class AbstractExtension:
 
     Extension classes should have a :py:attr:`_helptext` attribute. It's used
     to display a brief summary.
+
+    :param manifest: Content manifest.
+    :type manifest: innoconv.manifest.Manifest
     """
 
     _helptext = ""

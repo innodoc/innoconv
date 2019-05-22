@@ -21,10 +21,23 @@ from innoconv.utils import to_ast
 
 
 class InnoconvRunner:
-    """Convert content files in a directory tree."""
+    """
+    Convert content files in a directory tree.
+
+    :param source_dir: Content source directory.
+    :type source_dir: str
+
+    :param output_dir: Output directory.
+    :type output_dir: str
+
+    :param manifest: Content manifest.
+    :type manifest: innoconv.manifest.Manifest
+
+    :param extensions: List of extension names to use.
+    :type extensions: list[str]
+    """
 
     def __init__(self, source_dir, output_dir, manifest, extensions):
-        """Set defaults and load extensions."""
         self._source_dir = source_dir
         self._output_dir = output_dir
         self._manifest = manifest

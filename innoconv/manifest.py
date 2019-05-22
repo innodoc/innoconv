@@ -36,18 +36,17 @@ from innoconv.constants import MANIFEST_BASENAME
 
 
 class Manifest:
-    """Represents course metadata."""
+    """
+    Represents course metadata.
+
+    :param data: A dict with the manifest fields as keys
+    :type data: dict
+    """
 
     required_fields = ("title", "languages")
     optional_fields = ("keywords", "license")
 
     def __init__(self, data):
-        """
-        Initialize a manifest.
-
-        :param data: A dict with the manifest fields as keys
-        :type data: dict
-        """
         for field in self.required_fields:
             if field not in data:
                 msg = "Required field {} not found in manifest!".format(field)
