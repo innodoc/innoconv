@@ -53,9 +53,7 @@ class TestTikz2Svg(TestExtension):
     ):
         """Test successful lifecycle."""
         input_ast = [deepcopy(TIKZ_BLOCK)]
-        _, asts = self._run(
-            Tikz2Svg, input_ast, languages=("en",), paths=PATHS
-        )
+        _, asts = self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
         self.assertTrue(mock_td.called)
         self.assertTrue(mock_ct.called)
         self.assertTrue(mock_mkdir.called)
@@ -79,9 +77,7 @@ class TestTikz2Svg(TestExtension):
                 "t": "Div",
             }
         ]
-        _, asts = self._run(
-            Tikz2Svg, input_ast, languages=("en",), paths=PATHS
-        )
+        _, asts = self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
         div = asts[0][0]
         self.assertEqual(div["t"], "Div")
         self.assertIn("figure", div["c"][0][1])

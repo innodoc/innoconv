@@ -102,16 +102,12 @@ class CopyStatic(AbstractExtension):
         """Remember paths to copy and rewrite URL."""
 
         def _get_src_file_path(root_dir, _path, _sec_path, lang=""):
-            return os.path.join(
-                root_dir, lang, STATIC_FOLDER, _sec_path, _path
-            )
+            return os.path.join(root_dir, lang, STATIC_FOLDER, _sec_path, _path)
 
         def _get_dest_file_path(root_dir, _path, _sec_path, lang=""):
             if lang:
                 lang = "_{}".format(lang)
-            return os.path.join(
-                root_dir, STATIC_FOLDER, lang, _sec_path, _path
-            )
+            return os.path.join(root_dir, STATIC_FOLDER, lang, _sec_path, _path)
 
         # skip remote resource
         if parse.urlparse(orig_path).scheme:

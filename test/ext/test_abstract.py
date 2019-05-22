@@ -5,9 +5,7 @@ import unittest
 from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
 
-MANIFEST = Manifest(
-    {"title": {"en": "Foo Course Title"}, "languages": ("en",)}
-)
+MANIFEST = Manifest({"title": {"en": "Foo Course Title"}, "languages": ("en",)})
 
 
 class MyCrazyExtension(AbstractExtension):
