@@ -47,6 +47,7 @@ class Manifest:
     optional_fields = ("keywords", "license")
 
     def __init__(self, data):
+        """Initialize Manifest."""
         for field in self.required_fields:
             if field not in data:
                 msg = "Required field {} not found in manifest!".format(field)
