@@ -14,14 +14,6 @@ title:
 languages: [en, de]
 """
 
-CUSTOM_CONTENT = """{}
-custom_content:
-  license: '_license'
-  contributors: '_contributors'
-""".format(
-    MINIMUM
-)
-
 KEYWORDS = """{}
 keywords: [foo, bar, baz]
 """.format(
@@ -100,14 +92,6 @@ class TestManifestFromYaml(unittest.TestCase):
             getattr(manifest, "keywords")
         with self.assertRaises(AttributeError):
             getattr(manifest, "custom_content")
-
-    def test_custom_content(self):
-        """Test a manifest with custom content."""
-        manifest = Manifest.from_yaml(CUSTOM_CONTENT)
-        custom_content = getattr(manifest, "custom_content")
-        self.assertIs(len(custom_content), 2)
-        self.assertEqual(custom_content["license"], "_license")
-        self.assertEqual(custom_content["contributors"], "_contributors")
 
     def test_keywords(self):
         """Test a manifest with keywords."""

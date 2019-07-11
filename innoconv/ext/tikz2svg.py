@@ -188,7 +188,7 @@ class Tikz2Svg(AbstractExtension):
         self._tikz_images = dict()
         self._output_dir = output_dir
 
-    def post_process_file(self, ast, _):
+    def post_process_file(self, ast, _, __):
         """Find TikZ images in AST and replace with image tags."""
         TraverseAst(self.process_element).traverse(ast)
 

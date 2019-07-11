@@ -11,6 +11,15 @@ MANIFEST = Manifest(
     {
         "title": {"en": "Foo Course Title", "de": "Foo Kurstitel"},
         "languages": ("de", "en"),
+        "pages": [
+            {
+                "id": "test1",
+                "icon": "info-circle",
+                "link_in_nav": True,
+                "link_in_footer": False,
+            },
+            {"id": "test2"},
+        ],
     }
 )
 
@@ -101,16 +110,16 @@ def walk_side_effect_section_differs(path):
     )
 
 
-TITLE = [
-    {"t": "Str", "c": "Section"},
-    {"t": "Space"},
-    {"t": "Str", "c": "title"},
-]
+TITLE = "Long title"
+SHORT_TITLE = "Short"
 
 
 @patch("builtins.open")
-@patch("innoconv.runner.to_ast", return_value=(["content_ast"], TITLE))
+@patch(
+    "innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE)
+)
 @patch("json.dump")
+@patch("innoconv.runner.exists", return_value=True)
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
 @patch("innoconv.runner.makedirs")
 @patch("innoconv.runner.isdir", return_value=True)
@@ -123,11 +132,11 @@ class TestInnoconvRunner(unittest.TestCase):
 
     def test_run(self, *args):
         """Test a regular run. Assert directory and file creation."""
-        _, makedirs, _, json_dump, *_ = args
+        _, makedirs, _, _, json_dump, *_ = args
         self.runner.run()
 
-        self.assertEqual(makedirs.call_count, 10)
-        self.assertEqual(json_dump.call_count, 10)
+        self.assertEqual(makedirs.call_count, 16)
+        self.assertEqual(json_dump.call_count, 16)
 
         paths = (
             "/out/de",
@@ -135,11 +144,17 @@ class TestInnoconvRunner(unittest.TestCase):
             "/out/de/section-1/section-1.1",
             "/out/de/section-1/section-1.2",
             "/out/de/section-2",
+            "/out/de/_pages",
+            "/out/de",
+            "/out/de",
             "/out/en",
             "/out/en/section-1",
             "/out/en/section-1/section-1.1",
             "/out/en/section-1/section-1.2",
             "/out/en/section-2",
+            "/out/en/_pages",
+            "/out/en",
+            "/out/en",
         )
 
         for i, path in enumerate(paths):
@@ -186,16 +201,28 @@ class TestInnoconvRunner(unittest.TestCase):
 
     def test_run_to_ast_fails(self, *args):
         """Ensure RuntimeError is raised on failed AST conversion."""
-        _, _, _, _, to_ast, *_ = args
+        _, _, _, _, _, to_ast, *_ = args
         to_ast.side_effect = RuntimeError()
         with self.assertRaises(RuntimeError):
             self.runner.run()
 
+    def test_run_no_pages(self, *_):
+        """Ensure pages key can be missing from manifest."""
+        manifest = Manifest({"title": {"en": "Test"}, "languages": ("en",)})
+        self.runner = InnoconvRunner("/src", "/out", manifest, [])
+        try:
+            self.runner.run()
+        except RuntimeError:
+            self.fail("Exception was raised with missing pages key!")
+
 
 @patch("builtins.open")
 @patch("innoconv.runner.EXTENSIONS", {"my_ext": AbstractExtension})
-@patch("innoconv.runner.to_ast", return_value=(["content_ast"], TITLE))
+@patch(
+    "innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE)
+)
 @patch("json.dump")
+@patch("innoconv.runner.exists", return_value=True)
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
 @patch("innoconv.runner.makedirs")
 @patch("innoconv.runner.isdir", return_value=True)
@@ -237,47 +264,45 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         self.assertEqual(mocks["pre_conversion"].call_args_list[0], call("de"))
         self.assertEqual(mocks["pre_conversion"].call_args_list[1], call("en"))
 
-        self.assertEqual(mocks["pre_process_file"].call_count, 10)
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[0], call("de")
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[1], call("de/section-1")
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[2],
-            call("de/section-1/section-1.1"),
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[3],
-            call("de/section-1/section-1.2"),
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[4], call("de/section-2")
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[5], call("en")
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[6], call("en/section-1")
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[7],
-            call("en/section-1/section-1.1"),
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[8],
-            call("en/section-1/section-1.2"),
-        )
-        self.assertEqual(
-            mocks["pre_process_file"].call_args_list[9], call("en/section-2")
-        )
+        self.assertEqual(mocks["pre_process_file"].call_count, 16)
+        pre_process_file_args = [
+            "de",
+            "de/section-1",
+            "de/section-1/section-1.1",
+            "de/section-1/section-1.2",
+            "de/section-2",
+            "de/_pages",
+            "de",
+            "de",
+            "en",
+            "en/section-1",
+            "en/section-1/section-1.1",
+            "en/section-1/section-1.2",
+            "en/section-2",
+            "en/_pages",
+            "en",
+            "en",
+        ]
+        for i, arg in enumerate(pre_process_file_args):
+            self.assertEqual(
+                mocks["pre_process_file"].call_args_list[i], call(arg)
+            )
 
-        self.assertEqual(mocks["post_process_file"].call_count, 10)
-        for i in range(0, 10):
+        self.assertEqual(mocks["post_process_file"].call_count, 16)
+        for i in list(range(0, 5)) + list(range(8, 13)):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
-                call(["content_ast"], TITLE),
+                call(["content_ast"], TITLE, "section"),
+            )
+        for i in (5, 13):
+            self.assertEqual(
+                mocks["post_process_file"].call_args_list[i],
+                call(["content_ast"], TITLE, "page"),
+            )
+        for i in (6, 7, 14, 15):
+            self.assertEqual(
+                mocks["post_process_file"].call_args_list[i],
+                call(["content_ast"], TITLE, "fragment"),
             )
 
         self.assertEqual(mocks["post_conversion"].call_count, 2)

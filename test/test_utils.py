@@ -20,15 +20,17 @@ class TestToAst(unittest.TestCase):
     def test_to_ast(self, popen_mock):
         """Ensure pandoc is called."""
         pandoc_output = (
-            '{"blocks":[{"t":"Para","c":[]}],"meta":{"title":'
-            '{"t":"MetaInlines","c":[{"t":"Str","c":"Test"},'
-            '{"t":"Space"},{"t":"Str","c":"Title"}]}}}'
+            '{"blocks":[{"t":"Para","c":[]}],'
+            '"meta":{"title":{"t":"MetaInlines","c":[{"t":"Str","c":"Test"},'
+            '{"t":"Space"},{"t":"Str","c":"Title"}]},'
+            '"short_title":{"t":"MetaInlines","c":[{"t":"Str","c":"Test"}]}}}'
         )
         _config_process_mock(0, pandoc_output)
-        blocks, title = to_ast("/some/document.md")
+        blocks, title, short_title = to_ast("/some/document.md")
         self.assertTrue(popen_mock.called)
         self.assertEqual(blocks, [{"t": "Para", "c": []}])
         self.assertEqual(title, "Test Title")
+        self.assertEqual(short_title, "Test")
 
     def test_to_ast_fails(self, _):
         """Ensure a RuntimeError is raised when pandoc fails."""
@@ -36,9 +38,31 @@ class TestToAst(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             to_ast("/some/document.md")
 
+    def test_to_ast_no_short_title(self, _):
+        """Check run without short title."""
+        pandoc_output = (
+            '{"blocks":[{"t":"Para","c":[]}],"meta":'
+            '{"title":{"t":"MetaInlines","c":[{"t":"Str","c":"Test"}]}}}'
+        )
+        _config_process_mock(0, pandoc_output)
+        try:
+            *_, short_title = to_ast("/some/document.md")
+        except ValueError:
+            self.fail("to_ast() raised ValueError!")
+        self.assertEqual(short_title, "Test")
+
     def test_to_ast_fails_without_title(self, _):
         """Ensure a ValueError is raised when title is missing."""
         pandoc_output = '{"blocks":[{"t":"Para","c":[]}],"meta":{}}'
         _config_process_mock(0, pandoc_output)
         with self.assertRaises(ValueError):
             to_ast("/some/document.md")
+
+    def test_ignore_missing_title(self, _):
+        """Ensure no Error is raised when title is missing."""
+        pandoc_output = '{"blocks":[{"t":"Para","c":[]}],"meta":{}}'
+        _config_process_mock(0, pandoc_output)
+        try:
+            to_ast("/some/document.md", ignore_missing_title=True)
+        except ValueError:
+            self.fail("to_ast() raised ValueError!")

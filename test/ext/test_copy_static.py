@@ -17,28 +17,95 @@ from ..utils import (
 )
 
 
+def _is_file_mock_no_logo(filename):
+    if "_logo" in filename:
+        return False
+    return True
+
+
+def _is_file_mock_logo_svg(filename):
+    if "_logo.svg" in filename and "/en/" not in filename:
+        return True
+    return False
+
+
+def _is_file_mock_present_localized(filename):
+    if "present.jpg" in filename and "/en/" in filename:
+        return True
+    return False
+
+
+def _is_file_mock_present_non_localized(filename):
+    if "present.jpg" in filename and "/en/" not in filename:
+        return True
+    return False
+
+
+def _is_file_mock_only_en(filename):
+    if "_logo" in filename:
+        return False
+    if "/en/" in filename:
+        return True
+    if "/la/" in filename:
+        return False
+    return True
+
+
+def _is_file_mock_non_localized(filename):
+    if "_logo" in filename or "/en/" in filename:
+        return False
+    return True
+
+
 @patch("os.makedirs", return_value=True)
 @patch("os.path.lexists", return_value=True)
-@patch("os.path.isfile", side_effect=itertools.cycle((True,)))
+@patch("os.path.isfile", side_effect=_is_file_mock_no_logo)
 @patch("shutil.copyfile")
 class TestCopyStatic(TestExtension):
     """Test the CopyStatic extension."""
 
-    def test_absolute_localized(self, copyfile, *_):
+    def test_logo(self, copyfile, isfile, *_):
+        """Test logo copy."""
+        isfile.side_effect = _is_file_mock_logo_svg
+        copy_static, _ = self._run(CopyStatic, [], languages=("en",))
+        self.assertEqual(copyfile.call_count, 1)
+        self.assertIn(
+            call(
+                join(SOURCE, STATIC_FOLDER, "_logo.svg"),
+                join(DEST, STATIC_FOLDER, "_logo.svg"),
+            ),
+            copyfile.call_args_list,
+        )
+        manifest_fields = copy_static.manifest_fields()
+        self.assertEqual(manifest_fields["logo"], "_logo.svg")
+
+    def test_no_logo(self, copyfile, *_):
+        """Test logo copy."""
+        copy_static, _ = self._run(CopyStatic, [], languages=("en",))
+        self.assertEqual(copyfile.call_count, 0)
+        manifest_fields = copy_static.manifest_fields()
+        self.assertNotIn("logo", manifest_fields)
+
+    def test_absolute_localized(self, copyfile, isfile, *_):
         """Test an absolute, localized file path."""
+        isfile.side_effect = _is_file_mock_present_localized
         ast = [get_image_ast("/present.jpg")]
         _, asts = self._run(CopyStatic, ast, languages=("en",))
         self.assertEqual(copyfile.call_count, 1)
-        src = join(SOURCE, "en", STATIC_FOLDER, "present.jpg")
-        dst = join(DEST, STATIC_FOLDER, "_en", "present.jpg")
-        self.assertEqual(call(src, dst), copyfile.call_args)
+        self.assertIn(
+            call(
+                join(SOURCE, "en", STATIC_FOLDER, "present.jpg"),
+                join(DEST, STATIC_FOLDER, "_en", "present.jpg"),
+            ),
+            copyfile.call_args_list,
+        )
         for i, path in enumerate(PATHS):
             with self.subTest(path):
                 self.assertEqual(asts[i][0]["c"][2][0], "_en/present.jpg")
 
     def test_absolute_nonlocalized(self, copyfile, isfile, *_):
         """Test an absolute, non-localized file path."""
-        isfile.side_effect = itertools.cycle((False, True))
+        isfile.side_effect = _is_file_mock_present_non_localized
         ast = [get_image_ast("/present.jpg")]
         _, asts = self._run(CopyStatic, ast, languages=("en",))
         self.assertEqual(copyfile.call_count, 1)
@@ -147,24 +214,9 @@ class TestCopyStatic(TestExtension):
 
     def test_only_en_present(self, copyfile, isfile, *_):
         """Test for when only en version present."""
+        isfile.side_effect = _is_file_mock_only_en
         ast = [get_image_ast("localizable.gif")]
         languages = ("en", "la")
-        isfile.side_effect = itertools.cycle(
-            (
-                True,
-                True,
-                True,
-                True,  # en
-                False,
-                True,
-                False,
-                True,
-                False,
-                True,
-                False,
-                True,  # la
-            )
-        )
         _, asts = self._run(CopyStatic, ast, languages=languages)
         self.assertEqual(copyfile.call_count, 8)
         for i, (title, path) in enumerate(PATHS):
@@ -209,7 +261,7 @@ class TestCopyStatic(TestExtension):
 
     def test_relative_nonlocalized(self, copyfile, isfile, *_):
         """Test a relative, non-localized reference."""
-        isfile.side_effect = itertools.cycle((False, True))
+        isfile.side_effect = _is_file_mock_non_localized
         ast = [get_image_ast("example_image.jpg")]
         _, asts = self._run(CopyStatic, ast, languages=("en",))
         self.assertEqual(copyfile.call_count, 4)

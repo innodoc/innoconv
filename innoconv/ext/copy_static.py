@@ -54,7 +54,7 @@ import os.path
 import shutil
 from urllib import parse
 
-from innoconv.constants import STATIC_FOLDER
+from innoconv.constants import LOGO_EXTENSIONS, STATIC_FOLDER
 from innoconv.ext.abstract import AbstractExtension
 from innoconv.traverse_ast import TraverseAst
 
@@ -79,6 +79,7 @@ class CopyStatic(AbstractExtension):
         self._current_language = None
         self._to_copy = set()
         self._current_path = None
+        self._logo_filename = None
 
     # content parsing
 
@@ -87,32 +88,21 @@ class CopyStatic(AbstractExtension):
         link = link_element["c"][2][0]
         if VIDEO_CLASS in link_element["c"][0][1]:
             try:
-                link_element["c"][2][0] = self._add_static(link)
+                link_element["c"][2][0] = self._add_static_from_section(link)
             except ValueError:
                 pass
 
     def _process_image(self, image_element):
         link = image_element["c"][2][0]
         try:
-            image_element["c"][2][0] = self._add_static(link)
+            image_element["c"][2][0] = self._add_static_from_section(link)
         except ValueError:
             pass
 
-    def _add_static(self, orig_path):
-        """Remember paths to copy and rewrite URL."""
-
-        def _get_src_file_path(root_dir, _path, _sec_path, lang=""):
-            return os.path.join(root_dir, lang, STATIC_FOLDER, _sec_path, _path)
-
-        def _get_dest_file_path(root_dir, _path, _sec_path, lang=""):
-            if lang:
-                lang = "_{}".format(lang)
-            return os.path.join(root_dir, STATIC_FOLDER, lang, _sec_path, _path)
-
+    def _add_static_from_section(self, orig_path):
         # skip remote resource
         if parse.urlparse(orig_path).scheme:
             raise ValueError()
-
         # relative to section?
         if orig_path[0] == "/":
             ref_path = orig_path[1:]
@@ -122,6 +112,18 @@ class CopyStatic(AbstractExtension):
             section_path = self._current_path[3:]  # strip language
             if section_path:
                 section_path = "{}/".format(section_path.strip("/"))
+        return self._add_static(ref_path, section_path)
+
+    def _add_static(self, ref_path, section_path=""):
+        """Remember paths to copy and rewrite URL."""
+
+        def _get_src_file_path(root_dir, _path, _sec_path, lang=""):
+            return os.path.join(root_dir, lang, STATIC_FOLDER, _sec_path, _path)
+
+        def _get_dest_file_path(root_dir, _path, _sec_path, lang=""):
+            if lang:
+                lang = "_{}".format(lang)
+            return os.path.join(root_dir, STATIC_FOLDER, lang, _sec_path, _path)
 
         # localized version
         src = _get_src_file_path(
@@ -139,7 +141,7 @@ class CopyStatic(AbstractExtension):
             dst = _get_dest_file_path(self._output_dir, ref_path, section_path)
             rewritten = "{}{}".format(section_path, ref_path)
             if not os.path.isfile(src):
-                msg = "Missing static file {}".format(orig_path)
+                msg = "Missing static file {}".format(ref_path)
                 raise RuntimeError(msg)
 
         self._to_copy.add((src, dst))
@@ -155,6 +157,18 @@ class CopyStatic(AbstractExtension):
                 os.makedirs(folder)
             logging.info(" %s -> %s", src, dst)
             shutil.copyfile(src, dst)
+
+    def _add_logo(self):
+        for ext in LOGO_EXTENSIONS:
+            try:
+                logo_filename = "_logo.{}".format(ext)
+                self._add_static(logo_filename)
+                self._logo_filename = logo_filename
+                logging.info("Logo %s copied.", logo_filename)
+                return
+            except RuntimeError:
+                continue
+        logging.info("No Logo found.")
 
     def process_element(self, elem, _):
         """Respond to AST element."""
@@ -178,10 +192,15 @@ class CopyStatic(AbstractExtension):
         """Remember file path."""
         self._current_path = path
 
-    def post_process_file(self, ast, _):
+    def post_process_file(self, ast, _, __):
         """Find all static files in AST."""
         TraverseAst(self.process_element).traverse(ast)
 
     def finish(self):
         """Copy static files to the output folder."""
+        self._add_logo()
         self._copy_files()
+
+    def manifest_fields(self):
+        """Add `logo` field to manifest."""
+        return {"logo": self._logo_filename} if self._logo_filename else {}

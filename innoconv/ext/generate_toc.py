@@ -77,9 +77,10 @@ class GenerateToc(AbstractExtension):
         """Remember current path."""
         self._current_path = path
 
-    def post_process_file(self, _, title):
+    def post_process_file(self, _, title, content_type):
         """Add this section file to the TOC."""
-        self._add_to_toc(title)
+        if content_type == "section":
+            self._add_to_toc(title)
 
     def manifest_fields(self):
         """Add `toc` field to manifest."""

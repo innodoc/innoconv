@@ -1,5 +1,6 @@
 ---
 title: Test document
+short_title: Test
 ---
 
 # Section 1 (10 words)

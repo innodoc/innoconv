@@ -27,8 +27,17 @@ MANIFEST_BASENAME = "manifest"
 #: Format for logger messages
 LOG_FORMAT = "%(levelname)s:%(filename)s %(message)s"
 
+#: Allowed file extensions for course logo
+LOGO_EXTENSIONS = ("png", "jpg", "jpeg", "gif", "svg")
+
 #: Static folder name
 STATIC_FOLDER = "_static"
+
+#: Custom content folder name
+PAGES_FOLDER = "_pages"
+
+#: Prefix for footer fragment files
+FOOTER_FRAGMENT_PREFIX = "_footer_"
 
 #: CLI exit codes
 EXIT_CODES = {"SUCCESS": 0, "MANIFEST_ERROR": 10, "RUNNER_ERROR": 11}

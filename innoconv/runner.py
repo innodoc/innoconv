@@ -13,9 +13,13 @@ certain events. The events are documented in
 import json
 import logging
 from os import makedirs, walk
-from os.path import abspath, dirname, isdir, join, relpath
+from os.path import abspath, dirname, exists, isdir, join, relpath
 
-from innoconv.constants import CONTENT_BASENAME
+from innoconv.constants import (
+    CONTENT_BASENAME,
+    FOOTER_FRAGMENT_PREFIX,
+    PAGES_FOLDER,
+)
 from innoconv.ext import EXTENSIONS
 from innoconv.utils import to_ast
 
@@ -73,11 +77,11 @@ class InnoconvRunner:
                     del dirs[i]  # skip meta directories like '_static'
             dirs.sort()  # sort section names
 
-            # process content file
+            # process section
             content_filename = "{}.md".format(CONTENT_BASENAME)
             if content_filename in files:
                 filepath = join(root, content_filename)
-                self._process_file(filepath, lang_num, section_num)
+                self._process_section(filepath, lang_num, section_num)
                 section_num += 1
             else:
                 raise RuntimeError(
@@ -90,7 +94,18 @@ class InnoconvRunner:
                 "Language {} is missing sections.".format(language)
             )
 
-    def _process_file(self, filepath, lang_num, section_num):
+        # process pages
+        try:
+            pages = self._manifest.pages
+        except AttributeError:
+            pages = []
+        for page in pages:
+            self._process_page(page, language)
+
+        # process footer fragments
+        self._process_footer_fragments(language)
+
+    def _process_section(self, filepath, lang_num, section_num):
         rel_path = dirname(relpath(filepath, self._source_dir))
         section_name = rel_path[3:]  # strip language
         if lang_num == 0:
@@ -116,8 +131,8 @@ class InnoconvRunner:
 
         # convert file using pandoc
         self._notify_extensions("pre_process_file", rel_path)
-        ast, title = to_ast(filepath)
-        self._notify_extensions("post_process_file", ast, title)
+        ast, title, _ = to_ast(filepath)
+        self._notify_extensions("post_process_file", ast, title, "section")
 
         # write file content
         makedirs(dirname(filepath_out), exist_ok=True)
@@ -126,6 +141,71 @@ class InnoconvRunner:
         logging.info("Wrote %s", filepath_out)
 
         return title
+
+    def _process_page(self, page, language):
+        try:
+            link_in_nav = page["link_in_nav"]
+        except KeyError:
+            link_in_nav = False
+        try:
+            link_in_footer = page["link_in_footer"]
+        except KeyError:
+            link_in_footer = False
+        if not (link_in_nav or link_in_footer):
+            logging.warning(
+                "Page '%s' should have at least on of "
+                "link_in_nav or link_in_nav set to true."
+            )
+            return
+        try:
+            page["title"]
+        except KeyError:
+            page["title"] = {}
+        input_filename = "{}.md".format(page["id"])
+        filepath = join(
+            self._source_dir, language, PAGES_FOLDER, input_filename
+        )
+        rel_path = dirname(relpath(filepath, self._source_dir))
+
+        # convert
+        self._notify_extensions("pre_process_file", rel_path)
+        ast, title, short_title = to_ast(filepath)
+        self._notify_extensions("post_process_file", ast, title, "page")
+        try:
+            page["short_title"][language] = short_title
+        except KeyError:
+            page["short_title"] = {language: short_title}
+        page["title"][language] = title
+
+        # write json output
+        output_filename = "{}.json".format(page["id"])
+        filepath_out = join(self._output_dir, rel_path, output_filename)
+        makedirs(dirname(filepath_out), exist_ok=True)
+        with open(filepath_out, "w") as out_file:
+            json.dump(ast, out_file)
+        logging.info("Wrote %s", filepath_out)
+
+    def _process_footer_fragments(self, language):
+        for part in ("a", "b"):
+            input_filename = "{}{}.md".format(FOOTER_FRAGMENT_PREFIX, part)
+            filepath = join(self._source_dir, language, input_filename)
+            rel_path = dirname(relpath(filepath, self._source_dir))
+            if not exists(filepath):
+                logging.warning("Footer fragment %s does not exist.", filepath)
+                continue
+
+            # convert
+            self._notify_extensions("pre_process_file", rel_path)
+            ast, title, _ = to_ast(filepath, ignore_missing_title=True)
+            self._notify_extensions("post_process_file", ast, title, "fragment")
+
+            # write json output
+            output_filename = "{}{}.json".format(FOOTER_FRAGMENT_PREFIX, part)
+            filepath_out = join(self._output_dir, rel_path, output_filename)
+            makedirs(dirname(filepath_out), exist_ok=True)
+            with open(filepath_out, "w") as out_file:
+                json.dump(ast, out_file)
+            logging.info("Wrote %s", filepath_out)
 
     def _notify_extensions(self, event_name, *args, **kwargs):
         for ext in self._extensions:
