@@ -33,6 +33,7 @@ RUN set -xe && \
       "option_doc 0" \
       "option_src 0" \
       > /tmp/install-tl-unx/texlive.profile && \
+    echo $PATH && \
     /tmp/install-tl-unx/install-tl --profile=/tmp/install-tl-unx/texlive.profile && \
     tlmgr install \
       collection-latex \
