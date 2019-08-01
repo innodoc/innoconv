@@ -1,4 +1,4 @@
-# Image used for testing, includes a variety of Python versions
+# Docker image for CI, includes a variety of Python versions
 ARG INNOCONV_IMAGE=innodoc/innoconv
 FROM $INNOCONV_IMAGE AS innoconv
 
@@ -27,6 +27,8 @@ RUN set -xe && \
       poppler-glib \
       readline-dev \
       sqlite-dev \
+      texlive \
+      texmf-full \
       zlib-dev
 
 # add user/group to run as
@@ -49,11 +51,9 @@ RUN set -xe && \
     bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.? .pyenv/versions/$version/bin/python?.?m; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
     bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.7 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
 
-# copy Pandoc, LaTeX and pdf2svg from main image
+# copy Pandoc and pdf2svg from main image
 USER root
-COPY --from=innoconv /etc/profile.d/tex_path.sh /etc/profile.d
 COPY --from=innoconv /usr/local/bin /usr/local/bin
-COPY --from=innoconv /usr/local/texlive /usr/local/texlive
 
 # clean up
 RUN set -xe && \
