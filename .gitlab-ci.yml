@@ -17,6 +17,7 @@ variables: &variables
   IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   IMAGE_CI_TAG: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG
   IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
+  DOCKER_TLS_CERTDIR: "/certs"
 
 before_script:
   - source /etc/profile
@@ -31,7 +32,7 @@ before_script:
 .docker-base: &docker-base
   image: docker
   services:
-    - docker:dind
+    - docker:18.09.7-dind
   before_script:
     - echo "$CI_JOB_TOKEN" | docker login --username gitlab-ci-token --password-stdin "$CI_REGISTRY"
   after_script:
