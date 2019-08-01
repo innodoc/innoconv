@@ -1,13 +1,13 @@
-# Image used for testing, includes a variety of Python versions
+# Docker image for CI, includes a variety of Python versions
+# Python 3.4.x isn't supported as alpine >3.9 uses OpenSSL 1.1.x (not 1.0.x)
 ARG INNOCONV_IMAGE=innodoc/innoconv
 FROM $INNOCONV_IMAGE AS innoconv
 
-# alpine:3.9 uses OpenSSL 1.1.x (not 1.0.x) which is not supported by Python 3.4.x!
-FROM alpine:3.8
+FROM alpine:3.10
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
 ARG PYTHON_VERSIONS
-ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.7.2 3.6.8 3.5.6 3.4.9}
+ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.7.2 3.6.8 3.5.6}
 
 RUN set -xe && \
     apk update && \
@@ -27,6 +27,8 @@ RUN set -xe && \
       poppler-glib \
       readline-dev \
       sqlite-dev \
+      texlive \
+      texmf-dist \
       zlib-dev
 
 # add user/group to run as
@@ -49,11 +51,9 @@ RUN set -xe && \
     bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.? .pyenv/versions/$version/bin/python?.?m; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
     bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.7 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
 
-# copy Pandoc, LaTeX and pdf2svg from main image
+# copy Pandoc and pdf2svg from main image
 USER root
-COPY --from=innoconv /etc/profile.d/tex_path.sh /etc/profile.d
 COPY --from=innoconv /usr/local/bin /usr/local/bin
-COPY --from=innoconv /usr/local/texlive /usr/local/texlive
 
 # clean up
 RUN set -xe && \
