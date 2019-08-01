@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.7-alpine
+ARG BASE_IMAGE=python:3.7-alpine3.10
 FROM $BASE_IMAGE AS build
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
