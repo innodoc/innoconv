@@ -26,7 +26,7 @@ before_script:
   <<: *variables
   GIT_SUBMODULE_STRATEGY: none
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay2
+  DOCKER_DRIVER: overlay
 
 .docker-base: &docker-base
   image: docker
