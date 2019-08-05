@@ -27,7 +27,7 @@ RUN set -xe && \
       poppler-glib \
       readline-dev \
       sqlite-dev \
-      texlive \
+      texlive-full \
       zlib-dev
 
 # add user/group to run as
