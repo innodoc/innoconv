@@ -8,7 +8,6 @@ output directory automatically.
 ===========
 Translation
 ===========
-
 It's possible to have language-specific versions of a static file.
 
 For that to work you need to have a :file:`_static` folder beneath the language
@@ -21,7 +20,6 @@ folder. Files in this folder will take precedence over the common
 ===============================
 Relative and absolute reference
 ===============================
-
 Files can be referenced using relative or absolute paths.
 
 *Absolute paths* are resolved to the root folder, either the common
@@ -33,7 +31,6 @@ fragment appended.
 -------
 Example
 -------
-
 This example shows how a reference to an image is resolved. The references
 happen inside the section ``chapter01`` in the English language version.
 
@@ -46,6 +43,7 @@ happen inside the section ``chapter01`` in the English language version.
 | Absolute | ``/subdir/my_picture.png`` →                   |
 |          | ``en/_static/subdir/my_picture.png``           |
 +----------+------------------------------------------------+
+
 """
 
 import logging
