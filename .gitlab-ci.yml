@@ -96,16 +96,6 @@ Python 3.5 integration tests:
   image: $IMAGE_CI_TAG
   script: tox -e py35-integration
 
-Python 3.4 unit tests:
-  stage: test
-  image: $IMAGE_CI_TAG
-  script: tox -e py34-unit
-
-Python 3.4 integration tests:
-  stage: test
-  image: $IMAGE_CI_TAG
-  script: tox -e py34-integration
-
 Linting:
   stage: test
   image: $IMAGE_CI_TAG
