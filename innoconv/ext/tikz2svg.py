@@ -17,7 +17,6 @@ Ti\ *k*\Z code blocks are replaced by image elements.
 -------
 Example
 -------
-
 A Ti\ *k*\Z image is written using a code block.
 
 .. code-block:: latex
@@ -38,6 +37,7 @@ tag, similar to the following.
 .. code-block:: md
 
   ![](/_tikz/tikz_abcdef0123456789.svg "Alt text")
+
 """
 
 

@@ -26,6 +26,7 @@ Example
      en: Example title
      de: Beispiel-Titel
    languages: en,de
+
 """
 
 import os
