@@ -1,15 +1,15 @@
 r"""
 Convert and insert Ti\ *k*\Z figures.
 
-SVG files are be rendered from Ti\ *k*\Z code and saved in the folder ``_tikz``
-in the static folder of the output directory.
+SVG files are rendered from Ti\ *k*\Z code and saved in the folder ``_tikz`` in
+the static folder of the output directory.
 
 Ti\ *k*\Z code blocks are replaced by image elements.
 
 .. note::
 
-    In order to use this extension you need to have the following installed on
-    your system:
+    In order to use this extension you need to have the following software
+    installed on your system:
 
     * LaTeX distribution with PGF/Ti\ *k*\Z
     * `pdf2svg <https://github.com/dawbarton/pdf2svg>`_
@@ -17,7 +17,7 @@ Ti\ *k*\Z code blocks are replaced by image elements.
 -------
 Example
 -------
-A Ti\ *k*\Z image is written using a code block.
+A Ti\ *k*\Z image is directly embedded into Markdown using a code block.
 
 .. code-block:: latex
 
@@ -31,8 +31,8 @@ A Ti\ *k*\Z image is written using a code block.
   \\end{tikzpicture}
   ```
 
-Upon conversion, this code block will be replaced in the output with an image
-tag, similar to the following.
+During conversion the code block will be turned into an image tag, similar
+to the following.
 
 .. code-block:: md
 
