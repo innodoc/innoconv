@@ -11,6 +11,17 @@ def get_bullet_list_ast():
     return {"t": "BulletList", "c": [[get_para_ast()], [get_para_ast()]]}
 
 
+def get_definitionlist_ast():
+    """Create DefinitionList element."""
+    return {
+        "t": "DefinitionList",
+        "c": [
+            [[get_filler_content()], [[get_para_ast()]]],
+            [[get_filler_content()], [[get_para_ast()]]],
+        ],
+    }
+
+
 def get_div_ast(content=None):
     """Create Div element with content."""
     if content is None:
@@ -94,7 +105,9 @@ def get_complex_ast():
     return [
         get_para_ast(),
         get_para_ast([get_image_ast("/present.png", "Image Present")]),
-        get_para_ast([get_para_ast([get_image_ast("/subfolder/present.mp4")])]),
+        get_para_ast(
+            [get_para_ast([get_image_ast("/subfolder/present.mp4")])]
+        ),
         get_para_ast(
             [
                 get_para_ast(get_para_ast()),

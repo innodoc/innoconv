@@ -11,29 +11,31 @@ class TraverseAst:
     """
 
     name_method_map = {
+        "BlockQuote": "_under_c",
+        "BulletList": "_bulletlist",
         "Code": "_noop",
         "CodeBlock": "_noop",
+        "DefinitionList": "_definitionlist",
+        "Div": "_under_c_1",
+        "Emph": "_under_c",
+        "Header": "_header",
+        "Image": "_under_c_1",
+        "LineBlock": "_lineblock",
         "LineBreak": "_noop",
+        "Link": "_under_c_1",
+        "Math": "_under_c_1",
+        "OrderedList": "_orderedlist",
+        "Para": "_under_c",
+        "Plain": "_under_c",
+        "Quoted": "_under_c_1",
         "RawBlock": "_noop",
         "RawInline": "_noop",
         "SoftBreak": "_noop",
         "Space": "_noop",
+        "Span": "_under_c_1",
         "Str": "_noop",
-        "BlockQuote": "_under_c",
-        "Emph": "_under_c",
-        "Para": "_under_c",
-        "Plain": "_under_c",
         "Strikeout": "_under_c",
         "Strong": "_under_c",
-        "Div": "_under_c_1",
-        "Image": "_under_c_1",
-        "Link": "_under_c_1",
-        "Math": "_under_c_1",
-        "Quoted": "_under_c_1",
-        "Span": "_under_c_1",
-        "Header": "_header",
-        "OrderedList": "_orderedlist",
-        "BulletList": "_bulletlist",
         "Table": "_table",
     }
 
@@ -47,7 +49,7 @@ class TraverseAst:
 
     @staticmethod
     def _unhandled(elem):
-        raise ValueError("Unhandled type: {}".format(elem["t"]))
+        raise ValueError("Unhandled type: {}".format(elem))
 
     def _under_c(self, elem):
         self.traverse(elem["c"], elem)
@@ -63,6 +65,16 @@ class TraverseAst:
             self.traverse(item, elem)
 
     def _bulletlist(self, elem):
+        for item in elem["c"]:
+            self.traverse(item, elem)
+
+    def _definitionlist(self, elem):
+        for item in elem["c"]:
+            self.traverse(item[0], elem)
+            for node in item[1]:
+                self.traverse(node, elem)
+
+    def _lineblock(self, elem):
         for item in elem["c"]:
             self.traverse(item, elem)
 

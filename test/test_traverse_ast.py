@@ -6,6 +6,7 @@ from unittest.mock import call, Mock
 from innoconv.traverse_ast import TraverseAst
 from .utils import (
     get_bullet_list_ast,
+    get_definitionlist_ast,
     get_div_ast,
     get_header_ast,
     get_ordered_list_ast,
@@ -30,6 +31,7 @@ class TestTraverseAst(unittest.TestCase):
             get_div_ast([get_table_ast()]),
             get_ordered_list_ast(),
             get_bullet_list_ast(),
+            get_definitionlist_ast(),
         ]
         header = ast[0]
         div = ast[1]
@@ -44,6 +46,7 @@ class TestTraverseAst(unittest.TestCase):
         olist_item_0 = olist["c"][1][0][0]
         olist_item_1 = olist["c"][1][1][0]
         blist = ast[3]
+        dlist = ast[4]
         expected = (
             (header, None),
             (header["c"][2][0], header),
@@ -71,6 +74,13 @@ class TestTraverseAst(unittest.TestCase):
             (blist["c"][0][0]["c"][0], blist["c"][0][0]),
             (blist["c"][1][0], blist),
             (blist["c"][1][0]["c"][0], blist["c"][1][0]),
+            (dlist, None),
+            (dlist["c"][0][0][0], dlist),
+            (dlist["c"][0][1][0][0], dlist),
+            (dlist["c"][0][1][0][0]["c"][0], dlist["c"][0][1][0][0]),
+            (dlist["c"][1][0][0], dlist),
+            (dlist["c"][1][1][0][0], dlist),
+            (dlist["c"][1][1][0][0]["c"][0], dlist["c"][0][1][0][0]),
         )
         self.traverse_ast.traverse(ast)
         self.assertEqual(self._callback_mock.call_count, len(expected))
