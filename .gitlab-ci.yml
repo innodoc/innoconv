@@ -19,8 +19,8 @@ variables: &variables
   IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
 
 before_script:
-  - source /etc/profile
-  - source $HOME/.bash_profile
+  - [ -f /etc/profile ] && source /etc/profile
+  - [ -f $HOME/.bash_profile ] && source $HOME/.bash_profile
 
 .docker-default-vars: &docker-default-vars
   <<: *variables
