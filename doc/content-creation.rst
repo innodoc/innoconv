@@ -13,7 +13,8 @@ Pandoc under the hood.
 
 .. seealso::
 
-  The :ref:`example-course` serves as a reference to authors.
+  There's also :ref:`addtional documentation <additional-documentation>` that
+  offers more detailed information on how to create content with innoDoc.
 
 Best practices
 --------------
@@ -86,8 +87,8 @@ part/chapter/section structure of the text.
 
 The names of the directories determine the order in the actual text. They are
 sorted alphanumerically. The directory name itself can be used to create
-:ref:`cross-references <xrefs>` from one part in the the text to another. Also,
-they might appear in more technical contexts such as
+cross-references from one part in the the text to another. Also, they might
+appear in more technical contexts such as
 :abbr:`URLs (Uniform Resource Locator)`.
 
 .. note::
@@ -177,90 +178,22 @@ After the metablock you can write your actual content.
 This section will not provide an exhaustive list of formatting options. Instead
 it will mainly focus on some features that are unique to innoDoc.
 
-.. seealso::
+.. _additional-documentation:
 
-  All possibilities are documented in the
-  :ref:`example course <example-course>`.
+Additional documentation
+------------------------
 
-.. _media-files:
-
-Media files
-```````````
-
-.. todo:: Media files
-
-.. _pgf-tikz:
-
-PGF/Ti\ *k*\ Z
-``````````````
-
-|pgftikz|_ is used to create vector graphics and is written in TeX.
-
-.. _pgftikz: https://sourceforge.net/projects/pgf/
-
-.. |pgftikz| replace:: PGF/Ti\ *k*\ Z
-
-.. todo:: pgf/tikz example
-
-.. _interactive-exercises:
-
-Interactive exercises
-`````````````````````
-
-.. todo:: section interactive exercises
-
-.. _xrefs:
-
-Cross-references
-````````````````
-
-.. todo:: section cross-references
-
-.. _glossary:
-
-Glossary
-````````
-
-.. todo:: section glossary
-
-.. _localization:
-
-Localization
-------------
-
-.. todo::
-
-  * general words
-  * use with only one language
-
-.. seealso::
-
-  * Section :ref:`sections_and_subsections` on how to structure directories
-    with multiple languages.
-  * Section :ref:`static_files` for translating media files.
-  * Section :ref:`content_files` for translating Markdown content.
-
-.. _example-course:
-
-Example course
---------------
-
-There's an example course. It's a comprehensive demonstration of what is
-possible with innoConv.
-
-It serves the following purposes:
-
-* Showcase the capabilities and features
-* Reference for authors
-* Material for automatic software tests
+For a more detailed instructions including examples on how to author content
+refer to the innoDoc example course. It features in-depth descriptions on all
+content elements and the general course structure.
 
 .. note::
 
-  If you want to start compiling content, check out this course and start
+  If you want to start compiling content, check out the source code and start
   using innoConv right away.
 
 Links
 ~~~~~
 
-* `Live version <https://tub_base.innocampus.tu-berlin.de/>`_
-* `Content source repository <https://gitlab.tu-berlin.de/innodoc/tub_base>`_
+* `Live version <https://veundmint.innocampus.tu-berlin.de/>`_
+* `Source repository <https://gitlab.tu-berlin.de/innodoc/tub_base>`_

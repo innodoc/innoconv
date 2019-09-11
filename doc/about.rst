@@ -15,8 +15,8 @@ sections and subsections of the work.
 
 .. seealso::
 
-  Check out the :ref:`example course <example-course>` to see how it looks
-  like.
+  Check out the :ref:`addtional documentation <additional-documentation>` to
+  see how a real course looks like.
 
 Features
 --------
@@ -30,14 +30,14 @@ the creation of educational content.
 
 These include
 
-* :ref:`localization`
+* Localization
 * Math formulas
 * Images and videos
-* :ref:`Interactive exercises <interactive-exercises>`
-* :ref:`pgf-tikz`
+* Interactive exercises
+* Vector graphics
 * Table of contents
-* :ref:`Inter-section references <xrefs>`
-* :ref:`glossary`
+* Inter-section references
+* Index
 
 innoDoc
 -------
