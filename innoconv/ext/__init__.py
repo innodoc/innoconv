@@ -13,6 +13,7 @@ methods defined in
 
 from innoconv.ext.copy_static import CopyStatic
 from innoconv.ext.generate_toc import GenerateToc
+from innoconv.ext.index_terms import IndexTerms
 from innoconv.ext.join_strings import JoinStrings
 from innoconv.ext.tikz2svg import Tikz2Svg
 from innoconv.ext.write_manifest import WriteManifest
@@ -21,6 +22,7 @@ from innoconv.ext.write_manifest import WriteManifest
 EXTENSIONS = {
     "copy_static": CopyStatic,
     "generate_toc": GenerateToc,
+    "index_terms": IndexTerms,
     "join_strings": JoinStrings,
     "tikz2svg": Tikz2Svg,
     "write_manifest": WriteManifest,

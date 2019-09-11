@@ -52,7 +52,11 @@ class TraverseAst:
         raise ValueError("Unhandled type: {}".format(elem))
 
     def _under_c(self, elem):
-        self.traverse(elem["c"], elem)
+        content = elem["c"]
+        if isinstance(content, list):
+            self.traverse(elem["c"], elem)
+        else:
+            self.traverse([elem["c"]], elem)
 
     def _under_c_1(self, elem):
         self.traverse(elem["c"][1], elem)

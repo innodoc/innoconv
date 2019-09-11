@@ -100,14 +100,17 @@ def get_generic_link_ast(content, link, title="", classes=None):
     return {"t": "Link", "c": [["", classes, []], content, [link, title]]}
 
 
+def get_index_term(content, term):
+    """Create an index term."""
+    return {"t": "Span", "c": [["", [], [["data-index-term", term]]], content]}
+
+
 def get_complex_ast():
     """Create a somewhat complex AST."""
     return [
         get_para_ast(),
         get_para_ast([get_image_ast("/present.png", "Image Present")]),
-        get_para_ast(
-            [get_para_ast([get_image_ast("/subfolder/present.mp4")])]
-        ),
+        get_para_ast([get_para_ast([get_image_ast("/subfolder/present.mp4")])]),
         get_para_ast(
             [
                 get_para_ast(get_para_ast()),
