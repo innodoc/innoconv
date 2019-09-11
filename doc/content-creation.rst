@@ -13,8 +13,12 @@ Pandoc under the hood.
 
 .. seealso::
 
-  There's also :ref:`addtional documentation <additional-documentation>` that
-  offers more detailed information on how to create content with innoDoc.
+  This section will only give an overview on how to structure your content. It
+  will not provide an exhaustive list of formatting options.
+
+  Please refer to the
+  :ref:`addtional documentation <additional_documentation>`. It offers more
+  detailed information on how to create content with innoDoc.
 
 Best practices
 --------------
@@ -46,12 +50,14 @@ Your content typically resides in a dedicated directory referred to as *root
 directory* from now on. There are some conventions that you need to follow.
 These are explained in this section.
 
+.. _manifest_file:
+
 The manifest file
 ~~~~~~~~~~~~~~~~~
 
 The root directory is home to the :file:`manifest.yml` file. It is used to
 store meta information about your content, like the title, the languages and so
-on.
+on. It is written in `YAML format <https://yaml.org/>`_.
 
 .. code-block:: yaml
   :caption: A minimal example for a content manifest.
@@ -63,10 +69,10 @@ on.
 
 .. note::
 
-  If your content uses only one language, you will still need to put this
-  single language here.
+  If your content uses just one language, you will still need to list the
+  language here.
 
-.. _directory-and-file-structure:
+.. _directory_and_file_structure:
 
 Directory and file structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,78 +89,18 @@ directory.
 Under each language directory there is a structure of folders reflecting the
 part/chapter/section structure of the text.
 
-.. note:: Every directory needs one :file:`content.md`.
+The names of the directories determine the section order. They are sorted
+alphanumerically. Therefore it's advisable to use a numerical prefix (e.g.
+``01-section``).
 
-The names of the directories determine the order in the actual text. They are
-sorted alphanumerically. The directory name itself can be used to create
-cross-references from one part in the the text to another. Also, they might
-appear in more technical contexts such as
-:abbr:`URLs (Uniform Resource Locator)`.
+The directory name itself is the ID for the section and can
+be used to create cross-references from one part in the the text to another.
+Also, they are used to form :abbr:`URLs (Uniform Resource Locator)`.
 
 .. note::
   While technically not strictly required, for convenience it's advisable to
   limit directory names to characters, numbers, hyphen and underscore
   (``a-z``, ``0-9``, ``-`` and ``_``).
-
-.. code-block:: text
-  :caption: Example directory structure for two languages.
-
-  root
-  ├── manifest.yml
-  ├── en
-  |   ├── content.md
-  |   ├── 01-part
-  |   |   ├── content.md
-  |   |   ├── 01-section
-  |   |   |   └── content.md
-  |   |   └── …
-  |   └── …
-  └── de
-      ├── content.md
-      ├── 01-part
-      |   ├── content.md
-      |   ├── 01-section
-      |   |   └── content.md
-      |   └── …
-      └── …
-
-.. important::
-
-  The directory structure in each of the language folders need to match!
-
-.. _static_files:
-
-Static files
-````````````
-
-There can be optional directories :file:`_static` for media files.
-
-These can exist in two different locations: Either at the root folder or inside
-a language folder. Some files might have a translated version. To account for
-this a localized version of the file can be put in the language's static
-folder.
-
-.. code-block:: text
-  :caption: Locations for static files.
-
-  root
-  ├── _static
-  |   ├── chart.svg
-  |   └── image.png
-  ├── en
-  |   ├── _static
-  |   |   └── video.mp4
-  └── de
-      └── _static
-          └── video.mp4
-
-*For the sake of clarity other needed files and directories are omitted in this
-listing.*
-
-.. _content_files:
-
-Content files
-~~~~~~~~~~~~~
 
 A file :file:`content.md` needs to exist in every section folder. It has a
 small section at the top of the file called
@@ -175,15 +121,100 @@ After the metablock you can write your actual content.
   A :file:`content.md` needs to exist for every language version, e.g.
   :file:`en/section01/content.md` and :file:`de/section01/content.md`.
 
-This section will not provide an exhaustive list of formatting options. Instead
-it will mainly focus on some features that are unique to innoDoc.
+Custom pages
+````````````
 
-.. _additional-documentation:
+A course can also include custom pages that are not part of the section
+structure. You can define pages by adding them to the ``pages`` key of the
+:ref:`manifest file <manifest_file>`. You need to define an ID, optionally an
+icon and can choose if the page should show up in the navigation and footer
+part of the viewer.
+
+.. code-block:: yaml
+
+  pages:
+    - id: about
+      icon: info-circle
+      link_in_nav: true
+      link_in_footer: true
+
+For every page you need to provide a content file in each language. It uses
+the page ID as the name (e.g. :file:`about.md`). The content file is
+placed in the :file:`_pages` directory inside the language folder.
+
+Pages also need a YAML header like described in
+:ref:`sections_and_subsections`.
+
+Example directory structure
+```````````````````````````
+
+.. code-block:: text
+  :caption: Example directory structure for two languages.
+
+  root
+  ├── manifest.yml
+  ├── en
+  |   ├── _pages
+  |   |   ├── about.md
+  |   |   └── …
+  |   ├── content.md
+  |   ├── 01-part
+  |   |   ├── content.md
+  |   |   ├── 01-section
+  |   |   |   └── content.md
+  |   |   └── …
+  |   └── …
+  └── de
+      ├── _pages
+      |   ├── about.md
+      |   └── …
+      ├── content.md
+      ├── 01-part
+      |   ├── content.md
+      |   ├── 01-section
+      |   |   └── content.md
+      |   └── …
+      └── …
+
+.. important::
+
+  The directory structure in each of the language folders need to match!
+
+.. _static_files:
+
+Static files
+````````````
+
+The directory :file:`_static` is used for placing static files such as images
+and videos.
+
+The directory exists under the root and can also be placed inside a language
+folder for content that needs to be localized. The converter will  prefer files
+from the localized folder.
+
+.. code-block:: text
+  :caption: Locations for static files.
+
+  root
+  ├── _static
+  |   ├── chart.svg
+  |   └── image.png
+  ├── en
+  |   └── _static
+  |       └── video.mp4
+  └── de
+      └── _static
+          └── video.mp4
+
+*For the sake of clarity other needed files and directories are omitted in this
+listing.*
+
+.. _additional_documentation:
 
 Additional documentation
 ------------------------
 
-For a more detailed instructions including examples on how to author content
+For more detailed instructions including examples on how to author content
 refer to the innoDoc example course. It features in-depth descriptions on all
 content elements and the general course structure.
 
@@ -195,5 +226,5 @@ content elements and the general course structure.
 Links
 ~~~~~
 
-* `Live version <https://veundmint.innocampus.tu-berlin.de/>`_
+* `innoDoc example course <https://veundmint.innocampus.tu-berlin.de/>`_
 * `Source repository <https://gitlab.tu-berlin.de/innodoc/tub_base>`_
