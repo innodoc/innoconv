@@ -45,7 +45,7 @@ class Manifest:
     """
 
     required_fields = ("title", "languages")
-    optional_fields = ("keywords", "license", "pages")
+    optional_fields = ("home_link", "keywords", "license", "pages")
 
     def __init__(self, data):
         """Initialize Manifest."""
