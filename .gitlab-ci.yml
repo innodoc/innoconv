@@ -18,10 +18,6 @@ variables: &variables
   IMAGE_CI_TAG: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG
   IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
 
-before_script:
-  - source /etc/profile
-  - source $HOME/.bash_profile
-
 .docker-default-vars: &docker-default-vars
   <<: *variables
   GIT_SUBMODULE_STRATEGY: none
