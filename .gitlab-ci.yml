@@ -151,6 +151,7 @@ Push tag image:
 
 Upload to PyPI:
   stage: release
+  image: $IMAGE_CI_TAG
   script:
     - if echo "$CI_COMMIT_TAG" | grep -qvE "$SEMVER_REGEXP"; then echo "Not a semver tag. Happily skipping..."; exit 0; fi
     - tox -e release
