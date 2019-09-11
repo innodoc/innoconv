@@ -1,5 +1,5 @@
 innoconv.ext.write_manifest
-==================================
+===========================
 
 .. automodule:: innoconv.ext.write_manifest
 

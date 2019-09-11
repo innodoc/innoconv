@@ -1,5 +1,5 @@
 innoconv.ext.join_strings
-================================
+=========================
 
 .. automodule:: innoconv.ext.join_strings
 
