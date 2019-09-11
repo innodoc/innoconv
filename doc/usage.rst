@@ -5,7 +5,7 @@ How to use innoConv
 
 The principle way of using innoConv is the :abbr:`CLI (Command-line interface)`
 :program:`innoconv`. Another option is to use innoConv in a
-:ref:`programmatic way <innoconv-as-a-library>` as Python library.
+:ref:`programmatic way <innoconv_as_a_library>` as Python library.
 
 Run the converter on your content directory.
 
@@ -23,7 +23,7 @@ unsuccessful run.
   conversion was successful. Though you might pass the
   :option:`--verbose <innoconv --verbose>` flag to change this behavior.
 
-.. _command-line-arguments:
+.. _command_line_arguments:
 
 Command line arguments
 ----------------------
@@ -31,7 +31,7 @@ Command line arguments
 .. click:: innoconv.cli:cli
    :prog: innoconv
 
-.. _innoconv-as-a-library:
+.. _innoconv_as_a_library:
 
 Using innoConv as a library
 ---------------------------

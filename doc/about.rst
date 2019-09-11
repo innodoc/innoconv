@@ -10,12 +10,12 @@ help of an :ref:`innodoc-compatible viewer <viewers>`.
 It takes plain-text files as a source. These are written in the
 `Markdown language <https://daringfireball.net/projects/markdown/>`_ and
 stored in a particular
-:ref:`directory structure <directory-and-file-structure>` reflecting the
+:ref:`directory structure <directory_and_file_structure>` reflecting the
 sections and subsections of the work.
 
 .. seealso::
 
-  Check out the :ref:`addtional documentation <additional-documentation>` to
+  Check out the :ref:`addtional documentation <additional_documentation>` to
   see how a real course looks like.
 
 Features
