@@ -63,6 +63,21 @@ class GenerateToc(AbstractExtension):
                 all_parts.insert(0, parts[1])
         return all_parts
 
+    @staticmethod
+    def _remove_empty_children(toc):
+        """Remove empty children list from toc entries."""
+
+        def _check_section(section):
+            if not section["children"]:
+                del section["children"]
+            else:
+                for child in section["children"]:
+                    _check_section(child)
+
+        for section in toc:
+            _check_section(section)
+        return toc
+
     # extension events
 
     def start(self, output_dir, _):
@@ -84,4 +99,4 @@ class GenerateToc(AbstractExtension):
 
     def manifest_fields(self):
         """Add `toc` field to manifest."""
-        return {"toc": self._toc}
+        return {"toc": self._remove_empty_children(self._toc)}

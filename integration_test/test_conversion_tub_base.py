@@ -2,12 +2,13 @@
 
 import json
 from os import listdir, sep, walk
-from os.path import isdir, isfile, join
+from os.path import basename, isdir, isfile, join
 from subprocess import PIPE, Popen
 
 from innoconv.constants import (
     CONTENT_BASENAME,
     MANIFEST_BASENAME,
+    PAGES_FOLDER,
     STATIC_FOLDER,
 )
 from innoconv.ext.tikz2svg import TIKZ_FOLDER
@@ -22,6 +23,11 @@ class TestConversionTubBase(BaseConversionTest):
 
     Extensive test of innoConv features combined including extensions.
     """
+
+    def setUp(self):
+        """Init attributes."""
+        super().setUp()
+        self._section_output_dirs = {}
 
     def test_conversion(self):
         """A conversion should run without problems."""
@@ -39,101 +45,190 @@ class TestConversionTubBase(BaseConversionTest):
         if process.returncode != 0:
             print(stdout)
             print(stderr)
-        self.assertEqual(process.returncode, 0)
-        self._test_converted_folders_present()
+        self.assertIs(process.returncode, 0)
+
+        for lang in ("de", "en"):
+            self._section_output_dirs[lang] = [
+                join(self.output_dir, dirname.replace(REPO_DIR + sep, ""))
+                for dirname, *_ in walk(join(REPO_DIR, lang))
+                if not basename(dirname).startswith("_")
+                and STATIC_FOLDER not in dirname
+            ]
+
+        self._test_section_folders_present()
         self._test_each_folder_has_content()
         self._test_verbose_output(stderr)
-        with self.subTest(extension="copystatic"):
-            self._test_copy_static()
-        with self.subTest(extension="join_strings"):
-            self._test_join_strings()
-        with self.subTest(extension="write_manifest"):
-            data = self._test_write_manifest(stderr)
-        with self.subTest(extension="generate_toc"):
-            self._test_generate_toc(data)
-        with self.subTest(extension="tikz2svg"):
-            self._test_tikz2svg()
+        manifest = self._test_write_manifest()
+        self._test_pages_present(manifest["pages"])
+        self._test_fragments_present()
+        self._test_copy_static()
+        self._test_generate_toc(manifest["toc"])
+        self._test_index_terms(manifest["index_terms"])
+        self._test_join_strings()
+        self._test_tikz2svg()
 
-    def _test_converted_folders_present(self):
+    def _test_section_folders_present(self):
         for lang in ("de", "en"):
-            self.assertTrue(isdir(join(self.output_dir, lang)))
-            self.assertTrue(isdir(join(self.output_dir, lang, "02-elements")))
-            self.assertTrue(
-                isdir(join(self.output_dir, lang, "02-elements", "01-headers"))
-            )
-            self.assertTrue(isdir(join(self.output_dir, lang, "01-project")))
+            for dir_name in self._section_output_dirs[lang]:
+                with self.subTest(dir_name=dir_name):
+                    self.assertTrue(isdir(dir_name))
 
     def _test_each_folder_has_content(self):
         for lang in ("de", "en"):
-            for dir_names, _, file_list in walk(join(self.output_dir, lang)):
-                skip = False
-                for dir_name in dir_names.split(sep):
-                    if dir_name.startswith("_"):
-                        skip = True
-                if not skip:
-                    self.assertIn(OUTPUT_CONTENT_FILENAME, file_list)
+            for dir_name in self._section_output_dirs[lang]:
+                with self.subTest(dir_name=dir_name):
+                    self.assertIn(OUTPUT_CONTENT_FILENAME, listdir(dir_name))
 
-    def _test_join_strings(self):
-        filepath = join(self.output_dir, "de", OUTPUT_CONTENT_FILENAME)
-        with open(filepath) as file:
-            data = json.load(file)
-            paragraph = data[0]
-            self.assertEqual(paragraph["t"], "Para")
-            content = paragraph["c"][0]
-            self.assertEqual(content["t"], "Str")
-            self.assertIn("Dies ist ein Beispiel-Kurs", content["c"])
+    def _test_pages_present(self, pages):
+        self.assertIs(len(pages), 2)
+        about_page, license_page = pages
+        self.assertEqual(about_page["id"], "about")
+        self.assertEqual(about_page["icon"], "info-circle")
+        self.assertEqual(about_page["link_in_nav"], True)
+        self.assertEqual(about_page["link_in_footer"], True)
+        self.assertEqual(license_page["id"], "license")
+        self.assertEqual(license_page["icon"], "copyright")
+        self.assertEqual(license_page["link_in_nav"], False)
+        self.assertEqual(license_page["link_in_footer"], True)
+        for lang in ("de", "en"):
+            for page in ("about", "license"):
+                file = join(
+                    self.output_dir, lang, PAGES_FOLDER, "{}.json".format(page)
+                )
+                with self.subTest(file=file):
+                    self.assertTrue(isfile(file))
 
-    def _test_copy_static(self):
-        files = (
-            ("02-elements", "06-media", "adam.jpg"),
-            ("02-elements", "06-media", "star.png"),
-            ("02-elements", "06-media", "tu-logo.png"),
-            ("02-elements", "06-media", "video.mp4"),
-            ("subfolder", "math.jpg"),
-            ("_en", "02-elements", "06-media", "lines.png"),
-            ("_de", "02-elements", "06-media", "lines.png"),
-        )
-        for file in files:
-            with self.subTest(file=file):
-                full_filename = join(self.output_dir, STATIC_FOLDER, *file)
-                self.assertTrue(isfile(full_filename))
+    def _test_fragments_present(self):
+        for lang in ("de", "en"):
+            for part in ("a", "b"):
+                file = join(
+                    self.output_dir, lang, "_footer_{}.json".format(part)
+                )
+                with self.subTest(file=file):
+                    self.assertTrue(isfile(file))
 
     def _test_verbose_output(self, stderr):
-        for section in ("03-links-and-formatting", "04-quotes"):
-            with self.subTest(section):
-                path = join("de", "02-elements", section, "content.json")
-                self.assertIn(path, stderr)
-        self.assertIn("Build finished!", stderr)
+        for lang in ("de", "en"):
+            for dir_name in self._section_output_dirs[lang]:
+                with self.subTest(dir_name=dir_name):
+                    self.assertIn(dir_name, stderr)
+        self.assertIn("Wrote manifest", stderr)
+
+    def _test_copy_static(self):
+        # files in <root>/<STATIC_FOLDER>
+        static_files = [
+            [
+                join(self.output_dir, dirname.replace(REPO_DIR + sep, ""), file)
+                for file in files
+            ]
+            for dirname, _, files in walk(join(REPO_DIR, STATIC_FOLDER))
+        ]
+        # files in <root>/<lang>/<STATIC_FOLDER>
+        for lang in ("de", "en"):
+            static_files += [
+                [
+                    join(
+                        self.output_dir,
+                        dirname.replace(REPO_DIR + sep, ""),
+                        file,
+                    ).replace(
+                        # <lang>/<STATIC_FOLDER>/file
+                        # -> <STATIC_FOLDER>/_<lang>/file
+                        join(lang, STATIC_FOLDER),
+                        join(STATIC_FOLDER, "_{}".format(lang)),
+                    )
+                    for file in files
+                ]
+                for dirname, _, files in walk(
+                    join(REPO_DIR, lang, STATIC_FOLDER)
+                )
+            ]
+        # remove dups
+        static_files = list(
+            dict.fromkeys(
+                # flatten list
+                [file for sublist in static_files for file in sublist]
+            )
+        )
+
+        for file in static_files:
+            with self.subTest(file=file):
+                self.assertTrue(isfile(file))
+
+    def _test_generate_toc(self, toc):
+        def _test_section(path, parent, children, toc_entry=None):
+            section_id = path.replace(parent + sep, "")
+            if toc_entry:
+                self.assertEqual(toc_entry["id"], section_id)
+                self.assertIn("de", toc_entry["title"])
+                self.assertIn("en", toc_entry["title"])
+            subdirs = [
+                d
+                for d in listdir(path)
+                if isdir(join(path, d)) and not d.startswith("_")
+            ]
+            if subdirs:
+                for index, dir_name in enumerate(sorted(subdirs)):
+                    subsection = children[index]
+                    subsection_children = (
+                        subsection["children"]
+                        if "children" in subsection
+                        else None
+                    )
+                    _test_section(
+                        join(path, dir_name),
+                        path,
+                        subsection_children,
+                        subsection,
+                    )
+            else:
+                self.assertIsNone(children)
+
+        _test_section(join(REPO_DIR, "en"), REPO_DIR, toc)
+
+    def _test_index_terms(self, index_terms):
+        # TODO
+        pass
+
+    def _test_join_strings(self):
+        exp_de = (
+            "Ein Kurs besteht aus einer Anzahl von Kapiteln, Abschnitten"
+            " und Unterabschnitten."
+        )
+        exp_en = (
+            "A course consists of a number of chapters, sections"
+            " and subsections."
+        )
+        for lang, exp in (("de", exp_de), ("en", exp_en)):
+            filepath = join(
+                self.output_dir, lang, "01-project", OUTPUT_CONTENT_FILENAME
+            )
+            with open(filepath) as file:
+                data = json.load(file)
+                paragraph = data[0]
+                content = paragraph["c"][0]
+                with self.subTest(file=file):
+                    self.assertEqual(content["t"], "Str")
+                    self.assertIn(exp, content["c"])
 
     def _test_tikz2svg(self):
         folder = join(self.output_dir, STATIC_FOLDER, TIKZ_FOLDER)
         length = len([n for n in listdir(folder) if n.endswith(".svg")])
-        self.assertEqual(length, 5)
+        self.assertIs(length, 5)
 
-    def _test_write_manifest(self, stderr):
+    def _test_write_manifest(self):
         filepath = join(self.output_dir, "{}.json".format(MANIFEST_BASENAME))
         self.assertTrue(isfile(filepath))
         with open(filepath) as file:
             data = json.load(file)
-            self.assertIn("languages", data)
-            self.assertIn("de", data["languages"])
-            self.assertIn("en", data["languages"])
-            self.assertIn("title", data)
-            self.assertIn("de", data["title"])
-            self.assertIn("en", data["title"])
-            self.assertEqual("innoDoc-Showcase-Kurs", data["title"]["de"])
-            self.assertEqual("innoDoc Showcase Course", data["title"]["en"])
-        self.assertIn("Wrote manifest", stderr)
+        self.assertIn("languages", data)
+        self.assertIn("de", data["languages"])
+        self.assertIn("en", data["languages"])
+        self.assertIn("title", data)
+        self.assertIn("de", data["title"])
+        self.assertIn("en", data["title"])
+        self.assertIn("logo", data)
+        self.assertIn("home_link", data)
+        self.assertEqual("innoDoc", data["title"]["de"])
+        self.assertEqual("innoDoc", data["title"]["en"])
         return data
-
-    def _test_generate_toc(self, data):
-        self.assertIn("toc", data)
-        self.assertIn("title", data["toc"][0])
-        self.assertIn("id", data["toc"][0])
-        self.assertIn("children", data["toc"][0])
-        self.assertEqual(4, len(data["toc"][0]["children"]))
-        self.assertEqual("01-project", data["toc"][0]["id"])
-        self.assertIn("de", data["toc"][0]["title"])
-        self.assertIn("en", data["toc"][0]["title"])
-        self.assertEqual("Projektstruktur", data["toc"][0]["title"]["de"])
-        self.assertEqual("Project structure", data["toc"][0]["title"]["en"])
