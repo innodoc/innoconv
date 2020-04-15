@@ -1,7 +1,7 @@
-FROM python:3.7-alpine3.10
+FROM python:3.8-alpine3.11
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
-ENV PANDOC_VERSION 2.7.3
+ENV PANDOC_VERSION 2.9.2.1
 ENV PDF2SVG_VERSION 0.2.3
 
 RUN set -xe && \

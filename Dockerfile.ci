@@ -3,11 +3,11 @@
 ARG INNOCONV_IMAGE=innodoc/innoconv
 FROM $INNOCONV_IMAGE AS innoconv
 
-FROM alpine:3.10
+FROM alpine:3.11
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
 ARG PYTHON_VERSIONS
-ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.7.2 3.6.8 3.5.6}
+ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.8.2 3.7.7 3.6.10 3.5.8}
 
 RUN set -xe && \
     apk update && \
