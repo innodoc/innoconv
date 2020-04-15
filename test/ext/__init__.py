@@ -28,9 +28,7 @@ class TestExtension(unittest.TestCase):
     """
 
     @staticmethod
-    def _run(
-        extension, ast=None, languages=("en", "de"), paths=PATHS, manifest=None
-    ):
+    def _run(extension, ast=None, languages=("en", "de"), paths=PATHS, manifest=None):
         if ast is None:
             ast = get_filler_content()
         title = {}
@@ -42,9 +40,7 @@ class TestExtension(unittest.TestCase):
             if issubclass(extension, AbstractExtension):
                 ext = extension(manifest)
             else:
-                raise ValueError(
-                    "extension not a sub-class of AbstractExtension!"
-                )
+                raise ValueError("extension not a sub-class of AbstractExtension!")
         except TypeError:
             ext = extension
         ext.start(DEST, SOURCE)

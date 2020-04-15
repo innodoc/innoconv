@@ -13,9 +13,7 @@ ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 METADATA_PATH = os.path.join(ROOT_DIR, "innoconv", "metadata.py")
 with open(METADATA_PATH, "r") as metadata_file:
     METADATA = dict(
-        re.findall(
-            r"__([a-z_]+)__\s*=\s*['\"]([^'\"]+)['\"]", metadata_file.read()
-        )
+        re.findall(r"__([a-z_]+)__\s*=\s*['\"]([^'\"]+)['\"]", metadata_file.read())
     )
 
 
@@ -47,9 +45,7 @@ def setup_package():
         long_description_content_type="text/markdown",
         url=METADATA["url"],
         zip_safe=False,
-        project_urls={
-            "Documentation": "https://readthedocs.org/projects/innoconv/"
-        },
+        project_urls={"Documentation": "https://readthedocs.org/projects/innoconv/"},
         classifiers=[
             "Development Status :: 4 - Beta",
             "Environment :: Console",

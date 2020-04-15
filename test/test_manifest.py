@@ -39,9 +39,7 @@ class TestManifestFromDirectory(unittest.TestCase):
         """Ensure a manifest.yml is accepted."""
         manifest = Manifest.from_directory("/path/to/content")
         self.assertIsInstance(manifest, Manifest)
-        self.assertEqual(
-            mopen.call_args, call("/path/to/content/manifest.yml", "r")
-        )
+        self.assertEqual(mopen.call_args, call("/path/to/content/manifest.yml", "r"))
 
     def test_yaml_ext(self, mopen):
         """Ensure a manifest.yaml is accepted."""

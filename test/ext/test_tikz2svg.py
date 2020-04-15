@@ -70,10 +70,7 @@ class TestTikz2Svg(TestExtension):
         """Test conversion with caption."""
         input_ast = [
             {
-                "c": [
-                    ["", ["figure"], []],
-                    [get_para_ast(), deepcopy(TIKZ_BLOCK)],
-                ],
+                "c": [["", ["figure"], []], [get_para_ast(), deepcopy(TIKZ_BLOCK)]],
                 "t": "Div",
             }
         ]
@@ -104,9 +101,7 @@ class TestTikz2Svg(TestExtension):
         input_ast = [deepcopy(TIKZ_BLOCK)]
         self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
         self.assertEqual(mock_ct.call_count, 2)
-        self.assertEqual(
-            mock_rmtree.call_args, call("/destination/_static/_tikz")
-        )
+        self.assertEqual(mock_rmtree.call_args, call("/destination/_static/_tikz"))
 
     def test_no_tikz_images(self, *_):
         """Test without any TikZ images."""

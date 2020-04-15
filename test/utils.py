@@ -123,8 +123,7 @@ def get_complex_ast():
         get_para_ast(
             [
                 get_generic_link_ast(
-                    [get_image_ast("example_image.jpg")],
-                    "http://www.tu-berlin.de",
+                    [get_image_ast("example_image.jpg")], "http://www.tu-berlin.de",
                 )
             ]
         ),

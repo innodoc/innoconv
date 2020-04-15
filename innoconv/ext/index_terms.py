@@ -27,9 +27,7 @@ INDEX_ID_TEMPLATE = "index-term-{}-{}"
 class IndexTerms(AbstractExtension):
     """Scan the documents for index terms."""
 
-    _helptext = (
-        "Scan the documents for index terms and write them to the manifest."
-    )
+    _helptext = "Scan the documents for index terms and write them to the manifest."
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""

@@ -43,9 +43,7 @@ def _parse_extensions(_, __, value):
     extensions = value.split(",")
     for ext in extensions:
         if ext not in EXTENSIONS.keys():
-            raise click.BadOptionUsage(
-                "-e", "Extension not found: {}".format(ext)
-            )
+            raise click.BadOptionUsage("-e", "Extension not found: {}".format(ext))
     return extensions
 
 
@@ -60,12 +58,9 @@ class CustomEpilogCommand(click.Command):
                 formatter.write_text(line)
 
 
-@click.command(
-    cls=CustomEpilogCommand, help=__description__, epilog=_get_epilog()
-)
+@click.command(cls=CustomEpilogCommand, help=__description__, epilog=_get_epilog())
 @click.argument(
-    "source_dir",
-    type=click.Path(exists=True, file_okay=False, resolve_path=True),
+    "source_dir", type=click.Path(exists=True, file_okay=False, resolve_path=True),
 )
 @click.option(
     "-o",
@@ -85,11 +80,7 @@ class CustomEpilogCommand(click.Command):
     callback=_parse_extensions,
 )
 @click.option(
-    "-f",
-    "--force",
-    is_flag=True,
-    help="Force overwriting of output.",
-    default=False,
+    "-f", "--force", is_flag=True, help="Force overwriting of output.", default=False,
 )
 @click.option("-v", "--verbose", is_flag=True, help="Print verbose messages.")
 @click.version_option(__version__)

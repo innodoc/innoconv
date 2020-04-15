@@ -43,9 +43,7 @@ class GenerateToc(AbstractExtension):
                         break
             # arrived at leaf -> add section
             if not found:
-                children.append(
-                    {"id": section_id, "title": {self._language: title}}
-                )
+                children.append({"id": section_id, "title": {self._language: title}})
         if found:
             found["title"][self._language] = title
 
@@ -58,9 +56,8 @@ class GenerateToc(AbstractExtension):
             if parts[1] == path:
                 all_parts.insert(0, parts[1])
                 break
-            else:
-                path = parts[0]
-                all_parts.insert(0, parts[1])
+            path = parts[0]
+            all_parts.insert(0, parts[1])
         return all_parts
 
     # extension events

@@ -11,15 +11,9 @@ class TestJoinStrings(TestExtension):
 
     @staticmethod
     def _run(
-        extension=JoinStrings,
-        ast=None,
-        languages=("en",),
-        paths=PATHS,
-        manifest=None,
+        extension=JoinStrings, ast=None, languages=("en",), paths=PATHS, manifest=None,
     ):
-        _, [ast] = TestExtension._run(
-            extension, ast, languages=languages, paths=paths
-        )
+        _, [ast] = TestExtension._run(extension, ast, languages=languages, paths=paths)
         return ast
 
     def test_unchanged(self):
@@ -122,11 +116,7 @@ class TestJoinStrings(TestExtension):
         given = [
             {
                 "t": "Strong",
-                "c": [
-                    {"t": "Str", "c": "A"},
-                    {"t": "Space"},
-                    {"t": "Str", "c": "B"},
-                ],
+                "c": [{"t": "Str", "c": "A"}, {"t": "Space"}, {"t": "Str", "c": "B"}],
             }
         ]
         expected = [{"t": "Strong", "c": [{"t": "Str", "c": "A B"}]}]
@@ -191,11 +181,7 @@ class TestJoinStrings(TestExtension):
                 "c": [
                     1,
                     ["a-2", [], []],
-                    [
-                        {"c": "A", "t": "Str"},
-                        {"t": "Space"},
-                        {"c": "B", "t": "Str"},
-                    ],
+                    [{"c": "A", "t": "Str"}, {"t": "Space"}, {"c": "B", "t": "Str"}],
                 ],
                 "t": "Header",
             },
@@ -218,10 +204,7 @@ class TestJoinStrings(TestExtension):
             },
         ]
         expected = [
-            {
-                "c": [1, ["a-2", [], []], [{"c": "A B", "t": "Str"}]],
-                "t": "Header",
-            },
+            {"c": [1, ["a-2", [], []], [{"c": "A B", "t": "Str"}]], "t": "Header"},
             {
                 "c": [
                     {

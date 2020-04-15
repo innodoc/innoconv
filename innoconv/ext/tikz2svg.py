@@ -84,9 +84,7 @@ class Tikz2Svg(AbstractExtension):
 
     @staticmethod
     def _run(cmd, cwd, stdin=None):
-        pipe = Popen(
-            cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd
-        )
+        pipe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd)
         if stdin:
             pipe.stdin.write(stdin.encode(ENCODING))
             pipe.stdin.close()

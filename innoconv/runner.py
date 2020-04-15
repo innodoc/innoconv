@@ -65,9 +65,7 @@ class InnoconvRunner:
         path = abspath(join(self._source_dir, language))
 
         if not isdir(path):
-            raise RuntimeError(
-                "Error: Directory {} does not exist".format(path)
-            )
+            raise RuntimeError("Error: Directory {} does not exist".format(path))
 
         section_num = 0
         for root, dirs, files in walk(path):
@@ -162,9 +160,7 @@ class InnoconvRunner:
         except KeyError:
             page["title"] = {}
         input_filename = "{}.md".format(page["id"])
-        filepath = join(
-            self._source_dir, language, PAGES_FOLDER, input_filename
-        )
+        filepath = join(self._source_dir, language, PAGES_FOLDER, input_filename)
         rel_path = dirname(relpath(filepath, self._source_dir))
 
         # convert
@@ -218,8 +214,6 @@ class InnoconvRunner:
             try:
                 self._extensions.append(EXTENSIONS[ext_name](self._manifest))
             except (ImportError, KeyError) as exc:
-                raise RuntimeError(
-                    "Extension {} not found!".format(ext_name)
-                ) from exc
+                raise RuntimeError("Extension {} not found!".format(ext_name)) from exc
         # pass extension list to extenions
         self._notify_extensions("extension_list", self._extensions)

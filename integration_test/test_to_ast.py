@@ -13,9 +13,7 @@ class TestToAst(unittest.TestCase):
 
     def test_to_ast(self):
         """Test returned AST for a given Markdown document."""
-        blocks, title, short_title = to_ast(
-            "{}/test_valid.md".format(FIXTURES_DIR)
-        )
+        blocks, title, short_title = to_ast("{}/test_valid.md".format(FIXTURES_DIR))
 
         self.assertEqual(title, "Test document")
         self.assertEqual(short_title, "Test")

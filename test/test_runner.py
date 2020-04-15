@@ -29,11 +29,7 @@ def walk_side_effect(path):
     lang = path[-2:]
     return iter(
         [
-            (
-                "/src/{}".format(lang),
-                ["section-1", "section-2"],
-                ["content.md"],
-            ),
+            ("/src/{}".format(lang), ["section-1", "section-2"], ["content.md"],),
             (
                 "/src/{}/section-1".format(lang),
                 ["section-1.1", "section-1.2", "_static"],
@@ -115,9 +111,7 @@ SHORT_TITLE = "Short"
 
 
 @patch("builtins.open")
-@patch(
-    "innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE)
-)
+@patch("innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE))
 @patch("json.dump")
 @patch("innoconv.runner.exists", return_value=True)
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
@@ -159,12 +153,8 @@ class TestInnoconvRunner(unittest.TestCase):
 
         for i, path in enumerate(paths):
             with self.subTest(path):
-                self.assertEqual(
-                    makedirs.call_args_list[i], call(path, exist_ok=True)
-                )
-                self.assertEqual(
-                    json_dump.call_args_list[i][0][0], ["content_ast"]
-                )
+                self.assertEqual(makedirs.call_args_list[i], call(path, exist_ok=True))
+                self.assertEqual(json_dump.call_args_list[i][0][0], ["content_ast"])
 
     def test_run_no_folder(self, isdir, *_):
         """Ensure RuntimeError is raised on missing language folder."""
@@ -218,9 +208,7 @@ class TestInnoconvRunner(unittest.TestCase):
 
 @patch("builtins.open")
 @patch("innoconv.runner.EXTENSIONS", {"my_ext": AbstractExtension})
-@patch(
-    "innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE)
-)
+@patch("innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE))
 @patch("json.dump")
 @patch("innoconv.runner.exists", return_value=True)
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
@@ -284,9 +272,7 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
             "en",
         ]
         for i, arg in enumerate(pre_process_file_args):
-            self.assertEqual(
-                mocks["pre_process_file"].call_args_list[i], call(arg)
-            )
+            self.assertEqual(mocks["pre_process_file"].call_args_list[i], call(arg))
 
         self.assertEqual(mocks["post_process_file"].call_count, 16)
         for i in list(range(0, 5)) + list(range(8, 13)):

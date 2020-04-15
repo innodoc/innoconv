@@ -45,10 +45,7 @@ def to_ast(filepath, ignore_missing_title=False):
     err = err.decode(ENCODING)
 
     if proc.returncode != 0:
-        msg = (
-            "pandoc process returned exit code ({})."
-            "This is the pandoc output:\n{}"
-        )
+        msg = "pandoc process returned exit code ({})." "This is the pandoc output:\n{}"
         raise RuntimeError(msg.format(proc.returncode, err))
 
     loaded = json.loads(out)
@@ -59,9 +56,7 @@ def to_ast(filepath, ignore_missing_title=False):
         if ignore_missing_title:
             title_ast = []
         else:
-            raise ValueError(
-                "Missing title in meta block in {}".format(filepath)
-            )
+            raise ValueError("Missing title in meta block in {}".format(filepath))
     title = to_string(title_ast)
     try:
         short_title_ast = loaded["meta"]["short_title"]["c"]

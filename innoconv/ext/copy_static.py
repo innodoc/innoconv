@@ -130,9 +130,7 @@ class CopyStatic(AbstractExtension):
         dst = _get_dest_file_path(
             self._output_dir, ref_path, section_path, self._current_language
         )
-        rewritten = "_{}/{}{}".format(
-            self._current_language, section_path, ref_path
-        )
+        rewritten = "_{}/{}{}".format(self._current_language, section_path, ref_path)
         if not os.path.isfile(src):
             # common version
             src = _get_src_file_path(self._source_dir, ref_path, section_path)
