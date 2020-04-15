@@ -16,7 +16,7 @@ interpreter.
 Python 3
 ~~~~~~~~
 
-innoConv is being tested and developed with **Python 3.4-3.7**.
+innoConv is being tested and developed with **Python 3.5-3.8**.
 
 Python should be available on the majority of Linux machines nowadays. Usually
 it's being installed using a package manager.

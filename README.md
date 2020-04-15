@@ -8,7 +8,7 @@ Please refer to the [documentation](https://innoconv.readthedocs.io/) for instal
 
 ## Requirements
 
-- [Python >=3.4](https://www.python.org/)
+- [Python >=3.5](https://www.python.org/)
 - [Pandoc](https://pandoc.org/)
 
 For Ti<i>k</i>z support:
@@ -88,7 +88,7 @@ $ tox -e linters
 Run unit and integration tests.
 
 ```sh
-$ tox -e py37-unit,py37-integration
+$ tox -e py38-unit,py38-integration
 ```
 
 #### HTML coverage report
@@ -96,7 +96,7 @@ $ tox -e py37-unit,py37-integration
 A coverage report will be created in `./htmlcov` and served via HTTP.
 
 ```sh
-$ tox -e py37-unit,cov-html,serve-cov
+$ tox -e py38-unit,cov-html,serve-cov
 ```
 
 #### Documentation
