@@ -3,11 +3,11 @@
 ARG INNOCONV_IMAGE=innodoc/innoconv
 FROM $INNOCONV_IMAGE AS innoconv
 
-FROM alpine:3.10
+FROM alpine:3.11
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
 ARG PYTHON_VERSIONS
-ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.7.2 3.6.8 3.5.6}
+ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.8.2 3.7.7 3.6.10 3.5.8}
 
 RUN set -xe && \
     apk update && \
@@ -46,11 +46,14 @@ RUN set -xe && \
     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile && \
     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile && \
     echo 'eval "$(pyenv init -)"' >> ~/.bash_profile && \
-    bash -c 'set -xe; . ~/.bash_profile; for version in $PYTHON_VERSIONS; do pyenv install $version; done; pyenv global $PYTHON_VERSIONS' && \
+    bash -c 'set -xe; . ~/.bash_profile; for version in $PYTHON_VERSIONS; do pyenv install $version; done; pyenv global $PYTHON_VERSIONS'
+
+RUN set -xe && \
     find ~/.pyenv/versions -type d -name "test*" -print0 | xargs -0 rm -rf && \
     find ~/.pyenv/versions -type d -name "share" -print0 | xargs -0 rm -rf && \
-    bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.? .pyenv/versions/$version/bin/python?.?m; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
-    bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.7 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
+    bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.?; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
+    bash -c 'set -xe; for version in $PYTHON_VERSIONS; do test -f .pyenv/versions/$version/bin/python?.?m && strip -s .pyenv/versions/$version/bin/python?.?m; done;' && \
+    bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.8 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
 
 # copy Pandoc and pdf2svg from main image
 USER root

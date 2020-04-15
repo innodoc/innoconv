@@ -65,6 +65,17 @@ Build CI image:
 
 # tox-based tests
 
+Python 3.8 unit tests:
+  stage: test
+  image: $IMAGE_CI_TAG
+  script: tox -e py38-unit
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
+
+Python 3.8 integration tests:
+  stage: test
+  image: $IMAGE_CI_TAG
+  script: tox -e py38-integration
+
 Python 3.7 unit tests:
   stage: test
   image: $IMAGE_CI_TAG

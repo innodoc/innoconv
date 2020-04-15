@@ -1,7 +1,7 @@
-FROM python:3.7-alpine3.10
+FROM python:3.8-alpine3.11
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
-ENV PANDOC_VERSION 2.7.3
+ENV PANDOC_VERSION 2.9.2.1
 ENV PDF2SVG_VERSION 0.2.3
 
 RUN set -xe && \
@@ -32,7 +32,7 @@ RUN set -xe && \
     rm -r /tmp/pdf2svg-${PDF2SVG_VERSION}
 
 # install pandoc
-RUN wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux.tar.gz \
+RUN wget -qO- https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux-amd64.tar.gz \
     | tar -xzf - --strip-components 2 -C /usr/local/bin pandoc-${PANDOC_VERSION}/bin/pandoc
 
 # install innoconv
