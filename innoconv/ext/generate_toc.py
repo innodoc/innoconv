@@ -29,29 +29,30 @@ class GenerateToc(AbstractExtension):
         if not path_components:  # skip root section
             return
         children = self._toc
-        while path_components:
-            section_id = path_components.pop(0)
-            # find/create child leaf
-            found = None
-            for child in children:
-                if child["id"] == section_id:
-                    found = child
-                    try:
-                        children = child["children"]
-                    except KeyError:
-                        children = child["children"] = []
-                        break
-            # arrived at leaf -> add section
-            if not found:
-                children.append({"id": section_id, "title": {self._language: title}})
-        if found:
-            found["title"][self._language] = title
+        while True:
+            path_component = path_components.pop(0)
+            child = None
+            for check_child in children:
+                if check_child["id"] == path_component:
+                    child = check_child
+                    break
+            if not child:
+                child = {"id": path_component, "title": {}}
+                children.append(child)
+            if path_components and "children" not in child:
+                # add children list, except in leaf nodes
+                child["children"] = []
+            if path_components:
+                children = child["children"]
+            else:
+                break
+        child["title"][self._language] = title
 
     @staticmethod
     def _splitall(path):
         """Split path into directory components."""
         all_parts = []
-        while 1:
+        while True:
             parts = split(path)
             if parts[1] == path:
                 all_parts.insert(0, parts[1])
