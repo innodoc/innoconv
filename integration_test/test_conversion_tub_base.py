@@ -171,6 +171,7 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertIn("title", data)
             self.assertIn("de", data["title"])
             self.assertIn("en", data["title"])
+            self.assertIn("mathjax", data)
             self.assertEqual("innoDoc", data["title"]["de"])
             self.assertEqual("innoDoc", data["title"]["en"])
             self.assertEqual("_logo.svg", data["logo"])
