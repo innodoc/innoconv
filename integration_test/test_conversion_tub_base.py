@@ -40,22 +40,23 @@ class TestConversionTubBase(BaseConversionTest):
             print(stdout)
             print(stderr)
         self.assertEqual(process.returncode, 0)
+
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
         self._test_verbose_output(stderr)
         with self.subTest(extension="write_manifest"):
-            manifest_data = self._test_write_manifest(stderr)
-        self._test_pages(manifest_data)
+            manifest = self._test_write_manifest(stderr)
+        self._test_pages(manifest)
         with self.subTest(extension="copystatic"):
             self._test_copy_static()
         with self.subTest(extension="join_strings"):
             self._test_join_strings()
         with self.subTest(extension="generate_toc"):
-            self._test_generate_toc(manifest_data)
+            self._test_generate_toc(manifest)
         with self.subTest(extension="tikz2svg"):
             self._test_tikz2svg()
         with self.subTest(extension="index_terms"):
-            self._test_index_terms(manifest_data)
+            self._test_index_terms(manifest)
 
     def _test_converted_folders_present(self):
         for lang in ("de", "en"):
@@ -76,10 +77,33 @@ class TestConversionTubBase(BaseConversionTest):
                 if not skip:
                     self.assertIn(OUTPUT_CONTENT_FILENAME, file_list)
 
-    def _test_pages(self, data):
-        # TODO
+    def _test_pages(self, manifest):
         for lang in ("de", "en"):
-            pass
+            self.assertTrue(isdir(join(self.output_dir, lang, "_pages")))
+            self.assertTrue(isfile(join(self.output_dir, lang, "_pages", "about.json")))
+            self.assertTrue(
+                isfile(join(self.output_dir, lang, "_pages", "license.json"))
+            )
+        self.assertEqual(2, len(manifest["pages"]))
+        page_about, page_license = manifest["pages"]
+
+        self.assertEqual("about", page_about["id"])
+        self.assertEqual("info-circle", page_about["icon"])
+        self.assertEqual(True, page_about["link_in_nav"])
+        self.assertEqual(True, page_about["link_in_footer"])
+        self.assertEqual("Über diesen Kurs", page_about["title"]["de"])
+        self.assertEqual("About this course", page_about["title"]["en"])
+        self.assertEqual("Über", page_about["short_title"]["de"])
+        self.assertEqual("About", page_about["short_title"]["en"])
+
+        self.assertEqual("license", page_license["id"])
+        self.assertEqual("copyright", page_license["icon"])
+        self.assertEqual(False, page_license["link_in_nav"])
+        self.assertEqual(True, page_license["link_in_footer"])
+        self.assertEqual("Lizenz", page_license["title"]["de"])
+        self.assertEqual("License", page_license["title"]["en"])
+        self.assertEqual("Lizenz", page_license["short_title"]["de"])
+        self.assertEqual("License", page_license["short_title"]["en"])
 
     def _test_join_strings(self):
         filepath = join(self.output_dir, "en", "01-project", OUTPUT_CONTENT_FILENAME)
@@ -136,7 +160,6 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertEqual("innoDoc", data["title"]["en"])
             self.assertEqual("_logo.svg", data["logo"])
             self.assertEqual("/page/about", data["home_link"])
-            self.assertEqual(2, len(data["pages"]))
         self.assertIn("Wrote manifest", stderr)
         return data
 
