@@ -25,13 +25,11 @@ before_script:
 .docker-default-vars: &docker-default-vars
   <<: *variables
   GIT_SUBMODULE_STRATEGY: none
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay # TODO: should be overlay2 (https://github.com/docker/for-linux/issues/711)
 
 .docker-base: &docker-base
   image: docker
   services:
-    - docker:18.09.7-dind # TODO: should be docker:dind (https://gitlab.com/gitlab-org/gitlab-runner/issues/4501)
+    - docker:dind
   before_script:
     - echo "$CI_JOB_TOKEN" | docker login --username gitlab-ci-token --password-stdin "$CI_REGISTRY"
   after_script:
