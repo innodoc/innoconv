@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 
 from innoconv.constants import (
     CONTENT_BASENAME,
+    FOOTER_FRAGMENT_PREFIX,
     MANIFEST_BASENAME,
     STATIC_FOLDER,
 )
@@ -43,6 +44,7 @@ class TestConversionTubBase(BaseConversionTest):
 
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
+        self._test_footer_fragments()
         self._test_verbose_output(stderr)
         with self.subTest(extension="write_manifest"):
             manifest = self._test_write_manifest(stderr)
@@ -66,6 +68,16 @@ class TestConversionTubBase(BaseConversionTest):
                 isdir(join(self.output_dir, lang, "02-elements", "02-headings"))
             )
             self.assertTrue(isdir(join(self.output_dir, lang, "01-project")))
+
+    def _test_footer_fragments(self):
+        for lang in ("de", "en"):
+            for part in ("a", "b"):
+                filename = "{}{}.json".format(FOOTER_FRAGMENT_PREFIX, part)
+                filepath = join(self.output_dir, lang, filename)
+                with open(filepath) as file:
+                    data = json.load(file)
+                    self.assertIsInstance(data, list)
+                    self.assertTrue(len(data) > 1)
 
     def _test_each_folder_has_content(self):
         for lang in ("de", "en"):
