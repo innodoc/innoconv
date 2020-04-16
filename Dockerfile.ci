@@ -49,8 +49,9 @@ RUN set -xe && \
     bash -c 'set -xe; . ~/.bash_profile; for version in $PYTHON_VERSIONS; do pyenv install $version; done; pyenv global $PYTHON_VERSIONS' && \
     find ~/.pyenv/versions -type d -name "test*" -print0 | xargs -0 rm -rf && \
     find ~/.pyenv/versions -type d -name "share" -print0 | xargs -0 rm -rf && \
-    bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.? .pyenv/versions/$version/bin/python?.?m; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
-    bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.7 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
+    bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.?; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
+    bash -c 'set -xe; for version in $PYTHON_VERSIONS; do test -f .pyenv/versions/$version/bin/python?.?m && strip -s .pyenv/versions/$version/bin/python?.?m; done;' && \
+    bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.8 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
 
 # copy Pandoc and pdf2svg from main image
 USER root
