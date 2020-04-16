@@ -14,6 +14,7 @@ import json
 import logging
 from os import makedirs, walk
 from os.path import abspath, dirname, exists, isdir, join, relpath
+import pathlib
 
 from innoconv.constants import (
     CONTENT_BASENAME,
@@ -69,10 +70,14 @@ class InnoconvRunner:
 
         section_num = 0
         for root, dirs, files in walk(path):
+            rel_path = relpath(root, path)
+
+            # skip meta directories like '_static'
+            parts = pathlib.Path(rel_path).parts
+            if parts and parts[0].startswith("_"):
+                continue
+
             # note: all dirs manipulation must happen in-place!
-            for i, directory in enumerate(dirs):
-                if directory.startswith("_"):
-                    del dirs[i]  # skip meta directories like '_static'
             dirs.sort()  # sort section names
 
             # process section
