@@ -27,6 +27,7 @@ RUN set -xe && \
       poppler-glib \
       readline-dev \
       sqlite-dev \
+      sqlite-libs \
       texlive \
       texmf-dist \
       texmf-dist-latexextra \
