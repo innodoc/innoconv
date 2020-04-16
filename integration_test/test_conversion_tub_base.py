@@ -43,23 +43,26 @@ class TestConversionTubBase(BaseConversionTest):
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
         self._test_verbose_output(stderr)
+        with self.subTest(extension="write_manifest"):
+            manifest_data = self._test_write_manifest(stderr)
+        self._test_pages(manifest_data)
         with self.subTest(extension="copystatic"):
             self._test_copy_static()
         with self.subTest(extension="join_strings"):
             self._test_join_strings()
-        with self.subTest(extension="write_manifest"):
-            data = self._test_write_manifest(stderr)
         with self.subTest(extension="generate_toc"):
-            self._test_generate_toc(data)
+            self._test_generate_toc(manifest_data)
         with self.subTest(extension="tikz2svg"):
             self._test_tikz2svg()
+        with self.subTest(extension="index_terms"):
+            self._test_index_terms(manifest_data)
 
     def _test_converted_folders_present(self):
         for lang in ("de", "en"):
             self.assertTrue(isdir(join(self.output_dir, lang)))
             self.assertTrue(isdir(join(self.output_dir, lang, "02-elements")))
             self.assertTrue(
-                isdir(join(self.output_dir, lang, "02-elements", "01-headers"))
+                isdir(join(self.output_dir, lang, "02-elements", "02-headings"))
             )
             self.assertTrue(isdir(join(self.output_dir, lang, "01-project")))
 
@@ -73,25 +76,33 @@ class TestConversionTubBase(BaseConversionTest):
                 if not skip:
                     self.assertIn(OUTPUT_CONTENT_FILENAME, file_list)
 
+    def _test_pages(self, data):
+        # TODO
+        for lang in ("de", "en"):
+            pass
+
     def _test_join_strings(self):
-        filepath = join(self.output_dir, "de", OUTPUT_CONTENT_FILENAME)
+        filepath = join(self.output_dir, "en", "01-project", OUTPUT_CONTENT_FILENAME)
         with open(filepath) as file:
             data = json.load(file)
             paragraph = data[0]
             self.assertEqual(paragraph["t"], "Para")
             content = paragraph["c"][0]
             self.assertEqual(content["t"], "Str")
-            self.assertIn("Dies ist ein Beispiel-Kurs", content["c"])
+            self.assertIn(
+                "A course consists of a number of chapters, sections and subsections.",
+                content["c"],
+            )
 
     def _test_copy_static(self):
         files = (
-            ("02-elements", "06-media", "adam.jpg"),
-            ("02-elements", "06-media", "star.png"),
-            ("02-elements", "06-media", "tu-logo.png"),
-            ("02-elements", "06-media", "video.mp4"),
+            ("02-elements", "07-media", "adam.jpg"),
+            ("02-elements", "07-media", "star.png"),
+            ("02-elements", "07-media", "tu-logo.png"),
+            ("02-elements", "07-media", "video.mp4"),
             ("subfolder", "math.jpg"),
-            ("_en", "02-elements", "06-media", "lines.png"),
-            ("_de", "02-elements", "06-media", "lines.png"),
+            ("_en", "02-elements", "07-media", "lines.png"),
+            ("_de", "02-elements", "07-media", "lines.png"),
         )
         for file in files:
             with self.subTest(file=file):
@@ -99,7 +110,7 @@ class TestConversionTubBase(BaseConversionTest):
                 self.assertTrue(isfile(full_filename))
 
     def _test_verbose_output(self, stderr):
-        for section in ("03-links-and-formatting", "04-quotes"):
+        for section in ("06-formulas", "09-interactive-exercises"):
             with self.subTest(section):
                 path = join("de", "02-elements", section, "content.json")
                 self.assertIn(path, stderr)
@@ -121,19 +132,27 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertIn("title", data)
             self.assertIn("de", data["title"])
             self.assertIn("en", data["title"])
-            self.assertEqual("innoDoc-Showcase-Kurs", data["title"]["de"])
-            self.assertEqual("innoDoc Showcase Course", data["title"]["en"])
+            self.assertEqual("innoDoc", data["title"]["de"])
+            self.assertEqual("innoDoc", data["title"]["en"])
+            self.assertEqual("_logo.svg", data["logo"])
+            self.assertEqual("/page/about", data["home_link"])
+            self.assertEqual(2, len(data["pages"]))
         self.assertIn("Wrote manifest", stderr)
         return data
 
     def _test_generate_toc(self, data):
         self.assertIn("toc", data)
-        self.assertIn("title", data["toc"][0])
-        self.assertIn("id", data["toc"][0])
-        self.assertIn("children", data["toc"][0])
-        self.assertEqual(4, len(data["toc"][0]["children"]))
-        self.assertEqual("01-project", data["toc"][0]["id"])
-        self.assertIn("de", data["toc"][0]["title"])
-        self.assertIn("en", data["toc"][0]["title"])
-        self.assertEqual("Projektstruktur", data["toc"][0]["title"]["de"])
-        self.assertEqual("Project structure", data["toc"][0]["title"]["en"])
+        sec_proj = data["toc"][0]
+        self.assertEqual("Projektstruktur", sec_proj["title"]["de"])
+        self.assertEqual("Project structure", sec_proj["title"]["en"])
+        self.assertEqual("01-project", sec_proj["id"])
+        self.assertEqual(4, len(sec_proj["children"]))
+        sec_folders = sec_proj["children"][0]
+        self.assertEqual("Ordnerstruktur", sec_folders["title"]["de"])
+        self.assertEqual("Folders", sec_folders["title"]["en"])
+        self.assertEqual("01-folders", sec_folders["id"])
+        self.assertNotIn("children", sec_folders)
+
+    def _test_index_terms(self, data):
+        # TODO
+        pass
