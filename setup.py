@@ -33,9 +33,9 @@ def setup_package():
         include_package_data=True,
         install_requires=[
             "click>=7,<8",
-            "coloredlogs>=10,<11",
-            "python-slugify>=3.0.3,<4",
-            "PyYAML>=3.13,<4",
+            "coloredlogs>=14,<15",
+            "python-slugify>=4,<5",
+            "PyYAML>=5,<6",
         ],
         packages=["innoconv", "innoconv.ext"],
         python_requires=">=3.5.0",
