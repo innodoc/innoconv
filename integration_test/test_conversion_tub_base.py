@@ -176,6 +176,19 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual("01-folders", sec_folders["id"])
         self.assertNotIn("children", sec_folders)
 
-    def _test_index_terms(self, data):
-        # TODO
-        pass
+    def _test_index_terms(self, manifest):
+        self.assertIn("index_terms", manifest)
+        index_terms = manifest["index_terms"]
+        self.assertEqual(len(index_terms["de"]), len(index_terms["en"]))
+
+        term, occurrences = index_terms["en"]["latex-formula"]
+        self.assertEqual(term, "$\\LaTeX$ formula")
+        self.assertEqual(1, len(occurrences))
+        self.assertEqual("02-elements/10-index", occurrences[0][0])
+        self.assertEqual("latex-formula-0", occurrences[0][1])
+
+        term, occurrences = index_terms["de"]["latex-formel"]
+        self.assertEqual(term, "$\\LaTeX$-Formel")
+        self.assertEqual(1, len(occurrences))
+        self.assertEqual("02-elements/10-index", occurrences[0][0])
+        self.assertEqual("latex-formel-0", occurrences[0][1])
