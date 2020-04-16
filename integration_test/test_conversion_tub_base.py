@@ -9,6 +9,7 @@ from innoconv.constants import (
     CONTENT_BASENAME,
     FOOTER_FRAGMENT_PREFIX,
     MANIFEST_BASENAME,
+    PAGES_FOLDER,
     STATIC_FOLDER,
 )
 from innoconv.ext.tikz2svg import TIKZ_FOLDER
@@ -91,10 +92,12 @@ class TestConversionTubBase(BaseConversionTest):
 
     def _test_pages(self, manifest):
         for lang in ("de", "en"):
-            self.assertTrue(isdir(join(self.output_dir, lang, "_pages")))
-            self.assertTrue(isfile(join(self.output_dir, lang, "_pages", "about.json")))
+            self.assertTrue(isdir(join(self.output_dir, lang, PAGES_FOLDER)))
             self.assertTrue(
-                isfile(join(self.output_dir, lang, "_pages", "license.json"))
+                isfile(join(self.output_dir, lang, PAGES_FOLDER, "about.json"))
+            )
+            self.assertTrue(
+                isfile(join(self.output_dir, lang, PAGES_FOLDER, "license.json"))
             )
         self.assertEqual(2, len(manifest["pages"]))
         page_about, page_license = manifest["pages"]
