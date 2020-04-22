@@ -1,5 +1,7 @@
 """This module helps with traversing an AST."""
 
+import logging
+
 
 class TraverseAst:
     """
@@ -19,6 +21,7 @@ class TraverseAst:
         "Div": "_under_c_1",
         "Emph": "_under_c",
         "Header": "_header",
+        "HorizontalRule": "_noop",
         "Image": "_under_c_1",
         "LineBlock": "_lineblock",
         "LineBreak": "_noop",
@@ -49,7 +52,7 @@ class TraverseAst:
 
     @staticmethod
     def _unhandled(elem):
-        raise ValueError("Unhandled type: {}".format(elem))
+        logging.warning("Unhandled type: %s", elem)
 
     def _under_c(self, elem):
         content = elem["c"]
