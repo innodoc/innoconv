@@ -19,8 +19,8 @@ class Supervisor(object):
         self._source_dir = source_dir
         self._output_dir = output_dir
         self._manifest = manifest
-        self._extensions = []
         self._load_extensions(extensions)
+        self._producer = None
         self._consumers = []
 
     def start(self):
@@ -48,9 +48,10 @@ class Supervisor(object):
 
     async def _create_workers(self):
         self._producer = WalkLanguageFolder(
-            self._manifest.languages,
+            self._manifest,
             self._source_dir,
             self._output_dir,
+            self._extensions,
             output_q_size=128
         )
         # self._manifest.languages, output_q_size=Q_SIZE_LANGUAGE_FOLDER)
@@ -61,7 +62,14 @@ class Supervisor(object):
             prev_worker = self._producer
             workers = []
             for _ in range(num_workers):
-                worker = Worker(prev_worker.output_q, output_q_size=output_q_size)
+                worker = Worker(
+                    self._manifest,
+                    self._source_dir,
+                    self._output_dir,
+                    self._extensions,
+                    prev_worker.output_q,
+                    output_q_size=output_q_size
+                )
                 workers.append(worker)
             self._consumers.append(workers)
 
@@ -87,7 +95,6 @@ class Supervisor(object):
             Worker = type(worker)
             await Worker.cleanup()
             logging.debug("Cleaned up %s", Worker.__name__)
-        # await asyncio.sleep(0.25)  # give aiohttp time to close TLS connections
         logging.info("Shutdown complete")
 
     async def _shutdown(self):
@@ -98,11 +105,6 @@ class Supervisor(object):
     async def _handle_signal(self, s):
         logging.info(f"Received {s.name}. Shutting down...")
         await self._shutdown()
-
-    def _notify_extensions(self, event_name, *args, **kwargs):
-        for ext in self._extensions:
-            func = getattr(ext, event_name)
-            func(*args, **kwargs)
 
     def _load_extensions(self, extensions):
         for ext_name in extensions:

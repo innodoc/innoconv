@@ -2,10 +2,22 @@ import asyncio
 
 
 class AbstractWorker(object):
-    def __init__(self, input_q=None, output_q_size=0):
-        type(self)._input_q = input_q
+    def __init__(
+        self,
+        manifest,
+        source_dir,
+        output_dir,
+        extensions,
+        input_q=None,
+        output_q_size=0
+    ):
+        self._manifest = manifest
+        self._source_dir = source_dir
+        self._output_dir = output_dir
+        self._extensions = extensions
+        self._input_q = input_q
         if output_q_size > 0:
-            type(self)._output_q = asyncio.Queue(output_q_size)
+            self._output_q = asyncio.Queue(output_q_size)
         self._task = asyncio.create_task(self._task())
         self._tasks_done = 0
 
@@ -34,3 +46,8 @@ class AbstractWorker(object):
 
     async def _task(self):
         raise NotImplementedError()
+
+    def _notify_extensions(self, event_name, *args, **kwargs):
+        for ext in self._extensions:
+            func = getattr(ext, event_name)
+            func(*args, **kwargs)
