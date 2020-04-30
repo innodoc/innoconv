@@ -1,68 +1,37 @@
-"""
-The innoConv runner is the core of the conversion process.
-
-It traverses the source directory recursively and finds all content files.
-These are converted one-by-one to JSON. Under the hood is uses
-`Pandoc <https://pandoc.org/>`_.
-
-It receives a list of extensions that are instantiated and notified upon
-certain events. The events are documented in
-:class:`AbstractExtension <innoconv.ext.abstract.AbstractExtension>`.
-"""
-
 import json
 import logging
-from os import makedirs, walk
 from os.path import abspath, dirname, exists, isdir, join, relpath
+from os import makedirs, walk
 import pathlib
 
-from innoconv.constants import (
-    CONTENT_BASENAME,
-    FOOTER_FRAGMENT_PREFIX,
-    PAGES_FOLDER,
-)
-from innoconv.ext import EXTENSIONS
+import aiofiles
+
+from innoconv.workers.base import AbstractWorker
+from innoconv.constants import CONTENT_BASENAME, FOOTER_FRAGMENT_PREFIX, PAGES_FOLDER
 from innoconv.utils import to_ast
 
 
-class InnoconvRunner:
-    """
-    Convert content files in a directory tree.
-
-    :param source_dir: Content source directory.
-    :type source_dir: str
-
-    :param output_dir: Output directory.
-    :type output_dir: str
-
-    :param manifest: Content manifest.
-    :type manifest: innoconv.manifest.Manifest
-
-    :param extensions: List of extension names to use.
-    :type extensions: list[str]
-    """
-
-    def __init__(self, source_dir, output_dir, manifest, extensions):
-        """Initialize InnoconvRunner."""
+class WalkLanguageFolder(AbstractWorker):
+    def __init__(self, languages, source_dir, output_dir, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._languages = languages
+        self._sections = []
         self._source_dir = source_dir
         self._output_dir = output_dir
-        self._manifest = manifest
-        self._extensions = []
-        self._load_extensions(extensions)
-        self._sections = []
 
-    def run(self):
-        """Start the conversion by iterating over language folders."""
-        self._notify_extensions("start", self._output_dir, self._source_dir)
+    async def get_total(self):
+        return len(self._torrent_ids)
 
-        for i, language in enumerate(self._manifest.languages):
-            self._notify_extensions("pre_conversion", language)
-            self._convert_language_folder(language, i)
-            self._notify_extensions("post_conversion", language)
+    async def _task(self):
+        # self._notify_extensions("start", self._output_dir, self._source_dir)
+        for i, language in enumerate(self._languages):
+            # self._notify_extensions("pre_conversion", language)
+            logging.info("Processing language %s", language)
+            await self._convert_language_folder(language, i)
+            # self._notify_extensions("post_conversion", language)
+        # self._notify_extensions("finish")
 
-        self._notify_extensions("finish")
-
-    def _convert_language_folder(self, language, lang_num):
+    async def _convert_language_folder(self, language, lang_num):
         path = abspath(join(self._source_dir, language))
 
         if not isdir(path):
@@ -84,7 +53,7 @@ class InnoconvRunner:
             content_filename = "{}.md".format(CONTENT_BASENAME)
             if content_filename in files:
                 filepath = join(root, content_filename)
-                self._process_section(filepath, lang_num, section_num)
+                await self._process_section(filepath, lang_num, section_num)
                 section_num += 1
             else:
                 raise RuntimeError(
@@ -103,12 +72,12 @@ class InnoconvRunner:
         except AttributeError:
             pages = []
         for page in pages:
-            self._process_page(page, language)
+            await self._process_page(page, language)
 
-        # process footer fragments
-        self._process_footer_fragments(language)
+        await self._process_footer_fragments(language)
 
-    def _process_section(self, filepath, lang_num, section_num):
+    async def _process_section(self, filepath, lang_num, section_num):
+        logging.info("Processing section file %s", filepath)
         rel_path = dirname(relpath(filepath, self._source_dir))
         section_name = rel_path[3:]  # strip language
         if lang_num == 0:
@@ -128,24 +97,16 @@ class InnoconvRunner:
                     "Extra section {} present.".format(rel_path)
                 )
 
-        # full filepath
+        # self._notify_extensions("pre_process_file", rel_path)
+        ast, title, _ = await to_ast(filepath)
+        # self._notify_extensions("post_process_file", ast, title, "section")
+
         output_filename = "{}.json".format(CONTENT_BASENAME)
         filepath_out = join(self._output_dir, rel_path, output_filename)
-
-        # convert file using pandoc
-        self._notify_extensions("pre_process_file", rel_path)
-        ast, title, _ = to_ast(filepath)
-        self._notify_extensions("post_process_file", ast, title, "section")
-
-        # write file content
-        makedirs(dirname(filepath_out), exist_ok=True)
-        with open(filepath_out, "w") as out_file:
-            json.dump(ast, out_file)
+        await self._write_ast(filepath_out, ast)
         logging.info("Wrote %s", filepath_out)
 
-        return title
-
-    def _process_page(self, page, language):
+    async def _process_page(self, page, language):
         try:
             link_in_nav = page["link_in_nav"]
         except KeyError:
@@ -169,9 +130,9 @@ class InnoconvRunner:
         rel_path = dirname(relpath(filepath, self._source_dir))
 
         # convert
-        self._notify_extensions("pre_process_file", rel_path)
-        ast, title, short_title = to_ast(filepath)
-        self._notify_extensions("post_process_file", ast, title, "page")
+        # self._notify_extensions("pre_process_file", rel_path)
+        ast, title, short_title = await to_ast(filepath)
+        # self._notify_extensions("post_process_file", ast, title, "page")
         try:
             page["short_title"][language] = short_title
         except KeyError:
@@ -181,12 +142,10 @@ class InnoconvRunner:
         # write json output
         output_filename = "{}.json".format(page["id"])
         filepath_out = join(self._output_dir, rel_path, output_filename)
-        makedirs(dirname(filepath_out), exist_ok=True)
-        with open(filepath_out, "w") as out_file:
-            json.dump(ast, out_file)
+        await self._write_ast(filepath_out, ast)
         logging.info("Wrote %s", filepath_out)
 
-    def _process_footer_fragments(self, language):
+    async def _process_footer_fragments(self, language):
         for part in ("a", "b"):
             input_filename = "{}{}.md".format(FOOTER_FRAGMENT_PREFIX, part)
             filepath = join(self._source_dir, language, input_filename)
@@ -196,28 +155,18 @@ class InnoconvRunner:
                 continue
 
             # convert
-            self._notify_extensions("pre_process_file", rel_path)
-            ast, title, _ = to_ast(filepath, ignore_missing_title=True)
-            self._notify_extensions("post_process_file", ast, title, "fragment")
+            # self._notify_extensions("pre_process_file", rel_path)
+            ast, title, _ = await to_ast(filepath, ignore_missing_title=True)
+            # self._notify_extensions("post_process_file", ast, title, "fragment")
 
             # write json output
             output_filename = "{}{}.json".format(FOOTER_FRAGMENT_PREFIX, part)
             filepath_out = join(self._output_dir, rel_path, output_filename)
-            makedirs(dirname(filepath_out), exist_ok=True)
-            with open(filepath_out, "w") as out_file:
-                json.dump(ast, out_file)
+            await self._write_ast(filepath_out, ast)
             logging.info("Wrote %s", filepath_out)
 
-    def _notify_extensions(self, event_name, *args, **kwargs):
-        for ext in self._extensions:
-            func = getattr(ext, event_name)
-            func(*args, **kwargs)
-
-    def _load_extensions(self, extensions):
-        for ext_name in extensions:
-            try:
-                self._extensions.append(EXTENSIONS[ext_name](self._manifest))
-            except (ImportError, KeyError) as exc:
-                raise RuntimeError("Extension {} not found!".format(ext_name)) from exc
-        # pass extension list to extenions
-        self._notify_extensions("extension_list", self._extensions)
+    async def _write_ast(self, filepath_out, ast):
+        makedirs(dirname(filepath_out), exist_ok=True)
+        async with aiofiles.open(filepath_out, mode="w") as out_file:
+            await out_file.write(json.dumps(ast))
+            await out_file.flush()

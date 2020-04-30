@@ -1,5 +1,6 @@
 """Project constants."""
 
+import multiprocessing
 import os
 
 
@@ -41,4 +42,11 @@ PAGES_FOLDER = "_pages"
 FOOTER_FRAGMENT_PREFIX = "_footer_"
 
 #: CLI exit codes
-EXIT_CODES = {"SUCCESS": 0, "MANIFEST_ERROR": 10, "RUNNER_ERROR": 11}
+EXIT_CODES = {
+    "SUCCESS": 0,
+    "MANIFEST_ERROR": 10,
+    "RUNNER_ERROR": 11,
+    "RUNNER_CANCELLED": 12,
+}
+
+CPU_COUNT = multiprocessing.cpu_count()

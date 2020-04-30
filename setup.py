@@ -29,9 +29,10 @@ def setup_package():
         author=METADATA["author"],
         author_email=METADATA["author_email"],
         description=METADATA["description"],
-        entry_points={"console_scripts": ["innoconv = innoconv.cli:cli"]},
+        entry_points={"console_scripts": ["innoconv = innoconv.cli.commands:cli"]},
         include_package_data=True,
         install_requires=[
+            "aiofiles>=0.5.0,<1.0.0",
             "click>=7,<8",
             "coloredlogs>=14,<15",
             "python-slugify>=4,<5",

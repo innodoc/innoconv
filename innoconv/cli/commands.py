@@ -1,5 +1,6 @@
 """Command line interface for the innoConv document converter."""
 
+from asyncio import CancelledError
 import logging
 import os
 import sys
@@ -8,6 +9,7 @@ import click
 import coloredlogs
 import yaml
 
+from innoconv.cli.validators import parse_extensions
 from innoconv.constants import (
     DEFAULT_EXTENSIONS,
     DEFAULT_OUTPUT_DIR_BASE,
@@ -17,14 +19,10 @@ from innoconv.constants import (
 from innoconv.ext import EXTENSIONS
 from innoconv.manifest import Manifest
 from innoconv.metadata import __author__, __description__, __url__, __version__
-from innoconv.runner import InnoconvRunner
+from innoconv.supervisor import Supervisor
 
 
-def _get_epilog():
-    max_length = len(max(EXTENSIONS.keys(), key=len))
-    fstr = " {{:<{}}} - {{}}".format(max_length)
-    extlist = [fstr.format(e, v.helptext()) for e, v in EXTENSIONS.items()]
-    return """Available extensions:
+EPILOG = """Available extensions:
 {}
 
 Author: {}
@@ -34,17 +32,14 @@ Copyright (C) 2018 innoCampus, TU Berlin
 
 This is free software; see the source for copying conditions. There is no
 warranty, not even for merchantability or fitness for a particular purpose.
-""".format(
-        "\n".join(extlist), __author__, __url__
-    )
+"""
 
 
-def _parse_extensions(_, __, value):
-    extensions = value.split(",")
-    for ext in extensions:
-        if ext not in EXTENSIONS.keys():
-            raise click.BadOptionUsage("-e", "Extension not found: {}".format(ext))
-    return extensions
+def _get_epilog():
+    max_length = len(max(EXTENSIONS.keys(), key=len))
+    fstr = " {{:<{}}} - {{}}".format(max_length)
+    extlist = [fstr.format(e, v.helptext()) for e, v in EXTENSIONS.items()]
+    return EPILOG.format("\n".join(extlist), __author__, __url__)
 
 
 class CustomEpilogCommand(click.Command):
@@ -77,7 +72,7 @@ class CustomEpilogCommand(click.Command):
     default=",".join(DEFAULT_EXTENSIONS),
     show_default=True,
     metavar="EXTS",
-    callback=_parse_extensions,
+    callback=parse_extensions,
 )
 @click.option(
     "-f", "--force", is_flag=True, help="Force overwriting of output.", default=False,
@@ -110,13 +105,25 @@ def cli(verbose, force, extensions, output_dir, source_dir):
         logging.critical(exc)
         sys.exit(EXIT_CODES["MANIFEST_ERROR"])
 
-    # start runner
+    # start supervisor
+    supervisor = Supervisor(source_dir, output_dir, manifest, extensions)
     try:
-        runner = InnoconvRunner(source_dir, output_dir, manifest, extensions)
-        runner.run()
-    except RuntimeError as error:
-        msg = "Something went wrong: {}".format(error)
-        logging.critical(msg)
+        supervisor.start()
+    except CancelledError:
+        sys.exit(EXIT_CODES["RUNNER_CANCELLED"])
+    except Exception:
+        logging.exception("Exception received from supervisor:")
         sys.exit(EXIT_CODES["RUNNER_ERROR"])
     logging.info("Build finished!")
     sys.exit(EXIT_CODES["SUCCESS"])
+
+    # # start runner
+    # try:
+    #     runner = InnoconvRunner(source_dir, output_dir, manifest, extensions)
+    #     runner.run()
+    # except RuntimeError as error:
+    #     msg = "Something went wrong: {}".format(error)
+    #     logging.critical(msg)
+    #     sys.exit(EXIT_CODES["RUNNER_ERROR"])
+    # logging.info("Build finished!")
+    # sys.exit(EXIT_CODES["SUCCESS"])

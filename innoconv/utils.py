@@ -1,5 +1,7 @@
 """Utility module."""
 
+import asyncio
+import logging
 import json
 from subprocess import PIPE, Popen
 
@@ -22,7 +24,7 @@ def to_string(ast):
     return out
 
 
-def to_ast(filepath, ignore_missing_title=False):
+async def to_ast(filepath, ignore_missing_title=False):
     """
     Convert a file to abstract syntax tree using pandoc.
 
@@ -39,16 +41,17 @@ def to_ast(filepath, ignore_missing_title=False):
     :raises ValueError: if no title was found
     """
     pandoc_cmd = ["pandoc", "--to=json", filepath]
-    proc = Popen(pandoc_cmd, stdout=PIPE, stderr=PIPE)
-    out, err = proc.communicate(timeout=60)
-    out = out.decode(ENCODING)
-    err = err.decode(ENCODING)
+    proc = await asyncio.create_subprocess_exec(*pandoc_cmd, stdout=PIPE, stderr=PIPE)
+    try:
+        out, err = await asyncio.wait_for(proc.communicate(), 60)
+    except asyncio.TimeoutError:
+        logging.error('Pandoc process timed out: %s', pandoc_cmd.join(' '))
 
     if proc.returncode != 0:
         msg = "Pandoc process returned exit code ({}). Pandoc output:\n{}"
-        raise RuntimeError(msg.format(proc.returncode, err))
+        raise RuntimeError(msg.format(proc.returncode, err.decode(ENCODING)))
 
-    loaded = json.loads(out)
+    loaded = json.loads(out.decode(ENCODING))
     blocks = loaded["blocks"]
     try:
         title_ast = loaded["meta"]["title"]["c"]
