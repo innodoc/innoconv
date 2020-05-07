@@ -61,7 +61,6 @@ COPY --from=innoconv /usr/local/bin /usr/local/bin
 # clean up
 RUN set -xe && \
     apk del \
-      libffi-dev \
       ncurses-dev \
       bzip2-dev \
       readline-dev \
