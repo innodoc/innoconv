@@ -92,6 +92,5 @@ class TestTraverseAst(unittest.TestCase):
     def test_error_on_unknown_element(self):
         """Test handling of unknown element."""
         ast = [get_para_ast(content=[{"t": "this-type-does-not-exist", "c": []}])]
-        with self.assertRaises(ValueError):
-            self.traverse_ast.traverse(ast)
+        self.traverse_ast.traverse(ast)
         self.assertEqual(self._callback_mock.call_count, 2)
