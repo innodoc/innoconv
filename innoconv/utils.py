@@ -45,7 +45,7 @@ def to_ast(filepath, ignore_missing_title=False):
     err = err.decode(ENCODING)
 
     if proc.returncode != 0:
-        msg = "pandoc process returned exit code ({})." "This is the pandoc output:\n{}"
+        msg = "pandoc process returned exit code ({}). This is the pandoc output:\n{}"
         raise RuntimeError(msg.format(proc.returncode, err))
 
     loaded = json.loads(out)
