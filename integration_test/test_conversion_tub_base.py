@@ -60,6 +60,8 @@ class TestConversionTubBase(BaseConversionTest):
             self._test_tikz2svg()
         with self.subTest(extension="index_terms"):
             self._test_index_terms(manifest)
+        with self.subTest(extension="number_boxes"):
+            self._test_number_boxes(manifest)
 
     def _test_converted_folders_present(self):
         for lang in ("de", "en"):
@@ -208,3 +210,45 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual(1, len(occurrences))
         self.assertEqual("02-elements/10-index", occurrences[0][0])
         self.assertEqual("latex-formel-0", occurrences[0][1])
+
+    def _test_number_boxes(self, manifest):
+        self.assertIn("boxes", manifest)
+        boxes = manifest["boxes"]
+        self.assertEqual(
+            list(boxes.keys()),
+            [
+                "01-project/01-folders",
+                "01-project/02-files/01-manifest",
+                "01-project/02-files/02-content",
+                "01-project/03-languages",
+                "01-project/04-building",
+                "02-elements/04-links/01-internal",
+                "02-elements/04-links/02-external",
+                "02-elements/06-formulas",
+                "02-elements/07-media/01-pgf-tikz",
+                "02-elements/09-interactive-exercises",
+                "02-elements/10-index",
+            ],
+        )
+
+        self.assertEqual(
+            boxes["01-project/01-folders"],
+            [["1.1.1", "example"], ["1.1.2", "info"], ["1.1.3", "info"]],
+        )
+        self.assertEqual(
+            boxes["02-elements/09-interactive-exercises"],
+            [
+                ["2.9.1", "exercise"],
+                ["2.9.2", "example"],
+                ["2.9.3", "exercise"],
+                ["2.9.4", "example"],
+                ["2.9.5", "exercise"],
+                ["2.9.6", "exercise"],
+                ["2.9.7", "exercise"],
+                ["2.9.8", "exercise"],
+                ["2.9.9", "exercise"],
+            ],
+        )
+        self.assertEqual(
+            boxes["02-elements/10-index"], [["2.10.1", "example"], ["2.10.2", "info"]]
+        )

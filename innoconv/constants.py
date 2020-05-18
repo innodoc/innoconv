@@ -12,6 +12,7 @@ DEFAULT_EXTENSIONS = (
     "generate_toc",
     "index_terms",
     "join_strings",
+    "number_boxes",
     "tikz2svg",
     "write_manifest",
 )

@@ -22,11 +22,11 @@ def get_definitionlist_ast():
     }
 
 
-def get_div_ast(content=None):
+def get_div_ast(content=None, classes=None, div_id=""):
     """Create Div element with content."""
     if content is None:
         content = [get_filler_content()]
-    return {"t": "Div", "c": [["", [], []], content]}
+    return {"t": "Div", "c": [[div_id, classes if classes else [], []], content]}
 
 
 def get_header_ast(content=None):
