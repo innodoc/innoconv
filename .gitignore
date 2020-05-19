@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 .tox
 .cache
+/venv
 
 # build
 doc/build
