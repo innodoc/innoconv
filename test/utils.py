@@ -29,6 +29,18 @@ def get_div_ast(content=None, classes=None, div_id=""):
     return {"t": "Div", "c": [[div_id, classes if classes else [], []], content]}
 
 
+def get_question_ast(points="1"):
+    """Create question element."""
+    return {"t": "Span", "c": [["", ["question"], [["points", points]]], []]}
+
+
+def get_exercise_ast(content=None, div_id="FOO_ID"):
+    """Create exercise element with content."""
+    if content is None:
+        content = [get_question_ast("1")]
+    return get_div_ast(content, classes="exercise", div_id=div_id)
+
+
 def get_header_ast(content=None):
     """Create Header element with content."""
     if content is None:

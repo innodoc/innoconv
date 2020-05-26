@@ -3,6 +3,10 @@
 import logging
 
 
+class IgnoreSubtree(Exception):
+    """Used to signal an elements sub-tree should not be traversed."""
+
+
 class TraverseAst:
     """
     Traverse an AST calling a custom function on each element.
@@ -120,5 +124,8 @@ class TraverseAst:
         if not isinstance(ast, list):
             return
         for elem in ast:
-            self._func(elem, parent)
-            self._process_children(elem)
+            try:
+                self._func(elem, parent)
+                self._process_children(elem)
+            except IgnoreSubtree:
+                pass

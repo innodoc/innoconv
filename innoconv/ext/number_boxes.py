@@ -14,7 +14,7 @@ import logging
 from pathlib import Path
 
 from innoconv.ext.abstract import AbstractExtension
-from innoconv.traverse_ast import TraverseAst
+from innoconv.traverse_ast import IgnoreSubtree, TraverseAst
 
 BOX_CLASSES = ("example", "info", "exercise")
 
@@ -37,12 +37,31 @@ class NumberBoxes(AbstractExtension):
         self._parts = None
         self._done = False
         self._num_boxes = 0
+        self._exercise_points = 0
 
     def _add_box(self, box_type, elem):
         self._counters["box"] += 1
         number = "{section}.{subsection}.{box}".format(**self._counters)
         section_id = "/".join(self._parts)
-        box = (number, box_type)
+        if elem["c"][0][0]:
+            box_id = elem["c"][0][0]
+        else:
+            box_id = "{}-{}".format(box_type, number)
+            if box_type == "exercise":
+                logging.warning(
+                    "Section %s has exercise without ID: %s for language %s",
+                    section_id,
+                    number,
+                    self._language,
+                )
+
+        # Collect questions inside exercise to get total points
+        if box_type == "exercise":
+            self._exercise_points = 0
+            TraverseAst(self._sum_points).traverse([elem])
+            box = (box_id, number, box_type, self._exercise_points)
+        else:
+            box = (box_id, number, box_type)
 
         if self._done:
             # Ensure this language doesn't have extra boxes
@@ -61,12 +80,22 @@ class NumberBoxes(AbstractExtension):
             except KeyError:
                 self._boxes[section_id] = [box]
 
-        # Use type and number as ID for element
+        # Set ID
         if not elem["c"][0][0]:
-            elem["c"][0][0] = "{}-{}".format(box_type, number)
+            elem["c"][0][0] = box_id
 
         # Attach number as attribute
         elem["c"][0][2].append(("data-number", number))
+
+    def _sum_points(self, elem, _):
+        if elem["t"] == "Span" and "question" in elem["c"][0][1]:
+            for key, val in elem["c"][0][2]:
+                if key == "points":
+                    try:
+                        self._exercise_points += int(val)
+                    except ValueError:
+                        msg = "Got bad int value for question point attribute: %s"
+                        logging.warning(msg, val)
 
     # extension events
 
@@ -77,6 +106,8 @@ class NumberBoxes(AbstractExtension):
             for box_class in BOX_CLASSES:
                 if box_class in classes:
                     self._add_box(box_class, elem)
+                    if box_class == "exercise":
+                        raise IgnoreSubtree
                     break
 
     def pre_conversion(self, language):

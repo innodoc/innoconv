@@ -4,13 +4,22 @@ from unittest.mock import call, patch
 
 from innoconv.ext.number_boxes import NumberBoxes
 from . import TestExtension
-from ..utils import get_div_ast, get_filler_content, get_para_ast
+from ..utils import (
+    get_div_ast,
+    get_exercise_ast,
+    get_filler_content,
+    get_question_ast,
+    get_para_ast,
+)
 
 AST = [
     get_para_ast(get_filler_content()),
     get_div_ast(classes="info"),
     get_para_ast(get_filler_content()),
-    get_div_ast(classes="example", div_id="FOO_ID"),
+    get_div_ast(classes="example", div_id="EXAM_ID"),
+    get_exercise_ast(
+        content=[get_question_ast("1"), get_question_ast("2")], div_id="EXER_ID"
+    ),
     get_para_ast(get_filler_content()),
 ]
 
@@ -24,11 +33,22 @@ class TestNumberBoxes(TestExtension):
         number_boxes, _ = self._run(NumberBoxes, AST, languages=("en",))
         manifest_fields = number_boxes.manifest_fields()
         self.assertEqual(warning.call_count, 0)
-
         boxes = {
-            "title-1": [("1.0.1", "info"), ("1.0.2", "example")],
-            "title-2": [("2.0.1", "info"), ("2.0.2", "example")],
-            "title-2/title-2-1": [("2.1.1", "info"), ("2.1.2", "example")],
+            "title-1": [
+                ("info-1.0.1", "1.0.1", "info"),
+                ("EXAM_ID", "1.0.2", "example"),
+                ("EXER_ID", "1.0.3", "exercise", 3),
+            ],
+            "title-2": [
+                ("info-2.0.1", "2.0.1", "info"),
+                ("EXAM_ID", "2.0.2", "example"),
+                ("EXER_ID", "2.0.3", "exercise", 3),
+            ],
+            "title-2/title-2-1": [
+                ("info-2.1.1", "2.1.1", "info"),
+                ("EXAM_ID", "2.1.2", "example"),
+                ("EXER_ID", "2.1.3", "exercise", 3),
+            ],
         }
         self.assertEqual(manifest_fields["boxes"], boxes)
 
@@ -36,29 +56,28 @@ class TestNumberBoxes(TestExtension):
         """Test assignment of IDs."""
         _, asts = self._run(NumberBoxes, AST, languages=("en",))
         self.assertEqual(warning.call_count, 0)
+        del asts[0]  # skip root
 
-        ast = asts[1]
-        self.assertEqual(ast[1]["c"][0][0], "info-1.0.1")
-        self.assertEqual(ast[1]["c"][0][2][0], ("data-number", "1.0.1"))
-        self.assertEqual(ast[3]["c"][0][0], "FOO_ID")
-        self.assertEqual(ast[3]["c"][0][2][0], ("data-number", "1.0.2"))
+        for i, section in enumerate(("1.0", "2.0", "2.1")):
+            ast = asts[i]
+            with self.subTest(section=section):
+                self.assertEqual(ast[1]["c"][0][0], "info-{}.1".format(section))
+                self.assertEqual(
+                    ast[1]["c"][0][2][0], ("data-number", "{}.1".format(section))
+                )
+                self.assertEqual(ast[3]["c"][0][0], "EXAM_ID")
+                self.assertEqual(
+                    ast[3]["c"][0][2][0], ("data-number", "{}.2".format(section))
+                )
+                self.assertEqual(ast[4]["c"][0][0], "EXER_ID")
+                self.assertEqual(
+                    ast[4]["c"][0][2][0], ("data-number", "{}.3".format(section))
+                )
 
-        ast = asts[2]
-        self.assertEqual(ast[1]["c"][0][0], "info-2.0.1")
-        self.assertEqual(ast[1]["c"][0][2][0], ("data-number", "2.0.1"))
-        self.assertEqual(ast[3]["c"][0][0], "FOO_ID")
-        self.assertEqual(ast[3]["c"][0][2][0], ("data-number", "2.0.2"))
-
-        ast = asts[3]
-        self.assertEqual(ast[1]["c"][0][0], "info-2.1.1")
-        self.assertEqual(ast[1]["c"][0][2][0], ("data-number", "2.1.1"))
-        self.assertEqual(ast[3]["c"][0][0], "FOO_ID")
-        self.assertEqual(ast[3]["c"][0][2][0], ("data-number", "2.1.2"))
-
-    def test_inconsistent_missing(self, warning):
+    def test_missing_box(self, warning):
         """Test detection of missing box."""
         number_boxes, _ = self._run(NumberBoxes, AST, languages=("en",))
-        inconsistent_ast = AST[:3] + AST[4:]  # leave out one box
+        inconsistent_ast = AST[:4] + AST[5:]  # leave out last box
         self._run(number_boxes, inconsistent_ast, languages=("de",))
         self.assertEqual(warning.call_count, 3)
         for section_id in ("title-1", "title-2", "title-2/title-2-1"):
@@ -67,16 +86,16 @@ class TestNumberBoxes(TestExtension):
                 warning.call_args_list,
             )
 
-    def test_detect_inconsistent_extra(self, warning):
+    def test_extra_box(self, warning):
         """Test detection of extra box."""
         number_boxes, _ = self._run(NumberBoxes, AST, languages=("en",))
         inconsistent_ast = AST + [get_div_ast(classes="info")]
         self._run(number_boxes, inconsistent_ast, languages=("de",))
         self.assertEqual(warning.call_count, 3)
         for section_id, number in (
-            ("title-1", "1.0.3"),
-            ("title-2", "2.0.3"),
-            ("title-2/title-2-1", "2.1.3"),
+            ("title-1", "1.0.4"),
+            ("title-2", "2.0.4"),
+            ("title-2/title-2-1", "2.1.4"),
         ):
             self.assertIn(
                 call(

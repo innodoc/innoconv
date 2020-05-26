@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import call, Mock
 
-from innoconv.traverse_ast import TraverseAst
+from innoconv.traverse_ast import IgnoreSubtree, TraverseAst
 from .utils import (
     get_bullet_list_ast,
     get_definitionlist_ast,
@@ -14,18 +14,17 @@ from .utils import (
     get_table_ast,
 )
 
+# TODO: test preventing of sub-tree traversion by passing True in func
+
 
 class TestTraverseAst(unittest.TestCase):
     """Test the TraverseAst class."""
 
-    def setUp(self):
-        """Instantiate the runner instance."""
-        self._callback_mock = Mock()
-        self.traverse_ast = TraverseAst(self._callback_mock)
-
     def test_traverse(self):
         """Test TraverseAst.traverse method."""
         # pylint: disable=too-many-locals
+        callback_mock = Mock()
+        traverse_ast = TraverseAst(callback_mock)
         ast = [
             get_header_ast(),
             get_div_ast([get_table_ast()]),
@@ -82,15 +81,33 @@ class TestTraverseAst(unittest.TestCase):
             (dlist["c"][1][1][0][0], dlist),
             (dlist["c"][1][1][0][0]["c"][0], dlist["c"][0][1][0][0]),
         )
-        self.traverse_ast.traverse(ast)
-        self.assertEqual(self._callback_mock.call_count, len(expected))
+        traverse_ast.traverse(ast)
+        self.assertEqual(callback_mock.call_count, len(expected))
         for idx, exp_elem in enumerate(expected):
             with self.subTest(element=exp_elem):
-                call_arg = self._callback_mock.call_args_list[idx]
+                call_arg = callback_mock.call_args_list[idx]
                 self.assertEqual(call_arg, call(*exp_elem))
 
     def test_error_on_unknown_element(self):
         """Test handling of unknown element."""
+        callback_mock = Mock()
+        traverse_ast = TraverseAst(callback_mock)
         ast = [get_para_ast(content=[{"t": "this-type-does-not-exist", "c": []}])]
-        self.traverse_ast.traverse(ast)
-        self.assertEqual(self._callback_mock.call_count, 2)
+        traverse_ast.traverse(ast)
+        self.assertEqual(callback_mock.call_count, 2)
+
+    def test_ignore_subtree(self):
+        """Test IgnoreSubtree is honored."""
+
+        def side_effect(elem, _):
+            if elem["t"] == "Div":
+                raise IgnoreSubtree
+
+        callback_mock = Mock(side_effect=side_effect)
+        traverse_ast = TraverseAst(callback_mock)
+        ast = [
+            get_div_ast([get_ordered_list_ast()]),
+        ]
+        traverse_ast.traverse(ast)
+        self.assertEqual(callback_mock.call_count, 1)
+        self.assertEqual(callback_mock.call_args_list[0], call(ast[0], None))

@@ -233,22 +233,30 @@ class TestConversionTubBase(BaseConversionTest):
 
         self.assertEqual(
             boxes["01-project/01-folders"],
-            [["1.1.1", "example"], ["1.1.2", "info"], ["1.1.3", "info"]],
+            [
+                ["example-1.1.1", "1.1.1", "example"],
+                ["info-1.1.2", "1.1.2", "info"],
+                ["info-1.1.3", "1.1.3", "info"],
+            ],
         )
         self.assertEqual(
             boxes["02-elements/09-interactive-exercises"],
             [
-                ["2.9.1", "exercise"],
-                ["2.9.2", "example"],
-                ["2.9.3", "exercise"],
-                ["2.9.4", "example"],
-                ["2.9.5", "exercise"],
-                ["2.9.6", "exercise"],
-                ["2.9.7", "exercise"],
-                ["2.9.8", "exercise"],
-                ["2.9.9", "exercise"],
+                ["exercise-2.9.1", "2.9.1", "exercise", 0],
+                ["example-2.9.2", "2.9.2", "example"],
+                ["exercise-2.9.3", "2.9.3", "exercise", 4],
+                ["example-2.9.4", "2.9.4", "example"],
+                ["exercise-2.9.5", "2.9.5", "exercise", 4],
+                ["exercise-2.9.6", "2.9.6", "exercise", 0],
+                ["exercise-2.9.7", "2.9.7", "exercise", 4],
+                ["exercise-2.9.8", "2.9.8", "exercise", 4],
+                ["exercise-2.9.9", "2.9.9", "exercise", 0],
             ],
         )
         self.assertEqual(
-            boxes["02-elements/10-index"], [["2.10.1", "example"], ["2.10.2", "info"]]
+            boxes["02-elements/10-index"],
+            [
+                ["example-2.10.1", "2.10.1", "example"],
+                ["info-2.10.2", "2.10.2", "info"],
+            ],
         )
