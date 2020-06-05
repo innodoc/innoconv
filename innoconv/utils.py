@@ -38,7 +38,7 @@ def to_ast(filepath, ignore_missing_title=False):
     :raises RuntimeError: if pandoc exits with an error
     :raises ValueError: if no title was found
     """
-    pandoc_cmd = ["pandoc", "--to=json", filepath]
+    pandoc_cmd = ["pandoc", "--strip-comments", "--to=json", filepath]
     proc = Popen(pandoc_cmd, stdout=PIPE, stderr=PIPE)
     out, err = proc.communicate(timeout=60)
     out = out.decode(ENCODING)
