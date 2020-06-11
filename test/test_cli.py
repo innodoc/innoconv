@@ -13,7 +13,7 @@ from innoconv.constants import DEFAULT_EXTENSIONS, LOG_FORMAT
 from innoconv.manifest import Manifest
 
 
-MANIFEST = Manifest(data={"title": "Foo title", "languages": ["en"]})
+MANIFEST = Manifest(data={"title": "Foo title", "languages": ["en"], "min_score": 80})
 
 
 @patch("innoconv.cli.Manifest.from_directory", side_effect=(MANIFEST,))

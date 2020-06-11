@@ -11,6 +11,7 @@ MANIFEST = Manifest(
     {
         "title": {"en": "Foo Course Title", "de": "Foo Kurstitel"},
         "languages": ("de", "en"),
+        "min_score": 90,
         "pages": [
             {
                 "id": "test1",
@@ -198,7 +199,9 @@ class TestInnoconvRunner(unittest.TestCase):
 
     def test_run_no_pages(self, *_):
         """Ensure pages key can be missing from manifest."""
-        manifest = Manifest({"title": {"en": "Test"}, "languages": ("en",)})
+        manifest = Manifest(
+            {"title": {"en": "Test"}, "languages": ("en",), "min_score": 90}
+        )
         self.runner = InnoconvRunner("/src", "/out", manifest, [])
         try:
             self.runner.run()

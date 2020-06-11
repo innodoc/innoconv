@@ -43,7 +43,11 @@ class TestWriteManifest(TestExtension):
 
         languages = ("en", "de")
         manifest = Manifest(
-            {"languages": languages, "title": {"en": "Title", "de": "Titel"}}
+            {
+                "languages": languages,
+                "title": {"en": "Title", "de": "Titel"},
+                "min_score": 90,
+            }
         )
         ext = WriteManifest(manifest)
         ext.extension_list([ExtA(manifest), ExtB(manifest)])

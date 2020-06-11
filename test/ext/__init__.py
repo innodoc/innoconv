@@ -35,7 +35,9 @@ class TestExtension(unittest.TestCase):
         for language in languages:
             title[language] = "Title ({})".format(language)
         if manifest is None:
-            manifest = Manifest({"languages": languages, "title": title})
+            manifest = Manifest(
+                {"languages": languages, "title": title, "min_score": 90}
+            )
         try:
             if issubclass(extension, AbstractExtension):
                 ext = extension(manifest)

@@ -26,6 +26,7 @@ Example
      en: Example title
      de: Beispiel-Titel
    languages: en,de
+   min_score: 90
 
 """
 
@@ -44,7 +45,7 @@ class Manifest:
     :type data: dict
     """
 
-    required_fields = ("title", "languages")
+    required_fields = ("title", "languages", "min_score")
     optional_fields = ("home_link", "pages", "mathjax")
 
     def __init__(self, data):

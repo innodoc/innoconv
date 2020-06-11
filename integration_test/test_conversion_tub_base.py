@@ -178,6 +178,7 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertEqual("innoDoc", data["title"]["en"])
             self.assertEqual("_logo.svg", data["logo"])
             self.assertEqual("/page/about", data["home_link"])
+            self.assertEqual(90, data["min_score"])
         self.assertIn("Wrote manifest", stderr)
         return data
 

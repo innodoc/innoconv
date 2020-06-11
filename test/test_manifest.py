@@ -12,6 +12,7 @@ title:
   de: Foo Titel
   en: Foo Title
 languages: [en, de]
+min_score: 80
 """
 
 KEYWORDS = """{}
@@ -49,7 +50,6 @@ class TestManifestFromDirectory(unittest.TestCase):
         )
         manifest = Manifest.from_directory("/path/to/content")
         self.assertIsInstance(manifest, Manifest)
-        print(mopen.call_args_list)
         self.assertEqual(
             mopen.call_args_list,
             [
@@ -86,6 +86,7 @@ class TestManifestFromYaml(unittest.TestCase):
         self.assertIs(len(languages), 2)
         self.assertIn("en", languages)
         self.assertIn("de", languages)
+        self.assertIs(getattr(manifest, "min_score"), 80)
         with self.assertRaises(AttributeError):
             getattr(manifest, "keywords")
         with self.assertRaises(AttributeError):

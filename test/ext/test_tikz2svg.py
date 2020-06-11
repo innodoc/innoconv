@@ -87,6 +87,7 @@ class TestTikz2Svg(TestExtension):
         manifest_data = {
             "languages": ("en",),
             "title": {"en": "Foo"},
+            "min_score": 90,
             "tikz_preamble": TIKZ_PREAMBLE,
         }
         manifest = Manifest(manifest_data)
