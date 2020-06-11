@@ -151,7 +151,7 @@ class TestConversionTubBase(BaseConversionTest):
                 self.assertTrue(isfile(full_filename))
 
     def _test_verbose_output(self, stderr):
-        for section in ("06-formulas", "09-interactive-exercises"):
+        for section in ("06-formulas", "10-interactive-exercises"):
             with self.subTest(section):
                 path = join("de", "02-elements", section, "content.json")
                 self.assertIn(path, stderr)
@@ -203,13 +203,13 @@ class TestConversionTubBase(BaseConversionTest):
         term, occurrences = index_terms["en"]["latex-formula"]
         self.assertEqual(term, "$\\LaTeX$ formula")
         self.assertEqual(1, len(occurrences))
-        self.assertEqual("02-elements/10-index", occurrences[0][0])
+        self.assertEqual("02-elements/11-index", occurrences[0][0])
         self.assertEqual("latex-formula-0", occurrences[0][1])
 
         term, occurrences = index_terms["de"]["latex-formel"]
         self.assertEqual(term, "$\\LaTeX$-Formel")
         self.assertEqual(1, len(occurrences))
-        self.assertEqual("02-elements/10-index", occurrences[0][0])
+        self.assertEqual("02-elements/11-index", occurrences[0][0])
         self.assertEqual("latex-formel-0", occurrences[0][1])
 
     def _test_number_boxes(self, manifest):
@@ -227,8 +227,10 @@ class TestConversionTubBase(BaseConversionTest):
                 "02-elements/04-links/02-external",
                 "02-elements/06-formulas",
                 "02-elements/07-media/01-pgf-tikz",
-                "02-elements/09-interactive-exercises",
-                "02-elements/10-index",
+                "02-elements/10-interactive-exercises",
+                "02-elements/10-interactive-exercises/01-text",
+                "02-elements/10-interactive-exercises/02-checkbox",
+                "02-elements/11-index",
             ],
         )
 
@@ -241,23 +243,17 @@ class TestConversionTubBase(BaseConversionTest):
             ],
         )
         self.assertEqual(
-            boxes["02-elements/09-interactive-exercises"],
+            boxes["02-elements/10-interactive-exercises"],
             [
-                ["exercise-2.9.1", "2.9.1", "exercise", 0],
-                ["example-2.9.2", "2.9.2", "example"],
-                ["exercise-2.9.3", "2.9.3", "exercise", 4],
-                ["example-2.9.4", "2.9.4", "example"],
-                ["exercise-2.9.5", "2.9.5", "exercise", 4],
-                ["exercise-2.9.6", "2.9.6", "exercise", 0],
-                ["exercise-2.9.7", "2.9.7", "exercise", 4],
-                ["exercise-2.9.8", "2.9.8", "exercise", 4],
-                ["exercise-2.9.9", "2.9.9", "exercise", 0],
+                ["EX_DUMMY", "2.10.1", "exercise", 0],
+                ["example-2.10.2", "2.10.2", "example"],
+                ["EX_FULL", "2.10.3", "exercise", 4],
             ],
         )
         self.assertEqual(
-            boxes["02-elements/10-index"],
+            boxes["02-elements/11-index"],
             [
-                ["example-2.10.1", "2.10.1", "example"],
-                ["info-2.10.2", "2.10.2", "info"],
+                ["example-2.11.1", "2.11.1", "example"],
+                ["info-2.11.2", "2.11.2", "info"],
             ],
         )
