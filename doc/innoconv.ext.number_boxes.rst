@@ -1,5 +1,5 @@
 innoconv.ext.number_boxes
-=====================
+=========================
 
 .. automodule:: innoconv.ext.number_boxes
 

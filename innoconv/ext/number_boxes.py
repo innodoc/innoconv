@@ -8,6 +8,11 @@ the whole document structure themselves. This extension adds a field to the
 It will assign an auto-generated ``ID`` based on the box type and number to the
 box div element (in case it doesn't already have one). Also a ``data-number``
 attribute is attached.
+
+Furthermore this extension faciliates the course-wide tracking of exercise
+progress. For each exercise, the achievable points are stored. A viewer
+application can easily display total points per section without having to scan
+all documents for exercises.
 """
 
 import logging
