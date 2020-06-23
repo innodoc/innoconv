@@ -38,7 +38,7 @@ class NumberBoxes(AbstractExtension):
             "section": 0,
             "subsection": 0,
         }
-        self._boxes = OrderedDict()  # Python3.4 support
+        self._boxes = OrderedDict()  # Python3.5 support
         self._language = None
         self._parts = None
         self._done = False
