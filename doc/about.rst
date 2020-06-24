@@ -53,7 +53,7 @@ represenation.
 
   Overview of the innoDoc software architecture.
 
-innoConv does neither have any busisness with how content is displayed nor
+innoConv does neither have any business with how content is displayed nor
 helps in its creation. Instead it leaves these tasks completely to others in
 the processing chain.
 
