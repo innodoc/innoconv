@@ -26,11 +26,12 @@ class TestToAst(unittest.TestCase):
             '"short_title":{"t":"MetaInlines","c":[{"t":"Str","c":"Test"}]}}}'
         )
         _config_process_mock(0, pandoc_output)
-        blocks, title, short_title = to_ast("/some/document.md")
+        blocks, title, short_title, section_type = to_ast("/some/document.md")
         self.assertTrue(popen_mock.called)
         self.assertEqual(blocks, [{"t": "Para", "c": []}])
         self.assertEqual(title, "Test Title")
         self.assertEqual(short_title, "Test")
+        self.assertIsNone(section_type)
 
     def test_to_ast_fails(self, _):
         """Ensure a RuntimeError is raised when pandoc fails."""
@@ -46,7 +47,7 @@ class TestToAst(unittest.TestCase):
         )
         _config_process_mock(0, pandoc_output)
         try:
-            *_, short_title = to_ast("/some/document.md")
+            *_, short_title, section_type = to_ast("/some/document.md")
         except ValueError:
             self.fail("to_ast() raised ValueError!")
         self.assertEqual(short_title, "Test")
@@ -66,3 +67,16 @@ class TestToAst(unittest.TestCase):
             to_ast("/some/document.md", ignore_missing_title=True)
         except ValueError:
             self.fail("to_ast() raised ValueError!")
+
+    def test_extract_section_type(self, popen_mock):
+        """Ensure section type is extracted."""
+        pandoc_output = (
+            '{"blocks":[{"t":"Para","c":[]}],'
+            '"meta":{"title":{"t":"MetaInlines","c":[{"t":"Str","c":"Test"},'
+            '{"t":"Space"},{"t":"Str","c":"Title"}]},'
+            '"type":{"t":"MetaInlines","c":[{"t":"Str","c":"exercises"}]}}}'
+        )
+        _config_process_mock(0, pandoc_output)
+        blocks, _, __, section_type = to_ast("/some/document.md")
+        self.assertTrue(popen_mock.called)
+        self.assertEqual(section_type, "exercises")

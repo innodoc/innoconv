@@ -23,7 +23,7 @@ class GenerateToc(AbstractExtension):
         self._language = None
         self._toc = []
 
-    def _add_to_toc(self, title):
+    def _add_to_toc(self, title, section_type):
         path_components = self._splitall(self._current_path)
         path_components.pop(0)  # language folder
         if not path_components:  # skip root section
@@ -46,7 +46,10 @@ class GenerateToc(AbstractExtension):
                 children = child["children"]
             else:
                 break
+
         child["title"][self._language] = title
+        if section_type:
+            child["type"] = section_type
 
     @staticmethod
     def _splitall(path):
@@ -75,10 +78,10 @@ class GenerateToc(AbstractExtension):
         """Remember current path."""
         self._current_path = path
 
-    def post_process_file(self, _, title, content_type):
+    def post_process_file(self, _, title, content_type, section_type=None):
         """Add this section file to the TOC."""
         if content_type == "section":
-            self._add_to_toc(title)
+            self._add_to_toc(title, section_type)
 
     def manifest_fields(self):
         """Add `toc` field to manifest."""

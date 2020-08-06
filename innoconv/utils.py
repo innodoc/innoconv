@@ -3,7 +3,7 @@
 import json
 from subprocess import PIPE, Popen
 
-from innoconv.constants import ENCODING
+from innoconv.constants import ALLOWED_SECTION_TYPES, ENCODING
 
 
 def to_string(ast):
@@ -32,8 +32,8 @@ def to_ast(filepath, ignore_missing_title=False):
     :param ignore_missing_title: Accept missing title in source file
     :type ignore_missing_title: bool
 
-    :rtype: (list of dicts, str)
-    :returns: (Pandoc AST, title)
+    :rtype: (list of dicts, str, str, str)
+    :returns: (Pandoc AST, title, short_title, section_type)
 
     :raises RuntimeError: if pandoc exits with an error
     :raises ValueError: if no title was found
@@ -50,6 +50,8 @@ def to_ast(filepath, ignore_missing_title=False):
 
     loaded = json.loads(out)
     blocks = loaded["blocks"]
+
+    # extract title
     try:
         title_ast = loaded["meta"]["title"]["c"]
     except KeyError:
@@ -64,4 +66,13 @@ def to_ast(filepath, ignore_missing_title=False):
         short_title_ast = None
     short_title = to_string(short_title_ast) if short_title_ast else title
 
-    return blocks, title, short_title
+    # extract type
+    section_type = None
+    try:
+        section_type = to_string(loaded["meta"]["type"]["c"])
+        if section_type not in ALLOWED_SECTION_TYPES:
+            raise ValueError("Invalid section type: {}".format(section_type))
+    except KeyError:
+        pass
+
+    return blocks, title, short_title, section_type

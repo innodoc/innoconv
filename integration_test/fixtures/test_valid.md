@@ -1,6 +1,7 @@
 ---
 title: Test document
 short_title: Test
+type: exercises
 ---
 
 # Section 1 (10 words)

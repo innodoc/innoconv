@@ -188,7 +188,7 @@ class CopyStatic(AbstractExtension):
         """Remember file path."""
         self._current_path = path
 
-    def post_process_file(self, ast, _, __):
+    def post_process_file(self, ast, *_):
         """Find all static files in AST."""
         TraverseAst(self.process_element).traverse(ast)
 

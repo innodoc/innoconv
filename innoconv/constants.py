@@ -3,6 +3,9 @@
 import os
 
 
+#: Allowed section types
+ALLOWED_SECTION_TYPES = ("exercises", "test")
+
 #: Default innoconv output directory
 DEFAULT_OUTPUT_DIR_BASE = os.path.join(".", "innoconv_output")
 

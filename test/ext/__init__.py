@@ -54,7 +54,7 @@ class TestExtension(unittest.TestCase):
                 file_ast = deepcopy(ast)
                 asts.append(file_ast)
                 file_title = "{} {}".format(title, language)
-                ext.post_process_file(file_ast, file_title, "section")
+                ext.post_process_file(file_ast, file_title, "section", "test")
             ext.post_conversion(language)
         ext.finish()
         return ext, asts

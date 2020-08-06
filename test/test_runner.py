@@ -109,10 +109,14 @@ def walk_side_effect_section_differs(path):
 
 TITLE = "Long title"
 SHORT_TITLE = "Short"
+SECTION_TYPE = "test"
 
 
 @patch("builtins.open")
-@patch("innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE))
+@patch(
+    "innoconv.runner.to_ast",
+    return_value=(["content_ast"], TITLE, SHORT_TITLE, SECTION_TYPE),
+)
 @patch("json.dump")
 @patch("innoconv.runner.exists", return_value=True)
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
@@ -211,7 +215,10 @@ class TestInnoconvRunner(unittest.TestCase):
 
 @patch("builtins.open")
 @patch("innoconv.runner.EXTENSIONS", {"my_ext": AbstractExtension})
-@patch("innoconv.runner.to_ast", return_value=(["content_ast"], TITLE, SHORT_TITLE))
+@patch(
+    "innoconv.runner.to_ast",
+    return_value=(["content_ast"], TITLE, SHORT_TITLE, SECTION_TYPE),
+)
 @patch("json.dump")
 @patch("innoconv.runner.exists", return_value=True)
 @patch("innoconv.runner.walk", side_effect=walk_side_effect)
@@ -281,17 +288,17 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         for i in list(range(0, 5)) + list(range(8, 13)):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
-                call(["content_ast"], TITLE, "section"),
+                call(["content_ast"], TITLE, "section", "test"),
             )
         for i in (5, 13):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
-                call(["content_ast"], TITLE, "page"),
+                call(["content_ast"], TITLE, "page", None),
             )
         for i in (6, 7, 14, 15):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
-                call(["content_ast"], TITLE, "fragment"),
+                call(["content_ast"], TITLE, "fragment", None),
             )
 
         self.assertEqual(mocks["post_conversion"].call_count, 2)

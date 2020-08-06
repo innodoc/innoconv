@@ -134,8 +134,10 @@ class InnoconvRunner:
 
         # convert file using pandoc
         self._notify_extensions("pre_process_file", rel_path)
-        ast, title, _ = to_ast(filepath)
-        self._notify_extensions("post_process_file", ast, title, "section")
+        ast, title, _, section_type = to_ast(filepath)
+        self._notify_extensions(
+            "post_process_file", ast, title, "section", section_type
+        )
 
         # write file content
         makedirs(dirname(filepath_out), exist_ok=True)
@@ -170,8 +172,8 @@ class InnoconvRunner:
 
         # convert
         self._notify_extensions("pre_process_file", rel_path)
-        ast, title, short_title = to_ast(filepath)
-        self._notify_extensions("post_process_file", ast, title, "page")
+        ast, title, short_title, _ = to_ast(filepath)
+        self._notify_extensions("post_process_file", ast, title, "page", None)
         try:
             page["short_title"][language] = short_title
         except KeyError:
@@ -197,8 +199,8 @@ class InnoconvRunner:
 
             # convert
             self._notify_extensions("pre_process_file", rel_path)
-            ast, title, _ = to_ast(filepath, ignore_missing_title=True)
-            self._notify_extensions("post_process_file", ast, title, "fragment")
+            ast, title, _, _ = to_ast(filepath, ignore_missing_title=True)
+            self._notify_extensions("post_process_file", ast, title, "fragment", None)
 
             # write json output
             output_filename = "{}{}.json".format(FOOTER_FRAGMENT_PREFIX, part)
