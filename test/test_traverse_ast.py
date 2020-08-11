@@ -14,8 +14,6 @@ from .utils import (
     get_table_ast,
 )
 
-# TODO: test preventing of sub-tree traversion by passing True in func
-
 
 class TestTraverseAst(unittest.TestCase):
     """Test the TraverseAst class."""
