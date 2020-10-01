@@ -125,7 +125,8 @@ class TestCopyStatic(TestExtension):
                 jpath = "{}/".format("/".join(path)) if path else ""
                 self.assertEqual(asts[i][1]["c"][0]["c"][2][0], "_en/present.png")
                 self.assertEqual(
-                    asts[i][2]["c"][0]["c"][0]["c"][2][0], "_en/subfolder/present.mp4",
+                    asts[i][2]["c"][0]["c"][0]["c"][2][0],
+                    "_en/subfolder/present.mp4",
                 )
                 self.assertEqual(asts[i][3]["c"][2]["c"][2][0], "_en/localizable.gif")
                 self.assertEqual(
@@ -175,7 +176,8 @@ class TestCopyStatic(TestExtension):
         """Ensure ignoring of YouTube reference."""
         ast = [
             get_youtube_ast(
-                "https://www.youtube.com/watch?v=C0DPdy98e4c", title="Test video",
+                "https://www.youtube.com/watch?v=C0DPdy98e4c",
+                title="Test video",
             )
         ]
         self._run(CopyStatic, ast)
@@ -304,11 +306,13 @@ class TestCopyStatic(TestExtension):
         _, asts = self._run(CopyStatic, ast)
         self.assertEqual(copyfile.call_count, 2)
         call_args = call(
-            "/source/de/_static/present.png", "/destination/_static/_de/present.png",
+            "/source/de/_static/present.png",
+            "/destination/_static/_de/present.png",
         )
         self.assertIn(call_args, copyfile.call_args_list)
         call_args = call(
-            "/source/en/_static/present.png", "/destination/_static/_en/present.png",
+            "/source/en/_static/present.png",
+            "/destination/_static/_en/present.png",
         )
         self.assertIn(call_args, copyfile.call_args_list)
         for i, (title, path) in enumerate(PATHS):
@@ -317,5 +321,6 @@ class TestCopyStatic(TestExtension):
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
                 self.assertEqual(
-                    asts[i + len(PATHS)][1]["c"][0]["c"][2][0], "_de/present.png",
+                    asts[i + len(PATHS)][1]["c"][0]["c"][2][0],
+                    "_de/present.png",
                 )

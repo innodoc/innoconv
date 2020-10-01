@@ -11,7 +11,11 @@ class TestJoinStrings(TestExtension):
 
     @staticmethod
     def _run(
-        extension=JoinStrings, ast=None, languages=("en",), paths=PATHS, manifest=None,
+        extension=JoinStrings,
+        ast=None,
+        languages=("en",),
+        paths=PATHS,
+        manifest=None,
     ):
         _, [ast] = TestExtension._run(extension, ast, languages=languages, paths=paths)
         return ast

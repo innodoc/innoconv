@@ -34,18 +34,22 @@ class TestGenerateToc(TestExtension):
         self.assertIs(len(toc[0]["children"][0]["children"]), 2)
         self.assertEqual(toc[0]["children"][0]["children"][0]["id"], "title-1-1-1")
         self.assertEqual(
-            toc[0]["children"][0]["children"][0]["title"]["de"], "Title 1-1-1 de",
+            toc[0]["children"][0]["children"][0]["title"]["de"],
+            "Title 1-1-1 de",
         )
         self.assertEqual(
-            toc[0]["children"][0]["children"][0]["title"]["en"], "Title 1-1-1 en",
+            toc[0]["children"][0]["children"][0]["title"]["en"],
+            "Title 1-1-1 en",
         )
         self.assertEqual(toc[0]["children"][0]["children"][0]["type"], "test")
         self.assertEqual(toc[0]["children"][0]["children"][1]["id"], "title-1-1-2")
         self.assertEqual(
-            toc[0]["children"][0]["children"][1]["title"]["de"], "Title 1-1-2 de",
+            toc[0]["children"][0]["children"][1]["title"]["de"],
+            "Title 1-1-2 de",
         )
         self.assertEqual(
-            toc[0]["children"][0]["children"][1]["title"]["en"], "Title 1-1-2 en",
+            toc[0]["children"][0]["children"][1]["title"]["en"],
+            "Title 1-1-2 en",
         )
         self.assertEqual(toc[0]["children"][0]["children"][1]["type"], "test")
         self.assertEqual(toc[1]["id"], "title-2")

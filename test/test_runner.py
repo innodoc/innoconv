@@ -30,7 +30,11 @@ def walk_side_effect(path):
     lang = path[-2:]
     return iter(
         [
-            ("/src/{}".format(lang), ["section-1", "section-2"], ["content.md"],),
+            (
+                "/src/{}".format(lang),
+                ["section-1", "section-2"],
+                ["content.md"],
+            ),
             (
                 "/src/{}/section-1".format(lang),
                 ["section-1.1", "section-1.2", "_static"],
