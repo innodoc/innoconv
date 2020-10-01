@@ -17,7 +17,7 @@ class GenerateToc(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
-        super(GenerateToc, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._output_dir = None
         self._current_path = None
         self._language = None

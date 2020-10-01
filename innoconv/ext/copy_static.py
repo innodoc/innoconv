@@ -71,7 +71,7 @@ class CopyStatic(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
-        super(CopyStatic, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._source_dir = None
         self._output_dir = None
         self._current_language = None
@@ -188,7 +188,7 @@ class CopyStatic(AbstractExtension):
         """Remember file path."""
         self._current_path = path
 
-    def post_process_file(self, ast, *_):
+    def post_process_file(self, ast, title, content_type, section_type=None):
         """Find all static files in AST."""
         TraverseAst(self.process_element).traverse(ast)
 

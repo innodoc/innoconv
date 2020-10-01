@@ -31,7 +31,7 @@ class IndexTerms(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
-        super(IndexTerms, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._current_section_name = None
         self._language = None
         self._index_terms = {}
@@ -79,7 +79,7 @@ class IndexTerms(AbstractExtension):
         self._current_section_name = path[3:]  # strip language
         self._page_occurences = {}
 
-    def post_process_file(self, ast, _, content_type, __):
+    def post_process_file(self, ast, title, content_type, section_type=None):
         """Scan the AST."""
         if content_type == "section":
             TraverseAst(self.process_element).traverse(ast)

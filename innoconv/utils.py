@@ -54,11 +54,13 @@ def to_ast(filepath, ignore_missing_title=False):
     # extract title
     try:
         title_ast = loaded["meta"]["title"]["c"]
-    except KeyError:
+    except KeyError as err:
         if ignore_missing_title:
             title_ast = []
         else:
-            raise ValueError("Missing title in meta block in {}".format(filepath))
+            raise ValueError(
+                "Missing title in meta block in {}".format(filepath)
+            ) from err
     title = to_string(title_ast)
     try:
         short_title_ast = loaded["meta"]["short_title"]["c"]

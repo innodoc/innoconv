@@ -22,7 +22,7 @@ class WriteManifest(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
-        super(WriteManifest, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._output_dir = None
 
     def _write_manifest(self):

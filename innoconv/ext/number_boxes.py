@@ -32,7 +32,7 @@ class NumberBoxes(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
-        super(NumberBoxes, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._counters = {
             "box": 0,
             "section": 0,
@@ -130,7 +130,7 @@ class NumberBoxes(AbstractExtension):
         """Remember current path."""
         self._parts = Path(path).parts[1:]  # strip language folder
 
-    def post_process_file(self, ast, _, content_type, __):
+    def post_process_file(self, ast, title, content_type, section_type=None):
         """Scan the AST."""
         if content_type == "section":
             self._num_boxes = 0

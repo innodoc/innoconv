@@ -47,7 +47,7 @@ class TestToAst(unittest.TestCase):
         )
         _config_process_mock(0, pandoc_output)
         try:
-            *_, short_title, section_type = to_ast("/some/document.md")
+            *_, short_title, _ = to_ast("/some/document.md")
         except ValueError:
             self.fail("to_ast() raised ValueError!")
         self.assertEqual(short_title, "Test")
@@ -77,6 +77,6 @@ class TestToAst(unittest.TestCase):
             '"type":{"t":"MetaInlines","c":[{"t":"Str","c":"exercises"}]}}}'
         )
         _config_process_mock(0, pandoc_output)
-        blocks, _, __, section_type = to_ast("/some/document.md")
+        _, __, ___, section_type = to_ast("/some/document.md")
         self.assertTrue(popen_mock.called)
         self.assertEqual(section_type, "exercises")

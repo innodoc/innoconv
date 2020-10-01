@@ -122,11 +122,11 @@ class InnoconvRunner:
                         "Inconsistent directory structure: "
                         "Section {} differs.".format(rel_path)
                     )
-            except IndexError:
+            except IndexError as err:
                 raise RuntimeError(
                     "Inconsistent directory structure: "
                     "Extra section {} present.".format(rel_path)
-                )
+                ) from err
 
         # full filepath
         output_filename = "{}.json".format(CONTENT_BASENAME)

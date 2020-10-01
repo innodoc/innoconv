@@ -31,7 +31,7 @@ class JoinStrings(AbstractExtension):
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
-        super(JoinStrings, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.previous_element = None  # the element we merge to
 
     # content parsing
@@ -103,6 +103,6 @@ class JoinStrings(AbstractExtension):
 
     # extension events
 
-    def post_process_file(self, ast, *_):
+    def post_process_file(self, ast, title, content_type, section_type=None):
         """Process AST in-place."""
         self._process_ast_element(ast)
