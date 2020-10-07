@@ -3,7 +3,7 @@
 ARG INNOCONV_IMAGE=innodoc/innoconv
 FROM $INNOCONV_IMAGE AS innoconv
 
-FROM alpine:3.11
+FROM alpine:3.12
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
 ARG PYTHON_VERSIONS
