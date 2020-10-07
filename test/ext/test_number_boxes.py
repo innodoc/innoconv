@@ -61,18 +61,12 @@ class TestNumberBoxes(TestExtension):
         for i, section in enumerate(("1.0", "2.0", "2.1")):
             ast = asts[i]
             with self.subTest(section=section):
-                self.assertEqual(ast[1]["c"][0][0], "info-{}.1".format(section))
-                self.assertEqual(
-                    ast[1]["c"][0][2][0], ("data-number", "{}.1".format(section))
-                )
+                self.assertEqual(ast[1]["c"][0][0], f"info-{section}.1")
+                self.assertEqual(ast[1]["c"][0][2][0], ("data-number", f"{section}.1"))
                 self.assertEqual(ast[3]["c"][0][0], "EXAM_ID")
-                self.assertEqual(
-                    ast[3]["c"][0][2][0], ("data-number", "{}.2".format(section))
-                )
+                self.assertEqual(ast[3]["c"][0][2][0], ("data-number", f"{section}.2"))
                 self.assertEqual(ast[4]["c"][0][0], "EXER_ID")
-                self.assertEqual(
-                    ast[4]["c"][0][2][0], ("data-number", "{}.3".format(section))
-                )
+                self.assertEqual(ast[4]["c"][0][2][0], ("data-number", f"{section}.3"))
 
     def test_missing_box(self, warning):
         """Test detection of missing box."""

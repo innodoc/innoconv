@@ -52,7 +52,7 @@ class IndexTerms(AbstractExtension):
         # add to manifest field
         entry = [
             self._current_section_name,
-            "{}-{}".format(index_term_slug, number),
+            f"{index_term_slug}-{number}",
         ]
         try:
             self._index_terms[self._language][index_term_slug][1].append(entry)

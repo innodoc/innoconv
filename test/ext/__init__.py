@@ -33,7 +33,7 @@ class TestExtension(unittest.TestCase):
             ast = get_filler_content()
         title = {}
         for language in languages:
-            title[language] = "Title ({})".format(language)
+            title[language] = f"Title ({language})"
         if manifest is None:
             manifest = Manifest(
                 {"languages": languages, "title": title, "min_score": 90}
@@ -53,7 +53,7 @@ class TestExtension(unittest.TestCase):
                 ext.pre_process_file(join(language, *path))
                 file_ast = deepcopy(ast)
                 asts.append(file_ast)
-                file_title = "{} {}".format(title, language)
+                file_title = f"{title} {language}"
                 ext.post_process_file(file_ast, file_title, "section", "test")
             ext.post_conversion(language)
         ext.finish()

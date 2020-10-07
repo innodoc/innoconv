@@ -52,7 +52,7 @@ class Manifest:
         """Initialize Manifest."""
         for field in self.required_fields:
             if field not in data:
-                msg = "Required field {} not found in manifest!".format(field)
+                msg = f"Required field {field} not found in manifest!"
                 raise RuntimeError(msg)
         for key, value in data.items():
             setattr(self, key, value)
@@ -70,7 +70,7 @@ class Manifest:
         """
 
         def _read_manifest_data(file_ext):
-            filename = "{}.{}".format(MANIFEST_BASENAME, file_ext)
+            filename = f"{MANIFEST_BASENAME}.{file_ext}"
             with open(os.path.join(dirpath, filename), "r") as file:
                 return file.read()
 

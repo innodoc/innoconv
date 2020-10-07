@@ -109,7 +109,7 @@ class CopyStatic(AbstractExtension):
             ref_path = orig_path
             section_path = self._current_path[3:]  # strip language
             if section_path:
-                section_path = "{}/".format(section_path.strip("/"))
+                section_path = f"{section_path.strip('/')}/"
         return self._add_static(ref_path, section_path)
 
     def _add_static(self, ref_path, section_path=""):
@@ -120,7 +120,7 @@ class CopyStatic(AbstractExtension):
 
         def _get_dest_file_path(root_dir, _path, _sec_path, lang=""):
             if lang:
-                lang = "_{}".format(lang)
+                lang = f"_{lang}"
             return os.path.join(root_dir, STATIC_FOLDER, lang, _sec_path, _path)
 
         # localized version
@@ -130,15 +130,14 @@ class CopyStatic(AbstractExtension):
         dst = _get_dest_file_path(
             self._output_dir, ref_path, section_path, self._current_language
         )
-        rewritten = "_{}/{}{}".format(self._current_language, section_path, ref_path)
+        rewritten = f"_{self._current_language}/{section_path}{ref_path}"
         if not os.path.isfile(src):
             # common version
             src = _get_src_file_path(self._source_dir, ref_path, section_path)
             dst = _get_dest_file_path(self._output_dir, ref_path, section_path)
-            rewritten = "{}{}".format(section_path, ref_path)
+            rewritten = f"{section_path}{ref_path}"
             if not os.path.isfile(src):
-                msg = "Missing static file {}".format(ref_path)
-                raise RuntimeError(msg)
+                raise RuntimeError(f"Missing static file {ref_path}")
 
         self._to_copy.add((src, dst))
         return rewritten
@@ -157,7 +156,7 @@ class CopyStatic(AbstractExtension):
     def _add_logo(self):
         for ext in LOGO_EXTENSIONS:
             try:
-                logo_filename = "_logo.{}".format(ext)
+                logo_filename = f"_logo.{ext}"
                 self._add_static(logo_filename)
                 self._logo_filename = logo_filename
                 logging.info("Logo %s copied.", logo_filename)

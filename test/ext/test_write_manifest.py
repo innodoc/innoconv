@@ -17,9 +17,7 @@ class TestWriteManifest(TestExtension):
         """Test the creation of a manifest file in the destination directory."""
         self._run(WriteManifest)
         self.assertIs(mock_open.call_count, 1)
-        self.assertEqual(
-            mock_open.call_args, call("{}/manifest.json".format(DEST), "w")
-        )
+        self.assertEqual(mock_open.call_args, call(f"{DEST}/manifest.json", "w"))
         self.assertIs(mock_dump.call_count, 1)
         manifest_dict = mock_dump.call_args[0][0]
         self.assertEqual(manifest_dict["title"]["en"], "Title (en)")

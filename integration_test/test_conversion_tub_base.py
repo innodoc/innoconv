@@ -16,7 +16,7 @@ from innoconv.constants import (
 from innoconv.ext.tikz2svg import TIKZ_FOLDER
 from . import BaseConversionTest, REPO_DIR
 
-OUTPUT_CONTENT_FILENAME = "{}.json".format(CONTENT_BASENAME)
+OUTPUT_CONTENT_FILENAME = f"{CONTENT_BASENAME}.json"
 
 
 class TestConversionTubBase(BaseConversionTest):
@@ -76,7 +76,7 @@ class TestConversionTubBase(BaseConversionTest):
     def _test_footer_fragments(self):
         for lang in ("de", "en"):
             for part in ("a", "b"):
-                filename = "{}{}.json".format(FOOTER_FRAGMENT_PREFIX, part)
+                filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.json"
                 filepath = join(self.output_dir, lang, filename)
                 with open(filepath) as file:
                     data = json.load(file)
@@ -164,7 +164,7 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual(length, 5)
 
     def _test_write_manifest(self, stderr):
-        filepath = join(self.output_dir, "{}.json".format(MANIFEST_BASENAME))
+        filepath = join(self.output_dir, f"{MANIFEST_BASENAME}.json")
         self.assertTrue(isfile(filepath))
         with open(filepath) as file:
             # For Python3.5 use OrderedDict

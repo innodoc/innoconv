@@ -30,6 +30,6 @@ class BaseConversionTest(TestCase):
         """Create a copy of the content repository."""
         ignore = ignore if callable(ignore) else ignore_patterns(*ignore)
         rand = "".join(choice(ascii_lowercase + digits) for _ in range(8))
-        repo_copy_dir = join(self.tmp_dir.name, "repo-copy-{}".format(rand))
+        repo_copy_dir = join(self.tmp_dir.name, f"repo-copy-{rand}")
         copytree(REPO_DIR, repo_copy_dir, ignore=ignore)
         return repo_copy_dir

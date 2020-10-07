@@ -31,18 +31,18 @@ def walk_side_effect(path):
     return iter(
         [
             (
-                "/src/{}".format(lang),
+                f"/src/{lang}",
                 ["section-1", "section-2"],
                 ["content.md"],
             ),
             (
-                "/src/{}/section-1".format(lang),
+                f"/src/{lang}/section-1",
                 ["section-1.1", "section-1.2", "_static"],
                 ["content.md"],
             ),
-            ("/src/{}/section-1/section-1.1".format(lang), [], ["content.md"]),
-            ("/src/{}/section-1/section-1.2".format(lang), [], ["content.md"]),
-            ("/src/{}/section-2".format(lang), [], ["content.md"]),
+            (f"/src/{lang}/section-1/section-1.1", [], ["content.md"]),
+            (f"/src/{lang}/section-1/section-1.2", [], ["content.md"]),
+            (f"/src/{lang}/section-2", [], ["content.md"]),
         ]
     )
 
@@ -50,7 +50,7 @@ def walk_side_effect(path):
 def walk_side_effect_missing_content_file(path):
     """Simulate a traversal with a content file missing."""
     lang = path[-2:]
-    return iter([("/src/{}".format(lang), ["section-1", "section-2"], [])])
+    return iter([(f"/src/{lang}", ["section-1", "section-2"], [])])
 
 
 def walk_side_effect_extra_section(path):

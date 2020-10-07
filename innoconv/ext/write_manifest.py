@@ -18,7 +18,7 @@ from innoconv.manifest import Manifest
 class WriteManifest(AbstractExtension):
     """Write a manifest file when conversion is done."""
 
-    _helptext = "Write a {}.json file.".format(MANIFEST_BASENAME)
+    _helptext = f"Write a {MANIFEST_BASENAME}.json file."
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
@@ -42,7 +42,7 @@ class WriteManifest(AbstractExtension):
             except AttributeError:
                 pass
         # write file
-        filename = "{}.json".format(MANIFEST_BASENAME)
+        filename = f"{MANIFEST_BASENAME}.json"
         filepath = join(self._output_dir, filename)
         with open(filepath, "w") as out_file:
             json.dump(manifest_dict, out_file)

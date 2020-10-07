@@ -91,7 +91,7 @@ class Tikz2Svg(AbstractExtension):
         pipe.wait()
         if pipe.returncode != 0:
             critical(cmd)
-            critical("Error: {}".format(pipe.returncode))
+            critical("Error: %d", pipe.returncode)
             critical("Printing program stdout:")
             critical(pipe.stdout.read().decode(ENCODING))
             critical("Printing program stderr:")
@@ -107,14 +107,14 @@ class Tikz2Svg(AbstractExtension):
         code = element["c"][1].strip()
         tikz_hash = md5(code.encode()).hexdigest()
         self._tikz_images[tikz_hash] = code
-        filename = "{}.svg".format(Tikz2Svg._get_tikz_name(tikz_hash))
+        filename = f"{Tikz2Svg._get_tikz_name(tikz_hash)}.svg"
         element["t"] = "Image"
         element["c"] = [
             ["", [], []],
             caption or [],
             [join(TIKZ_FOLDER, filename), TIKZ_IMG_TAG_ALT],
         ]
-        info("Found TikZ image {}".format(filename))
+        info("Found TikZ image %s", filename)
 
     def _parse_tikz(self, elem, parent):
         try:
@@ -132,7 +132,7 @@ class Tikz2Svg(AbstractExtension):
         self._tikz_found(elem)
 
     def _render_and_copy_tikz(self):
-        info("Compiling {} TikZ images.".format(len(self._tikz_images)))
+        info("Compiling %d TikZ images.", len(self._tikz_images))
         if not self._tikz_images:
             return
         with TemporaryDirectory(prefix="innoconv-tikz2pdf-") as tmp_dir:
@@ -154,13 +154,13 @@ class Tikz2Svg(AbstractExtension):
                 texdoc = TEX_FILE_TEMPLATE.format(
                     tikz_code=tikz_code, preamble=preamble
                 )
-                info("Compiling {}".format(file_base))
+                info("Compiling %s", file_base)
                 # compile tex
                 cmd = CMD_PDFLATEX.format(join("pdf_out", file_base))
                 self._run(cmd, tmp_dir, stdin=texdoc)
                 # convert to SVG
-                pdf_filename = join(pdf_path, "{}.pdf".format(file_base))
-                svg_filename = join(svg_path, "{}.svg".format(file_base))
+                pdf_filename = join(pdf_path, f"{file_base}.pdf")
+                svg_filename = join(svg_path, f"{file_base}.svg")
                 cmd = CMD_PDF2SVG.format(pdf_filename, svg_filename)
                 self._run(cmd, tmp_dir)
             # copy SVG files

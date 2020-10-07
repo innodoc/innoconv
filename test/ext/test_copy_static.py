@@ -122,7 +122,7 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 11)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 self.assertEqual(asts[i][1]["c"][0]["c"][2][0], "_en/present.png")
                 self.assertEqual(
                     asts[i][2]["c"][0]["c"][0]["c"][2][0],
@@ -131,14 +131,14 @@ class TestCopyStatic(TestExtension):
                 self.assertEqual(asts[i][3]["c"][2]["c"][2][0], "_en/localizable.gif")
                 self.assertEqual(
                     asts[i][3]["c"][3]["c"][2][0],
-                    "_en/{}example_video.ogv".format(jpath),
+                    f"_en/{jpath}example_video.ogv",
                 )
                 self.assertEqual(
                     asts[i][4]["c"][2][0], "https://www.example.com/example.png"
                 )
                 self.assertEqual(
                     asts[i][5]["c"][0]["c"][1][0]["c"][2][0],
-                    "_en/{}example_image.jpg".format(jpath),
+                    f"_en/{jpath}example_image.jpg",
                 )
 
     def test_file_does_not_exist(self, *args):
@@ -215,24 +215,24 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 8)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest(("en", title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 call_args = call(
-                    "/source/en/_static/{}localizable.gif".format(jpath),
-                    "/destination/_static/_en/{}localizable.gif".format(jpath),
+                    f"/source/en/_static/{jpath}localizable.gif",
+                    f"/destination/_static/_en/{jpath}localizable.gif",
                 )
                 self.assertIn(call_args, copyfile.call_args_list)
-                src = "_en/{}localizable.gif".format(jpath)
+                src = f"_en/{jpath}localizable.gif"
                 self.assertEqual(asts[i][0]["c"][2][0], src)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest(("la", title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 call_args = call(
-                    "/source/_static/{}localizable.gif".format(jpath),
-                    "/destination/_static/{}localizable.gif".format(jpath),
+                    f"/source/_static/{jpath}localizable.gif",
+                    f"/destination/_static/{jpath}localizable.gif",
                 )
                 self.assertIn(call_args, copyfile.call_args_list)
                 idx = i + len(PATHS)
-                src = "{}localizable.gif".format(jpath)
+                src = f"{jpath}localizable.gif"
                 self.assertEqual(asts[idx][0]["c"][2][0], src)
 
     def test_relative_localized(self, copyfile, *_):
@@ -242,13 +242,13 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 4)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 call_args = call(
-                    "/source/en/_static/{}example_video.ogv".format(jpath),
-                    "/destination/_static/_en/{}example_video.ogv".format(jpath),
+                    f"/source/en/_static/{jpath}example_video.ogv",
+                    f"/destination/_static/_en/{jpath}example_video.ogv",
                 )
                 self.assertIn(call_args, copyfile.call_args_list)
-                src = "_en/{}example_video.ogv".format(jpath)
+                src = f"_en/{jpath}example_video.ogv"
                 self.assertEqual(asts[i][0]["c"][2][0], src)
 
     def test_relative_nonlocalized(self, copyfile, isfile, *_):
@@ -259,13 +259,13 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 4)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 call_args = call(
-                    "/source/_static/{}example_image.jpg".format(jpath),
-                    "/destination/_static/{}example_image.jpg".format(jpath),
+                    f"/source/_static/{jpath}example_image.jpg",
+                    f"/destination/_static/{jpath}example_image.jpg",
                 )
                 self.assertIn(call_args, copyfile.call_args_list)
-                src = "{}example_image.jpg".format(jpath)
+                src = f"{jpath}example_image.jpg"
                 self.assertEqual(asts[i][0]["c"][2][0], src)
 
     def test_relative_two_langs(self, copyfile, *_):
@@ -276,23 +276,23 @@ class TestCopyStatic(TestExtension):
         self.assertEqual(copyfile.call_count, 8)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 call_args = call(
-                    "/source/de/_static/{}localized_present.png".format(jpath),
-                    "/destination/_static/_de/{}localized_present.png".format(jpath),
+                    f"/source/de/_static/{jpath}localized_present.png",
+                    f"/destination/_static/_de/{jpath}localized_present.png",
                 )
                 self.assertIn(call_args, copyfile.call_args_list)
-                src = "_de/{}localized_present.png".format(jpath)
+                src = f"_de/{jpath}localized_present.png"
                 self.assertEqual(asts[i][0]["c"][2][0], src)
         for i, (title, path) in enumerate(PATHS):
             with self.subTest((title, path)):
-                jpath = "{}/".format("/".join(path)) if path else ""
+                jpath = f"{'/'.join(path)}/" if path else ""
                 call_args = call(
-                    "/source/en/_static/{}localized_present.png".format(jpath),
-                    "/destination/_static/_en/{}localized_present.png".format(jpath),
+                    f"/source/en/_static/{jpath}localized_present.png",
+                    f"/destination/_static/_en/{jpath}localized_present.png",
                 )
                 self.assertIn(call_args, copyfile.call_args_list)
-                src = "_en/{}localized_present.png".format(jpath)
+                src = f"_en/{jpath}localized_present.png"
                 self.assertEqual(asts[i + len(PATHS)][0]["c"][2][0], src)
 
     def test_deep_single_picture(self, copyfile, *_):

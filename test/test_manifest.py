@@ -15,11 +15,9 @@ languages: [en, de]
 min_score: 80
 """
 
-KEYWORDS = """{}
+KEYWORDS = f"""{MINIMUM}
 keywords: [foo, bar, baz]
-""".format(
-    MINIMUM
-)
+"""
 
 MISSING_TITLE = """
 languages: [en, de]

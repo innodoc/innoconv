@@ -45,8 +45,11 @@ def to_ast(filepath, ignore_missing_title=False):
     err = err.decode(ENCODING)
 
     if proc.returncode != 0:
-        msg = "pandoc process returned exit code ({}). This is the pandoc output:\n{}"
-        raise RuntimeError(msg.format(proc.returncode, err))
+        msg = (
+            f"pandoc process returned exit code ({proc.returncode}). "
+            f"This is the pandoc output:\n{err}"
+        )
+        raise RuntimeError(msg)
 
     loaded = json.loads(out)
     blocks = loaded["blocks"]
@@ -58,9 +61,8 @@ def to_ast(filepath, ignore_missing_title=False):
         if ignore_missing_title:
             title_ast = []
         else:
-            raise ValueError(
-                "Missing title in meta block in {}".format(filepath)
-            ) from err
+            msg = f"Missing title in meta block in {filepath}"
+            raise ValueError(msg) from err
     title = to_string(title_ast)
     try:
         short_title_ast = loaded["meta"]["short_title"]["c"]
@@ -73,7 +75,7 @@ def to_ast(filepath, ignore_missing_title=False):
     try:
         section_type = to_string(loaded["meta"]["type"]["c"])
         if section_type not in ALLOWED_SECTION_TYPES:
-            raise ValueError("Invalid section type: {}".format(section_type))
+            raise ValueError(f"Invalid section type: {section_type}")
     except KeyError:
         pass
 

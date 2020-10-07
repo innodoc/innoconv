@@ -52,7 +52,7 @@ class NumberBoxes(AbstractExtension):
         if elem["c"][0][0]:
             box_id = elem["c"][0][0]
         else:
-            box_id = "{}-{}".format(box_type, number)
+            box_id = f"{box_type}-{number}"
             if box_type == "exercise":
                 logging.warning(
                     "Section %s has exercise without ID: %s for language %s",

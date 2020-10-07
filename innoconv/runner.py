@@ -66,7 +66,7 @@ class InnoconvRunner:
         path = abspath(join(self._source_dir, language))
 
         if not isdir(path):
-            raise RuntimeError("Error: Directory {} does not exist".format(path))
+            raise RuntimeError(f"Error: Directory {path} does not exist")
 
         section_num = 0
         for root, dirs, files in walk(path):
@@ -81,21 +81,20 @@ class InnoconvRunner:
             dirs.sort()  # sort section names
 
             # process section
-            content_filename = "{}.md".format(CONTENT_BASENAME)
+            content_filename = f"{CONTENT_BASENAME}.md"
             if content_filename in files:
                 filepath = join(root, content_filename)
                 self._process_section(filepath, lang_num, section_num)
                 section_num += 1
             else:
-                raise RuntimeError(
-                    "Found section without content file: {}".format(root)
-                )
+                raise RuntimeError(f"Found section without content file: {root}")
 
         if section_num != len(self._sections):
-            raise RuntimeError(
+            msg = (
                 "Inconsistent directory structure: "
-                "Language {} is missing sections.".format(language)
+                f"Language {language} is missing sections."
             )
+            raise RuntimeError(msg)
 
         # process pages
         try:
@@ -118,18 +117,20 @@ class InnoconvRunner:
             # ensure sections are identical for all languages
             try:
                 if self._sections[section_num] != section_name:
-                    raise RuntimeError(
+                    msg = (
                         "Inconsistent directory structure: "
-                        "Section {} differs.".format(rel_path)
+                        f"Section {rel_path} differs."
                     )
+                    raise RuntimeError(msg)
             except IndexError as err:
-                raise RuntimeError(
+                msg = (
                     "Inconsistent directory structure: "
-                    "Extra section {} present.".format(rel_path)
-                ) from err
+                    f"Extra section {rel_path} present."
+                )
+                raise RuntimeError(msg) from err
 
         # full filepath
-        output_filename = "{}.json".format(CONTENT_BASENAME)
+        output_filename = f"{CONTENT_BASENAME}.json"
         filepath_out = join(self._output_dir, rel_path, output_filename)
 
         # convert file using pandoc
@@ -166,7 +167,7 @@ class InnoconvRunner:
             page["title"]
         except KeyError:
             page["title"] = {}
-        input_filename = "{}.md".format(page["id"])
+        input_filename = f"{page['id']}.md"
         filepath = join(self._source_dir, language, PAGES_FOLDER, input_filename)
         rel_path = dirname(relpath(filepath, self._source_dir))
 
@@ -181,7 +182,7 @@ class InnoconvRunner:
         page["title"][language] = title
 
         # write json output
-        output_filename = "{}.json".format(page["id"])
+        output_filename = f"{page['id']}.json"
         filepath_out = join(self._output_dir, rel_path, output_filename)
         makedirs(dirname(filepath_out), exist_ok=True)
         with open(filepath_out, "w") as out_file:
@@ -190,7 +191,7 @@ class InnoconvRunner:
 
     def _process_footer_fragments(self, language):
         for part in ("a", "b"):
-            input_filename = "{}{}.md".format(FOOTER_FRAGMENT_PREFIX, part)
+            input_filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.md"
             filepath = join(self._source_dir, language, input_filename)
             rel_path = dirname(relpath(filepath, self._source_dir))
             if not exists(filepath):
@@ -203,7 +204,7 @@ class InnoconvRunner:
             self._notify_extensions("post_process_file", ast, title, "fragment", None)
 
             # write json output
-            output_filename = "{}{}.json".format(FOOTER_FRAGMENT_PREFIX, part)
+            output_filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.json"
             filepath_out = join(self._output_dir, rel_path, output_filename)
             makedirs(dirname(filepath_out), exist_ok=True)
             with open(filepath_out, "w") as out_file:
@@ -221,6 +222,6 @@ class InnoconvRunner:
             try:
                 self._extensions.append(EXTENSIONS[ext_name](self._manifest))
             except (ImportError, KeyError) as exc:
-                raise RuntimeError("Extension {} not found!".format(ext_name)) from exc
+                raise RuntimeError(f"Extension {ext_name} not found!") from exc
         # pass extension list to extenions
         self._notify_extensions("extension_list", self._extensions)

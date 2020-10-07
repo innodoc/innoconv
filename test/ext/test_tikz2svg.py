@@ -32,7 +32,7 @@ TIKZ_PREAMBLE = r"""
 """
 
 IMAGE_BLOCK = get_image_ast(
-    join(TIKZ_FOLDER, "{}.svg".format(TIKZ_FILENAME.format(TIKZ_HASH))),
+    join(TIKZ_FOLDER, f"{TIKZ_FILENAME.format(TIKZ_HASH)}.svg"),
     description="TikZ Image",
 )
 
@@ -61,8 +61,8 @@ class TestTikz2Svg(TestExtension):
         self.assertEqual(mock_popen.call_count, 2)
         image = asts[0][0]
         self.assertEqual(image["t"], "Image")
-        filename = "{}.svg".format(TIKZ_FILENAME.format(TIKZ_HASH))
-        imgpath = "{}/{}".format(TIKZ_FOLDER, filename)
+        filename = f"{TIKZ_FILENAME.format(TIKZ_HASH)}.svg"
+        imgpath = f"{TIKZ_FOLDER}/{filename}"
         self.assertEqual(image["c"][2][0], imgpath)
         self.assertEqual(image["c"][2][1], TIKZ_IMG_TAG_ALT)
 

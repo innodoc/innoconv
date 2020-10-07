@@ -5,7 +5,7 @@ import unittest
 
 from innoconv.utils import to_ast
 
-FIXTURES_DIR = "{}/fixtures".format(os.path.dirname(os.path.realpath(__file__)))
+FIXTURES_DIR = f"{os.path.dirname(os.path.realpath(__file__))}/fixtures"
 
 
 class TestToAst(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestToAst(unittest.TestCase):
     def test_to_ast(self):
         """Test returned AST for a given Markdown document."""
         blocks, title, short_title, section_type = to_ast(
-            "{}/test_valid.md".format(FIXTURES_DIR)
+            f"{FIXTURES_DIR}/test_valid.md"
         )
 
         self.assertEqual(title, "Test document")

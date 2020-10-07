@@ -22,28 +22,26 @@ from innoconv.runner import InnoconvRunner
 
 def _get_epilog():
     max_length = len(max(EXTENSIONS.keys(), key=len))
-    fstr = " {{:<{}}} - {{}}".format(max_length)
-    extlist = [fstr.format(e, v.helptext()) for e, v in EXTENSIONS.items()]
-    return """Available extensions:
-{}
+    extlist = [f" {e:<{max_length}} - {v.helptext()}" for e, v in EXTENSIONS.items()]
+    extlist = "\n".join(extlist)
+    return f"""Available extensions:
+{extlist}
 
-Author: {}
-Web: {}
+Author: {__author__}
+Web: {__url__}
 
 Copyright (C) 2018 innoCampus, TU Berlin
 
 This is free software; see the source for copying conditions. There is no
 warranty, not even for merchantability or fitness for a particular purpose.
-""".format(
-        "\n".join(extlist), __author__, __url__
-    )
+"""
 
 
 def _parse_extensions(_, __, value):
     extensions = value.split(",")
     for ext in extensions:
         if ext not in EXTENSIONS.keys():
-            raise click.BadOptionUsage("-e", "Extension not found: {}".format(ext))
+            raise click.BadOptionUsage("-e", f"Extension not found: {ext}")
     return extensions
 
 
@@ -96,11 +94,8 @@ def cli(verbose, force, extensions, output_dir, source_dir):
 
     # check output directory
     if os.path.exists(output_dir) and not force:
-        raise click.FileError(
-            output_dir,
-            "Output directory {} already exists. "
-            "To overwrite use --force.".format(output_dir),
-        )
+        msg = f"Output directory {output_dir} already exists. To overwrite use --force."
+        raise click.FileError(output_dir, msg)
 
     # read course manifest
     try:
@@ -120,8 +115,7 @@ def cli(verbose, force, extensions, output_dir, source_dir):
         runner = InnoconvRunner(source_dir, output_dir, manifest, extensions)
         runner.run()
     except RuntimeError as error:
-        msg = "Something went wrong: {}".format(error)
-        logging.critical(msg)
+        logging.critical("Something went wrong: %s", error)
         sys.exit(EXIT_CODES["RUNNER_ERROR"])
     logging.info("Build finished!")
     sys.exit(EXIT_CODES["SUCCESS"])
