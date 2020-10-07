@@ -16,10 +16,13 @@ interpreter.
 Python 3
 ~~~~~~~~
 
-innoConv is being tested and developed with **Python 3.5-3.8**.
+innoConv is developed using Python 3.9.
+
+The software is tested against all maintained Python versions (**Python
+3.6-3.9** at the time of writing).
 
 Python should be available on the majority of Linux machines nowadays. Usually
-it's being installed using a package manager.
+it's installed using a package manager.
 
 Pandoc
 ~~~~~~

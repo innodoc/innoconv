@@ -1,5 +1,4 @@
 # Docker image for CI, includes a variety of Python versions
-# Python 3.4.x isn't supported as alpine >3.9 uses OpenSSL 1.1.x (not 1.0.x)
 ARG INNOCONV_IMAGE=innodoc/innoconv
 FROM $INNOCONV_IMAGE AS innoconv
 
@@ -7,7 +6,7 @@ FROM alpine:3.12
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
 ARG PYTHON_VERSIONS
-ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.8.2 3.7.7 3.6.10 3.5.8}
+ENV PYTHON_VERSIONS ${PYTHON_VERSIONS:-3.9.0 3.8.6 3.7.9 3.6.12}
 
 RUN set -xe && \
     apk update && \
@@ -53,7 +52,7 @@ RUN set -xe && \
     find ~/.pyenv/versions -type d -name "share" -print0 | xargs -0 rm -rf && \
     bash -c 'set -xe; for version in $PYTHON_VERSIONS; do chmod +w .pyenv/versions/$version/lib/libpython*.a; strip -s .pyenv/versions/$version/lib/libpython*.a .pyenv/versions/$version/bin/python?.?; chmod -w .pyenv/versions/$version/lib/libpython*.a; done;' && \
     bash -c 'set -xe; for version in $PYTHON_VERSIONS; do test -f .pyenv/versions/$version/bin/python?.?m && strip -s .pyenv/versions/$version/bin/python?.?m; done;' && \
-    bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.8 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
+    bash -c 'set -xe; . ~/.bash_profile; pyenv rehash; pip3.9 install tox; for version in $PYTHON_VERSIONS; do pyenv local $version; pip install --upgrade pip setuptools; done; pyenv local $PYTHON_VERSIONS'
 
 # copy Pandoc and pdf2svg from main image
 USER root
