@@ -17,6 +17,7 @@ RUN set -xe && \
       texlive \
       texmf-dist \
       texmf-dist-latexextra \
+      texmf-dist-pictures \
       wget \
       xz
 

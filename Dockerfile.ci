@@ -31,6 +31,7 @@ RUN set -xe && \
       texlive \
       texmf-dist \
       texmf-dist-latexextra \
+      texmf-dist-pictures \
       zlib-dev
 
 # add user/group to run as
