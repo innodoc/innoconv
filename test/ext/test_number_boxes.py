@@ -37,17 +37,17 @@ class TestNumberBoxes(TestExtension):
             "title-1": [
                 ("info-1.0.1", "1.0.1", "info"),
                 ("EXAM_ID", "1.0.2", "example"),
-                ("EXER_ID", "1.0.3", "exercise", 3),
+                ("EXER_ID", "1.0.3", "exercise", 3, 2),
             ],
             "title-2": [
                 ("info-2.0.1", "2.0.1", "info"),
                 ("EXAM_ID", "2.0.2", "example"),
-                ("EXER_ID", "2.0.3", "exercise", 3),
+                ("EXER_ID", "2.0.3", "exercise", 3, 2),
             ],
             "title-2/title-2-1": [
                 ("info-2.1.1", "2.1.1", "info"),
                 ("EXAM_ID", "2.1.2", "example"),
-                ("EXER_ID", "2.1.3", "exercise", 3),
+                ("EXER_ID", "2.1.3", "exercise", 3, 2),
             ],
         }
         self.assertEqual(manifest_fields["boxes"], boxes)

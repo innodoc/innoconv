@@ -247,9 +247,9 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual(
             boxes["02-elements/10-interactive-exercises"],
             [
-                ["EX_DUMMY", "2.10.1", "exercise", 0],
+                ["EX_DUMMY", "2.10.1", "exercise", 0, 0],
                 ["example-2.10.2", "2.10.2", "example"],
-                ["EX_FULL", "2.10.3", "exercise", 4],
+                ["EX_FULL", "2.10.3", "exercise", 4, 1],
             ],
         )
         self.assertEqual(

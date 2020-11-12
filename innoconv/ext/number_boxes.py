@@ -10,9 +10,9 @@ box div element (in case it doesn't already have one). Also a ``data-number``
 attribute is attached.
 
 Furthermore this extension faciliates the course-wide tracking of exercise
-progress. For each exercise, the achievable points are stored. A viewer
-application can easily display total points per section without having to scan
-all documents for exercises.
+progress. For each exercise, the total achievable points and number of questions
+are stored. A viewer application can easily display total points per section
+without having to scan all documents for exercises.
 """
 
 from collections import OrderedDict
@@ -42,8 +42,11 @@ class NumberBoxes(AbstractExtension):
         self._language = None
         self._parts = None
         self._done = False
-        self._num_boxes = 0
-        self._exercise_points = 0
+        self._counters = {
+            "box_count": 0,
+            "exercise_points": 0,
+            "question_count": 0,
+        }
 
     def _add_box(self, box_type, elem):
         self._counters["box"] += 1
@@ -61,11 +64,18 @@ class NumberBoxes(AbstractExtension):
                     self._language,
                 )
 
-        # Collect questions inside exercise to get total points
+        # Collect questions inside exercise to get total points, question count
         if box_type == "exercise":
-            self._exercise_points = 0
-            TraverseAst(self._sum_points).traverse([elem])
-            box = (box_id, number, box_type, self._exercise_points)
+            self._counters["exercise_points"] = 0
+            self._counters["question_count"] = 0
+            TraverseAst(self._scan_questions).traverse([elem])
+            box = (
+                box_id,
+                number,
+                box_type,
+                self._counters["exercise_points"],
+                self._counters["question_count"],
+            )
         else:
             box = (box_id, number, box_type)
 
@@ -79,7 +89,7 @@ class NumberBoxes(AbstractExtension):
                     box_type,
                     self._language,
                 )
-            self._num_boxes += 1
+            self._counters["box_count"] += 1
         else:
             try:
                 self._boxes[section_id].append(box)
@@ -93,12 +103,13 @@ class NumberBoxes(AbstractExtension):
         # Attach number as attribute
         elem["c"][0][2].append(("data-number", number))
 
-    def _sum_points(self, elem, _):
+    def _scan_questions(self, elem, _):
         if elem["t"] == "Span" and "question" in elem["c"][0][1]:
+            self._counters["question_count"] += 1
             for key, val in elem["c"][0][2]:
                 if key == "points":
                     try:
-                        self._exercise_points += int(val)
+                        self._counters["exercise_points"] += int(val)
                     except ValueError:
                         msg = "Got bad int value for question point attribute: %s"
                         logging.warning(msg, val)
@@ -133,7 +144,7 @@ class NumberBoxes(AbstractExtension):
     def post_process_file(self, ast, title, content_type, section_type=None):
         """Scan the AST."""
         if content_type == "section":
-            self._num_boxes = 0
+            self._counters["box_count"] = 0
             section_level = len(self._parts)
             if section_level > 0:
                 if section_level == 1:
@@ -153,7 +164,7 @@ class NumberBoxes(AbstractExtension):
                         expected_len = len(self._boxes[section_id])
                     except KeyError:
                         expected_len = 0
-                    if expected_len > self._num_boxes:
+                    if expected_len > self._counters["box_count"]:
                         logging.warning(
                             "Section %s has too few boxes for language %s",
                             section_id,
