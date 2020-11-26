@@ -81,6 +81,8 @@ class NumberBoxes(AbstractExtension):
 
         if self._done:
             # Ensure this language doesn't have extra boxes
+            if section_id not in self._boxes:
+                self._boxes[section_id] = []
             if box not in self._boxes[section_id]:
                 logging.warning(
                     "Section %s has extra box %s (%s) for language %s",
