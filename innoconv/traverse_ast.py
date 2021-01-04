@@ -90,11 +90,15 @@ class TraverseAst:
             self.traverse(item, elem)
 
     def _table(self, elem):
-        for headcell in elem["c"][3]:
-            self.traverse(headcell, elem)
-        for row in elem["c"][4]:
-            for col in row:
-                self.traverse(col, elem)
+        try:
+            headcells = elem["c"][3][1][0][1]
+        except IndexError:
+            headcells = []
+        for headcell in headcells:
+            self.traverse(headcell[4], elem)
+        for row in elem["c"][4][0][3]:
+            for col in row[1]:
+                self.traverse(col[4], elem)
 
     def _process_children(self, elem):
         """

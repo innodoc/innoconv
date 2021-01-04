@@ -28,7 +28,7 @@ Pandoc
 ~~~~~~
 
 You need to make sure to have a recent version of the :program:`pandoc` binary
-available in :envvar:`$PATH` (version 2.9.2.1 at the time of writing). There are
+available in :envvar:`$PATH` (version 2.11.2 at the time of writing). There are
 `several ways how to install Pandoc <https://pandoc.org/installing.html>`_.
 
 Installation
