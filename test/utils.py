@@ -1,6 +1,11 @@
 """Convenience functions for generating AST structures."""
 
 
+def get_empty_ica():
+    """Create empty id, class, attributes info."""
+    return ["", [], []]
+
+
 def get_filler_content():
     """Create simple Str element."""
     return {"t": "Str", "c": "Lorem Ipsum"}
@@ -45,7 +50,7 @@ def get_header_ast(content=None):
     """Create Header element with content."""
     if content is None:
         content = [get_filler_content()]
-    return {"t": "Header", "c": [1, ["", [], []], content]}
+    return {"t": "Header", "c": [1, get_empty_ica(), content]}
 
 
 def get_para_ast(content=None):
@@ -59,8 +64,24 @@ def get_image_ast(path, title="", description=""):
     """Create Image element."""
     return {
         "t": "Image",
-        "c": [["", [], []], [{"t": "Str", "c": title}], [path, description]],
+        "c": [get_empty_ica(), [{"t": "Str", "c": title}], [path, description]],
     }
+
+
+def get_plain_ast(content):
+    """Create Plain element."""
+    return {"t": "Plain", "c": [{"t": "Str", "c": content}]}
+
+
+def get_table_cell_ast(content):
+    """Create Table cell."""
+    return [
+        get_empty_ica(),
+        {"t": "AlignDefault"},
+        1,
+        1,
+        [get_plain_ast(content)],
+    ]
 
 
 def get_table_ast():
@@ -68,14 +89,54 @@ def get_table_ast():
     return {
         "t": "Table",
         "c": [
-            [],
-            [{"t": "AlignDefault"}, {"t": "AlignDefault"}],
-            [0, 0],
-            [[get_para_ast()], [get_para_ast()]],
+            get_empty_ica(),
+            [None, get_plain_ast("caption")],
             [
-                [[get_para_ast()], [get_para_ast()]],
-                [[get_para_ast()], [get_para_ast()]],
+                [{"t": "AlignDefault"}, {"t": "ColWidthDefault"}],
+                [{"t": "AlignDefault"}, {"t": "ColWidthDefault"}],
             ],
+            # header
+            [
+                get_empty_ica(),
+                [
+                    [
+                        get_empty_ica(),
+                        [
+                            get_table_cell_ast("H1"),
+                            get_table_cell_ast("H2"),
+                        ],
+                    ],
+                ],
+            ],
+            # body
+            [
+                [
+                    get_empty_ica(),
+                    0,
+                    [],
+                    # rows
+                    [
+                        [
+                            get_empty_ica(),
+                            # cols
+                            [
+                                get_table_cell_ast("A1"),
+                                get_table_cell_ast("A2"),
+                            ],
+                        ],
+                        [
+                            get_empty_ica(),
+                            # cols
+                            [
+                                get_table_cell_ast("B1"),
+                                get_table_cell_ast("B2"),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            # footer
+            [get_empty_ica(), []],
         ],
     }
 

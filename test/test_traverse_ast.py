@@ -33,12 +33,12 @@ class TestTraverseAst(unittest.TestCase):
         header = ast[0]
         div = ast[1]
         table = div["c"][1][0]
-        table_headcell_0 = table["c"][3][0][0]
-        table_headcell_1 = table["c"][3][1][0]
-        table_cell_0_0 = table["c"][4][0][0][0]
-        table_cell_0_1 = table["c"][4][0][1][0]
-        table_cell_1_0 = table["c"][4][1][0][0]
-        table_cell_1_1 = table["c"][4][1][1][0]
+        table_headcell_0 = table["c"][3][1][0][1][0][4][0]
+        table_headcell_1 = table["c"][3][1][0][1][1][4][0]
+        table_cell_0_0 = table["c"][4][0][3][0][1][0][4][0]
+        table_cell_0_1 = table["c"][4][0][3][0][1][1][4][0]
+        table_cell_1_0 = table["c"][4][0][3][1][1][0][4][0]
+        table_cell_1_1 = table["c"][4][0][3][1][1][1][4][0]
         olist = ast[2]
         olist_item_0 = olist["c"][1][0][0]
         olist_item_1 = olist["c"][1][1][0]
@@ -80,7 +80,9 @@ class TestTraverseAst(unittest.TestCase):
             (dlist["c"][1][1][0][0]["c"][0], dlist["c"][0][1][0][0]),
         )
         traverse_ast.traverse(ast)
+
         self.assertEqual(callback_mock.call_count, len(expected))
+
         for idx, exp_elem in enumerate(expected):
             with self.subTest(element=exp_elem):
                 call_arg = callback_mock.call_args_list[idx]
