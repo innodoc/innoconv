@@ -128,7 +128,8 @@ disable=print-statement,
         dict-keys-not-iterating,
         dict-values-not-iterating,
         too-few-public-methods,
-        bad-continuation
+        bad-continuation,
+        duplicate-code
 
 
 # Enable the message, report, category or checker with the given id(s). You can
