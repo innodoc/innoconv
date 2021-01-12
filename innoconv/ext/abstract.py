@@ -68,7 +68,9 @@ class AbstractExtension:
         :type path: str
         """
 
-    def post_process_file(self, ast, title, content_type, section_type=None):
+    def post_process_file(
+        self, ast, title, content_type, section_type=None, short_title=None
+    ):
         """
         Conversion of a single file finished. The AST can be modified.
 
@@ -79,6 +81,8 @@ class AbstractExtension:
         :param content_type: Content type ('section' or 'custom')
         :type content_type: str
         :param section_type: Section type ('exercises', 'test' or None)
+        :type section_type: str
+        :param short_title: Section title short form (localized)
         :type section_type: str
         """
 

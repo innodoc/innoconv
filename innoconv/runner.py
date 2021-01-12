@@ -135,9 +135,9 @@ class InnoconvRunner:
 
         # convert file using pandoc
         self._notify_extensions("pre_process_file", rel_path)
-        ast, title, _, section_type = to_ast(filepath)
+        ast, title, short_title, section_type = to_ast(filepath)
         self._notify_extensions(
-            "post_process_file", ast, title, "section", section_type
+            "post_process_file", ast, title, "section", section_type, short_title
         )
 
         # write file content

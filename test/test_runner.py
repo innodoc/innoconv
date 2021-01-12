@@ -292,7 +292,7 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         for i in list(range(0, 5)) + list(range(8, 13)):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
-                call(["content_ast"], TITLE, "section", "test"),
+                call(["content_ast"], TITLE, "section", "test", "Short"),
             )
         for i in (5, 13):
             self.assertEqual(

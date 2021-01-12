@@ -143,7 +143,9 @@ class NumberBoxes(AbstractExtension):
         """Remember current path."""
         self._parts = Path(path).parts[1:]  # strip language folder
 
-    def post_process_file(self, ast, title, content_type, section_type=None):
+    def post_process_file(
+        self, ast, title, content_type, section_type=None, short_title=None
+    ):
         """Scan the AST."""
         if content_type == "section":
             self._counters["box_count"] = 0

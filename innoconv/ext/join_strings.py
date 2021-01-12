@@ -103,6 +103,8 @@ class JoinStrings(AbstractExtension):
 
     # extension events
 
-    def post_process_file(self, ast, title, content_type, section_type=None):
+    def post_process_file(
+        self, ast, title, content_type, section_type=None, short_title=None
+    ):
         """Process AST in-place."""
         self._process_ast_element(ast)

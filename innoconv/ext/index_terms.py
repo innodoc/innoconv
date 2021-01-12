@@ -79,7 +79,9 @@ class IndexTerms(AbstractExtension):
         self._current_section_name = path[3:]  # strip language
         self._page_occurences = {}
 
-    def post_process_file(self, ast, title, content_type, section_type=None):
+    def post_process_file(
+        self, ast, title, content_type, section_type=None, short_title=None
+    ):
         """Scan the AST."""
         if content_type == "section":
             TraverseAst(self.process_element).traverse(ast)

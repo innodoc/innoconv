@@ -23,11 +23,23 @@ class GenerateToc(AbstractExtension):
         self._language = None
         self._toc = []
 
-    def _add_to_toc(self, title, section_type):
+    def _add_to_toc(self, title, short_title, section_type):
         path_components = self._splitall(self._current_path)
         path_components.pop(0)  # language folder
         if not path_components:  # skip root section
             return
+        child = self._get_child(path_components)
+
+        child["title"][self._language] = title
+        if section_type is not None:
+            child["type"] = section_type
+        if short_title is not None and short_title != title:
+            try:
+                child["short_title"][self._language] = short_title
+            except KeyError:
+                child["short_title"] = {self._language: short_title}
+
+    def _get_child(self, path_components):
         children = self._toc
         while True:
             path_component = path_components.pop(0)
@@ -36,7 +48,7 @@ class GenerateToc(AbstractExtension):
                 if check_child["id"] == path_component:
                     child = check_child
                     break
-            if not child:
+            if child is None:
                 child = {"id": path_component, "title": {}}
                 children.append(child)
             if path_components and "children" not in child:
@@ -46,10 +58,7 @@ class GenerateToc(AbstractExtension):
                 children = child["children"]
             else:
                 break
-
-        child["title"][self._language] = title
-        if section_type:
-            child["type"] = section_type
+        return child
 
     @staticmethod
     def _splitall(path):
@@ -78,10 +87,12 @@ class GenerateToc(AbstractExtension):
         """Remember current path."""
         self._current_path = path
 
-    def post_process_file(self, _, title, content_type, section_type=None):
+    def post_process_file(
+        self, _, title, content_type, section_type=None, short_title=None
+    ):
         """Add this section file to the TOC."""
         if content_type == "section":
-            self._add_to_toc(title, section_type)
+            self._add_to_toc(title, short_title, section_type)
 
     def manifest_fields(self):
         """Add `toc` field to manifest."""
