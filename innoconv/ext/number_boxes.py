@@ -20,7 +20,7 @@ import logging
 from pathlib import Path
 
 from innoconv.ext.abstract import AbstractExtension
-from innoconv.traverse_ast import IgnoreSubtree, TraverseAst
+from innoconv.traverse_ast import IgnoreSubtreeError, TraverseAst
 
 BOX_CLASSES = ("example", "info", "exercise")
 
@@ -126,7 +126,7 @@ class NumberBoxes(AbstractExtension):
                 if box_class in classes:
                     self._add_box(box_class, elem)
                     if box_class == "exercise":
-                        raise IgnoreSubtree
+                        raise IgnoreSubtreeError
                     break
 
     def pre_conversion(self, language):

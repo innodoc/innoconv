@@ -3,7 +3,7 @@
 import logging
 
 
-class IgnoreSubtree(Exception):
+class IgnoreSubtreeError(Exception):
     """Used to signal an elements sub-tree should not be traversed."""
 
 
@@ -131,5 +131,5 @@ class TraverseAst:
             try:
                 self._func(elem, parent)
                 self._process_children(elem)
-            except IgnoreSubtree:
+            except IgnoreSubtreeError:
                 pass

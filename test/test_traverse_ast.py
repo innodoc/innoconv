@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import call, Mock
 
-from innoconv.traverse_ast import IgnoreSubtree, TraverseAst
+from innoconv.traverse_ast import IgnoreSubtreeError, TraverseAst
 from .utils import (
     get_bullet_list_ast,
     get_definitionlist_ast,
@@ -97,11 +97,11 @@ class TestTraverseAst(unittest.TestCase):
         self.assertEqual(callback_mock.call_count, 2)
 
     def test_ignore_subtree(self):
-        """Test IgnoreSubtree is honored."""
+        """Test IgnoreSubtreeError is honored."""
 
         def side_effect(elem, _):
             if elem["t"] == "Div":
-                raise IgnoreSubtree
+                raise IgnoreSubtreeError
 
         callback_mock = Mock(side_effect=side_effect)
         traverse_ast = TraverseAst(callback_mock)
