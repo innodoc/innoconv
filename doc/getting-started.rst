@@ -19,7 +19,7 @@ Python 3
 innoConv is developed using Python 3.9.
 
 The software is tested against all maintained Python versions (**Python
-3.6-3.9** at the time of writing).
+3.7-3.10** at the time of writing).
 
 Python should be available on the majority of Linux machines nowadays. Usually
 it's installed using a package manager.

@@ -1,4 +1,4 @@
-FROM python:3.9-alpine3.12
+FROM python:3.10-alpine3.12
 LABEL maintainer="Mirko Dietrich <dietrich@math.tu-berlin.de>"
 
 ENV PANDOC_VERSION 2.11.2

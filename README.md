@@ -8,7 +8,7 @@ Please refer to the [documentation](https://innoconv.readthedocs.io/) for instal
 
 ## Requirements
 
-- [Python >=3.6](https://www.python.org/)
+- [Python >=3.7](https://www.python.org/)
 - [Pandoc](https://pandoc.org/)
 
 For Ti<i>k</i>z support:
