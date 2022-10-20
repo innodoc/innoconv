@@ -10,6 +10,8 @@ import json
 import logging
 from os.path import join
 
+from camel_converter import to_camel
+
 from innoconv.constants import MANIFEST_BASENAME
 from innoconv.ext.abstract import AbstractExtension
 from innoconv.manifest import Manifest
@@ -31,11 +33,11 @@ class WriteManifest(AbstractExtension):
 
         manifest_dict = {}
         for field in Manifest.required_fields:
-            manifest_dict[field] = getattr(self._manifest, field)
+            manifest_dict[to_camel(field)] = getattr(self._manifest, field)
         # optional fields
         for field in Manifest.optional_fields:
             try:
-                manifest_dict[field] = getattr(self._manifest, field)
+                manifest_dict[to_camel(field)] = getattr(self._manifest, field)
             except AttributeError:
                 pass
         # extra fields from extensions

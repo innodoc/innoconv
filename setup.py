@@ -32,6 +32,7 @@ def setup_package():
         entry_points={"console_scripts": ["innoconv = innoconv.cli:cli"]},
         include_package_data=True,
         install_requires=[
+            "camel-converter>=1,<2",
             "click>=8,<9",
             "coloredlogs>=15,<16",
             "python-slugify>=6,<7",

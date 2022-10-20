@@ -88,7 +88,7 @@ $ tox -e linters
 Run unit and integration tests.
 
 ```sh
-$ tox -e py38-unit,py38-integration
+$ tox -e py310-unit,py310-integration
 ```
 
 #### HTML coverage report
@@ -96,7 +96,7 @@ $ tox -e py38-unit,py38-integration
 A coverage report will be created in `./htmlcov` and served via HTTP.
 
 ```sh
-$ tox -e py38-unit,cov-html,serve-cov
+$ tox -e py310-unit,cov-html,serve-cov
 ```
 
 #### Documentation

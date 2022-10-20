@@ -60,8 +60,8 @@ class TestConversionTubBase(BaseConversionTest):
             self._test_tikz2svg()
         with self.subTest(extension="index_terms"):
             self._test_index_terms(manifest)
-        with self.subTest(extension="number_boxes"):
-            self._test_number_boxes(manifest)
+        with self.subTest(extension="number_cards"):
+            self._test_number_cards(manifest)
 
     def _test_converted_folders_present(self):
         for lang in ("de", "en"):
@@ -212,11 +212,11 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual("02-elements/11-index", occurrences[0][0])
         self.assertEqual("latex-formel-0", occurrences[0][1])
 
-    def _test_number_boxes(self, manifest):
-        self.assertIn("boxes", manifest)
-        boxes = manifest["boxes"]
+    def _test_number_cards(self, manifest):
+        self.assertIn("cards", manifest)
+        cards = manifest["cards"]
         self.assertEqual(
-            list(boxes.keys()),
+            list(cards.keys()),
             [
                 "01-project/01-folders",
                 "01-project/02-files/01-manifest",
@@ -235,7 +235,7 @@ class TestConversionTubBase(BaseConversionTest):
         )
 
         self.assertEqual(
-            boxes["01-project/01-folders"],
+            cards["01-project/01-folders"],
             [
                 ["example-1.1.1", "1.1.1", "example"],
                 ["info-1.1.2", "1.1.2", "info"],
@@ -243,7 +243,7 @@ class TestConversionTubBase(BaseConversionTest):
             ],
         )
         self.assertEqual(
-            boxes["02-elements/10-interactive-exercises"],
+            cards["02-elements/10-interactive-exercises"],
             [
                 ["EX_DUMMY", "2.10.1", "exercise", 0, 0],
                 ["example-2.10.2", "2.10.2", "example"],
@@ -251,7 +251,7 @@ class TestConversionTubBase(BaseConversionTest):
             ],
         )
         self.assertEqual(
-            boxes["02-elements/11-index"],
+            cards["02-elements/11-index"],
             [
                 ["example-2.11.1", "2.11.1", "example"],
                 ["info-2.11.2", "2.11.2", "info"],

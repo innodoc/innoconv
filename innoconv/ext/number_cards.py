@@ -1,12 +1,12 @@
 """
-Scan documents for numbered boxes (info, example, exercise).
+Scan documents for numbered cards (info, example, exercise).
 
-Viewers need to be able to quickly number and reference boxes without scanning
+Viewers need to be able to quickly number and reference cards without scanning
 the whole document structure themselves. This extension adds a field to the
-:class:`Manifest <innoconv.manifest.Manifest>` that lists all boxes per section.
+:class:`Manifest <innoconv.manifest.Manifest>` that lists all cards per section.
 
-It will assign an auto-generated ``ID`` based on the box type and number to the
-box div element (in case it doesn't already have one). Also a ``data-number``
+It will assign an auto-generated ``ID`` based on the card type and number to the
+card div element (in case it doesn't already have one). Also a ``data-number``
 attribute is attached.
 
 Furthermore this extension faciliates the course-wide tracking of exercise
@@ -21,41 +21,41 @@ from pathlib import Path
 from innoconv.ext.abstract import AbstractExtension
 from innoconv.traverse_ast import IgnoreSubtreeError, TraverseAst
 
-BOX_CLASSES = ("example", "info", "exercise")
+CARD_CLASSES = ("example", "info", "exercise")
 
 
-class NumberBoxes(AbstractExtension):
-    """Scan the documents for boxes."""
+class NumberCards(AbstractExtension):
+    """Scan the documents for cards."""
 
-    _helptext = "Number all boxes and add a boxes field to the manifest."
+    _helptext = "Number all cards and add a cards field to the manifest."
 
     def __init__(self, *args, **kwargs):
         """Initialize variables."""
         super().__init__(*args, **kwargs)
         self._counters = {
-            "box": 0,
+            "card": 0,
             "section": 0,
             "subsection": 0,
         }
-        self._boxes = {}
+        self._cards = {}
         self._language = None
         self._parts = None
         self._done = False
         self._counters = {
-            "box_count": 0,
+            "card_count": 0,
             "exercise_points": 0,
             "question_count": 0,
         }
 
-    def _add_box(self, box_type, elem):
-        self._counters["box"] += 1
-        number = "{section}.{subsection}.{box}".format(**self._counters)
+    def _add_card(self, card_type, elem):
+        self._counters["card"] += 1
+        number = "{section}.{subsection}.{card}".format(**self._counters)
         section_id = "/".join(self._parts)
         if elem["c"][0][0]:
-            box_id = elem["c"][0][0]
+            card_id = elem["c"][0][0]
         else:
-            box_id = f"{box_type}-{number}"
-            if box_type == "exercise":
+            card_id = f"{card_type}-{number}"
+            if card_type == "exercise":
                 logging.warning(
                     "Section %s has exercise without ID: %s for language %s",
                     section_id,
@@ -64,42 +64,42 @@ class NumberBoxes(AbstractExtension):
                 )
 
         # Collect questions inside exercise to get total points, question count
-        if box_type == "exercise":
+        if card_type == "exercise":
             self._counters["exercise_points"] = 0
             self._counters["question_count"] = 0
             TraverseAst(self._scan_questions).traverse([elem])
-            box = (
-                box_id,
+            card = (
+                card_id,
                 number,
-                box_type,
+                card_type,
                 self._counters["exercise_points"],
                 self._counters["question_count"],
             )
         else:
-            box = (box_id, number, box_type)
+            card = (card_id, number, card_type)
 
         if self._done:
-            # Ensure this language doesn't have extra boxes
-            if section_id not in self._boxes:
-                self._boxes[section_id] = []
-            if box not in self._boxes[section_id]:
+            # Ensure this language doesn't have extra cards
+            if section_id not in self._cards:
+                self._cards[section_id] = []
+            if card not in self._cards[section_id]:
                 logging.warning(
-                    "Section %s has extra box %s (%s) for language %s",
+                    "Section %s has extra card %s (%s) for language %s",
                     section_id,
                     number,
-                    box_type,
+                    card_type,
                     self._language,
                 )
-            self._counters["box_count"] += 1
+            self._counters["card_count"] += 1
         else:
             try:
-                self._boxes[section_id].append(box)
+                self._cards[section_id].append(card)
             except KeyError:
-                self._boxes[section_id] = [box]
+                self._cards[section_id] = [card]
 
         # Set ID
         if not elem["c"][0][0]:
-            elem["c"][0][0] = box_id
+            elem["c"][0][0] = card_id
 
         # Attach number as attribute
         elem["c"][0][2].append(("data-number", number))
@@ -121,10 +121,10 @@ class NumberBoxes(AbstractExtension):
         """Respond to AST element."""
         if elem["t"] == "Div":
             classes = elem["c"][0][1]
-            for box_class in BOX_CLASSES:
-                if box_class in classes:
-                    self._add_box(box_class, elem)
-                    if box_class == "exercise":
+            for card_class in CARD_CLASSES:
+                if card_class in classes:
+                    self._add_card(card_class, elem)
+                    if card_class == "exercise":
                         raise IgnoreSubtreeError
                     break
 
@@ -147,33 +147,33 @@ class NumberBoxes(AbstractExtension):
     ):
         """Scan the AST."""
         if content_type == "section":
-            self._counters["box_count"] = 0
+            self._counters["card_count"] = 0
             section_level = len(self._parts)
             if section_level > 0:
                 if section_level == 1:
                     self._counters["section"] += 1
                     self._counters["subsection"] = 0
-                    self._counters["box"] = 0
+                    self._counters["card"] = 0
                 elif section_level == 2:
                     self._counters["subsection"] += 1
-                    self._counters["box"] = 0
+                    self._counters["card"] = 0
 
                 TraverseAst(self.process_element).traverse(ast)
 
-                # Ensure this language doesn't have less boxes in section
+                # Ensure this language doesn't have less cards in section
                 if self._done:
                     section_id = "/".join(self._parts)
                     try:
-                        expected_len = len(self._boxes[section_id])
+                        expected_len = len(self._cards[section_id])
                     except KeyError:
                         expected_len = 0
-                    if expected_len > self._counters["box_count"]:
+                    if expected_len > self._counters["card_count"]:
                         logging.warning(
-                            "Section %s has too few boxes for language %s",
+                            "Section %s has too few cards for language %s",
                             section_id,
                             self._language,
                         )
 
     def manifest_fields(self):
-        """Add ``boxes`` field to manifest."""
-        return {"boxes": self._boxes}
+        """Add ``cards`` field to manifest."""
+        return {"cards": self._cards}

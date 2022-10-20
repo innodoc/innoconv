@@ -88,4 +88,4 @@ class IndexTerms(AbstractExtension):
 
     def manifest_fields(self):
         """Add `index_terms` field to manifest."""
-        return {"index_terms": self._index_terms}
+        return {"indexTerms": self._index_terms}
