@@ -19,6 +19,7 @@ class BaseConversionTest(TestCase):
 
     def setUp(self):
         """Prepare temp dirs."""
+        # pylint: disable=consider-using-with
         self.tmp_dir = TemporaryDirectory(prefix="innoconv-test-")
         self.output_dir = join(self.tmp_dir.name, "innoconv_output")
 
@@ -28,7 +29,8 @@ class BaseConversionTest(TestCase):
 
     def _copy_repo(self, ignore=None):
         """Create a copy of the content repository."""
-        ignore = ignore if callable(ignore) else ignore_patterns(*ignore)
+        if not callable(ignore) and ignore is not None:
+            ignore = ignore_patterns(*ignore)
         rand = "".join(choice(ascii_lowercase + digits) for _ in range(8))
         repo_copy_dir = join(self.tmp_dir.name, f"repo-copy-{rand}")
         copytree(REPO_DIR, repo_copy_dir, ignore=ignore)

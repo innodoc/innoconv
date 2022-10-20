@@ -65,13 +65,13 @@ For an exhaustive list of commands please have a look at `tox.ini`.
 Spawn a shell in a development environment.
 
 ```sh
-$ tox -e shell
+$ tox -e dev
 ```
 
 Or directly start your current development version.
 
 ```sh
-$ tox -e shell -- innoconv /path/to/content
+$ tox -e dev -- innoconv /path/to/content
 ```
 
 #### Linting

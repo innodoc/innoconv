@@ -1,3 +1,6 @@
 {
-    "python.linting.pylintEnabled": true
+  "python.defaultInterpreterPath": "./.tox/dev/bin/python",
+  "python.linting.enabled": true,
+  "python.linting.pylintCategorySeverity.refactor": "Information",
+  "python.linting.pylintEnabled": true
 }

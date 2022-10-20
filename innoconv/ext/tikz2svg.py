@@ -80,23 +80,28 @@ class Tikz2Svg(AbstractExtension):
         """Initialize variables."""
         super().__init__(*args, **kwargs)
         self._output_dir = None
-        self._tikz_images = None
+        self._tikz_images = {}
 
     @staticmethod
     def _run(cmd, cwd, stdin=None):
-        pipe = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd)
-        if stdin:
-            pipe.stdin.write(stdin.encode(ENCODING))
-            pipe.stdin.close()
-        pipe.wait()
-        if pipe.returncode != 0:
-            critical(cmd)
-            critical("Error: %d", pipe.returncode)
-            critical("Printing program stdout:")
-            critical(pipe.stdout.read().decode(ENCODING))
-            critical("Printing program stderr:")
-            critical(pipe.stderr.read().decode(ENCODING))
-            raise RuntimeError("Tikz2Pdf: Error converting to PDF!")
+        with Popen(
+            cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd
+        ) as pipe:
+            if pipe.stdin is None or pipe.stdout is None or pipe.stderr is None:
+                raise RuntimeError("Failed to open pipe!")
+
+            if stdin is not None:
+                pipe.stdin.write(stdin.encode(ENCODING))
+                pipe.stdin.close()
+            pipe.wait()
+            if pipe.returncode != 0:
+                critical(cmd)
+                critical("Error: %d", pipe.returncode)
+                critical("Printing program stdout:")
+                critical(pipe.stdout.read().decode(ENCODING))
+                critical("Printing program stderr:")
+                critical(pipe.stderr.read().decode(ENCODING))
+                raise RuntimeError("Tikz2Pdf: Error converting to PDF!")
 
     @staticmethod
     def _get_tikz_name(tikz_hash):
@@ -132,6 +137,9 @@ class Tikz2Svg(AbstractExtension):
         self._tikz_found(elem)
 
     def _render_and_copy_tikz(self):
+        if self._output_dir is None:
+            raise RuntimeError("output dir is None!")
+
         info("Compiling %d TikZ images.", len(self._tikz_images))
         if not self._tikz_images:
             return
@@ -183,7 +191,7 @@ class Tikz2Svg(AbstractExtension):
 
     def start(self, output_dir, source_dir):
         """Initialize the list of images to be converted."""
-        self._tikz_images = dict()
+        self._tikz_images = {}
         self._output_dir = output_dir
 
     def post_process_file(

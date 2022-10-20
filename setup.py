@@ -11,13 +11,13 @@ ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # Need to parse metadata manually as setup.py must not import innoconv
 METADATA_PATH = os.path.join(ROOT_DIR, "innoconv", "metadata.py")
-with open(METADATA_PATH, "r") as metadata_file:
+with open(METADATA_PATH, "r", encoding="utf-8") as metadata_file:
     METADATA = dict(
         re.findall(r"__([a-z_]+)__\s*=\s*['\"]([^'\"]+)['\"]", metadata_file.read())
     )
 
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     LONG_DESCRIPTION = fh.read()
 
 

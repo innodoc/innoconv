@@ -35,14 +35,14 @@ class TestConversionTubBase(BaseConversionTest):
             self.output_dir,
             REPO_DIR,
         ]
-        process = Popen(command, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = process.communicate(timeout=60)
-        stdout = stdout.decode("utf-8")
-        stderr = stderr.decode("utf-8")
-        if process.returncode != 0:
-            print(stdout)
-            print(stderr)
-        self.assertEqual(process.returncode, 0)
+        with Popen(command, stdout=PIPE, stderr=PIPE) as process:
+            stdout, stderr = process.communicate(timeout=60)
+            stdout = stdout.decode("utf-8")
+            stderr = stderr.decode("utf-8")
+            if process.returncode != 0:
+                print(stdout)
+                print(stderr)
+            self.assertEqual(process.returncode, 0)
 
         self._test_converted_folders_present()
         self._test_each_folder_has_content()
@@ -78,7 +78,7 @@ class TestConversionTubBase(BaseConversionTest):
             for part in ("a", "b"):
                 filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.json"
                 filepath = join(self.output_dir, lang, filename)
-                with open(filepath) as file:
+                with open(filepath, encoding="utf-8") as file:
                     data = json.load(file)
                     self.assertIsInstance(data, list)
                     self.assertTrue(len(data) > 1)
@@ -125,7 +125,7 @@ class TestConversionTubBase(BaseConversionTest):
 
     def _test_join_strings(self):
         filepath = join(self.output_dir, "en", "01-project", OUTPUT_CONTENT_FILENAME)
-        with open(filepath) as file:
+        with open(filepath, encoding="utf-8") as file:
             data = json.load(file)
             paragraph = data[0]
             self.assertEqual(paragraph["t"], "Para")
@@ -166,7 +166,7 @@ class TestConversionTubBase(BaseConversionTest):
     def _test_write_manifest(self, stderr):
         filepath = join(self.output_dir, f"{MANIFEST_BASENAME}.json")
         self.assertTrue(isfile(filepath))
-        with open(filepath) as file:
+        with open(filepath, encoding="utf-8") as file:
             # For Python3.5 use OrderedDict
             data = json.load(file, object_pairs_hook=OrderedDict)
             self.assertIn("languages", data)

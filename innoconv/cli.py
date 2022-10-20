@@ -40,7 +40,7 @@ warranty, not even for merchantability or fitness for a particular purpose.
 def _parse_extensions(_, __, value):
     extensions = value.split(",")
     for ext in extensions:
-        if ext not in EXTENSIONS.keys():
+        if ext not in EXTENSIONS:
             raise click.BadOptionUsage("-e", f"Extension not found: {ext}")
     return extensions
 

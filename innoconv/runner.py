@@ -142,7 +142,7 @@ class InnoconvRunner:
 
         # write file content
         makedirs(dirname(filepath_out), exist_ok=True)
-        with open(filepath_out, "w") as out_file:
+        with open(filepath_out, "w", encoding="utf-8") as out_file:
             json.dump(ast, out_file)
         logging.info("Wrote %s", filepath_out)
 
@@ -185,7 +185,7 @@ class InnoconvRunner:
         output_filename = f"{page['id']}.json"
         filepath_out = join(self._output_dir, rel_path, output_filename)
         makedirs(dirname(filepath_out), exist_ok=True)
-        with open(filepath_out, "w") as out_file:
+        with open(filepath_out, "w", encoding="utf-8") as out_file:
             json.dump(ast, out_file)
         logging.info("Wrote %s", filepath_out)
 
@@ -207,7 +207,7 @@ class InnoconvRunner:
             output_filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.json"
             filepath_out = join(self._output_dir, rel_path, output_filename)
             makedirs(dirname(filepath_out), exist_ok=True)
-            with open(filepath_out, "w") as out_file:
+            with open(filepath_out, "w", encoding="utf-8") as out_file:
                 json.dump(ast, out_file)
             logging.info("Wrote %s", filepath_out)
 

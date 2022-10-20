@@ -26,6 +26,9 @@ class WriteManifest(AbstractExtension):
         self._output_dir = None
 
     def _write_manifest(self):
+        if self._output_dir is None:
+            raise ValueError("output directory is None!")
+
         manifest_dict = {}
         for field in Manifest.required_fields:
             manifest_dict[field] = getattr(self._manifest, field)
@@ -44,7 +47,7 @@ class WriteManifest(AbstractExtension):
         # write file
         filename = f"{MANIFEST_BASENAME}.json"
         filepath = join(self._output_dir, filename)
-        with open(filepath, "w") as out_file:
+        with open(filepath, "w", encoding="utf-8") as out_file:
             json.dump(manifest_dict, out_file)
         logging.info("Wrote manifest %s", filepath)
 

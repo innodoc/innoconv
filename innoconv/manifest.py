@@ -71,7 +71,7 @@ class Manifest:
 
         def _read_manifest_data(file_ext):
             filename = f"{MANIFEST_BASENAME}.{file_ext}"
-            with open(os.path.join(dirpath, filename), "r") as file:
+            with open(os.path.join(dirpath, filename), "r", encoding="utf-8") as file:
                 return file.read()
 
         try:
