@@ -15,7 +15,6 @@ are stored. A viewer application can easily display total points per section
 without having to scan all documents for exercises.
 """
 
-from collections import OrderedDict
 import logging
 from pathlib import Path
 
@@ -38,7 +37,7 @@ class NumberBoxes(AbstractExtension):
             "section": 0,
             "subsection": 0,
         }
-        self._boxes = OrderedDict()  # Python3.5 support
+        self._boxes = {}
         self._language = None
         self._parts = None
         self._done = False

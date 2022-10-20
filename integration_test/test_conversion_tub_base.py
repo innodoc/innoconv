@@ -1,6 +1,5 @@
 """Integration tests for conversion process using entry-point innoconv."""
 
-from collections import OrderedDict
 import json
 from os import listdir, sep, walk
 from os.path import isdir, isfile, join
@@ -167,8 +166,7 @@ class TestConversionTubBase(BaseConversionTest):
         filepath = join(self.output_dir, f"{MANIFEST_BASENAME}.json")
         self.assertTrue(isfile(filepath))
         with open(filepath, encoding="utf-8") as file:
-            # For Python3.5 use OrderedDict
-            data = json.load(file, object_pairs_hook=OrderedDict)
+            data = json.load(file)
             self.assertIn("languages", data)
             self.assertIn("de", data["languages"])
             self.assertIn("en", data["languages"])
