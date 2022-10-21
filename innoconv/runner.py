@@ -150,23 +150,18 @@ class InnoconvRunner:
 
     def _process_page(self, page, language):
         try:
-            link_in_nav = page["link_in_nav"]
+            if "nav" not in page["linked"] and "footer" not in page["linked"]:
+                logging.warning(
+                    "Page '%s' should have either 'nav' or 'footer' in 'linked' array."
+                )
         except KeyError:
-            link_in_nav = False
-        try:
-            link_in_footer = page["link_in_footer"]
-        except KeyError:
-            link_in_footer = False
-        if not (link_in_nav or link_in_footer):
-            logging.warning(
-                "Page '%s' should have at least on of "
-                "link_in_nav or link_in_nav set to true."
-            )
-            return
+            logging.warning("Page '%s' should have key 'linked'.")
+
         try:
             page["title"]
         except KeyError:
             page["title"] = {}
+
         input_filename = f"{page['id']}.md"
         filepath = join(self._source_dir, language, PAGES_FOLDER, input_filename)
         rel_path = dirname(relpath(filepath, self._source_dir))

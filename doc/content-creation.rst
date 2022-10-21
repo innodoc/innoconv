@@ -135,8 +135,7 @@ part of the viewer.
   pages:
     - id: about
       icon: info-circle
-      link_in_nav: true
-      link_in_footer: true
+      linked: [nav, footer]
 
 For every page you need to provide a content file in each language. It uses
 the page ID as the name (e.g. :file:`about.md`). The content file is

@@ -11,7 +11,7 @@ from string import ascii_lowercase, digits
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
-REPO_DIR = join(dirname(realpath(__file__)), "tub_base")
+REPO_DIR = join(dirname(realpath(__file__)), "content")
 
 
 class BaseConversionTest(TestCase):

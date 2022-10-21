@@ -20,7 +20,7 @@ OUTPUT_CONTENT_FILENAME = f"{CONTENT_BASENAME}.json"
 
 class TestConversionTubBase(BaseConversionTest):
     """
-    Test conversion of tub_base course.
+    Test conversion of innodoc documentation.
 
     Extensive test of innoConv features combined including extensions.
     """
@@ -106,8 +106,8 @@ class TestConversionTubBase(BaseConversionTest):
 
         self.assertEqual("about", page_about["id"])
         self.assertEqual("info-circle", page_about["icon"])
-        self.assertEqual(True, page_about["link_in_nav"])
-        self.assertEqual(True, page_about["link_in_footer"])
+        self.assertIn("nav", page_about["linked"])
+        self.assertIn("footer", page_about["linked"])
         self.assertEqual("Über diesen Kurs", page_about["title"]["de"])
         self.assertEqual("About this course", page_about["title"]["en"])
         self.assertEqual("Über", page_about["short_title"]["de"])
@@ -115,8 +115,8 @@ class TestConversionTubBase(BaseConversionTest):
 
         self.assertEqual("license", page_license["id"])
         self.assertEqual("copyright", page_license["icon"])
-        self.assertEqual(False, page_license["link_in_nav"])
-        self.assertEqual(True, page_license["link_in_footer"])
+        self.assertNotIn("nav", page_about["linked"])
+        self.assertIn("footer", page_about["linked"])
         self.assertEqual("Lizenz", page_license["title"]["de"])
         self.assertEqual("License", page_license["title"]["en"])
         self.assertEqual("Lizenz", page_license["short_title"]["de"])

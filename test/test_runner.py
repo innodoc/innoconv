@@ -16,8 +16,7 @@ MANIFEST = Manifest(
             {
                 "id": "test1",
                 "icon": "info-circle",
-                "link_in_nav": True,
-                "link_in_footer": False,
+                "linked": ["nav"],
             },
             {"id": "test2"},
         ],
