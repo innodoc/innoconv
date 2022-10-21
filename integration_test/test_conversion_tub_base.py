@@ -74,7 +74,7 @@ class TestConversionTubBase(BaseConversionTest):
 
     def _test_footer_fragments(self):
         for lang in ("de", "en"):
-            for part in ("a", "b"):
+            for part in ("A", "B"):
                 filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.json"
                 filepath = join(self.output_dir, lang, filename)
                 with open(filepath, encoding="utf-8") as file:

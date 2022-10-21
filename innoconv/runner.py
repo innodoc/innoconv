@@ -191,7 +191,7 @@ class InnoconvRunner:
 
     def _process_footer_fragments(self, language):
         for part in ("a", "b"):
-            input_filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.md"
+            input_filename = f"{FOOTER_FRAGMENT_PREFIX}_{part}.md"
             filepath = join(self._source_dir, language, input_filename)
             rel_path = dirname(relpath(filepath, self._source_dir))
             if not exists(filepath):
@@ -204,7 +204,7 @@ class InnoconvRunner:
             self._notify_extensions("post_process_file", ast, title, "fragment", None)
 
             # write json output
-            output_filename = f"{FOOTER_FRAGMENT_PREFIX}{part}.json"
+            output_filename = f"{FOOTER_FRAGMENT_PREFIX}{part.upper()}.json"
             filepath_out = join(self._output_dir, rel_path, output_filename)
             makedirs(dirname(filepath_out), exist_ok=True)
             with open(filepath_out, "w", encoding="utf-8") as out_file:

@@ -42,7 +42,7 @@ STATIC_FOLDER = "_static"
 PAGES_FOLDER = "_pages"
 
 #: Prefix for footer fragment files
-FOOTER_FRAGMENT_PREFIX = "_footer_"
+FOOTER_FRAGMENT_PREFIX = "_footer"
 
 #: CLI exit codes
 EXIT_CODES = {"SUCCESS": 0, "MANIFEST_ERROR": 10, "RUNNER_ERROR": 11}
