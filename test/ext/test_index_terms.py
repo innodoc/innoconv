@@ -52,4 +52,4 @@ class TestIndexTerms(TestExtension):
                 ],
             }
         }
-        self.assertEqual(manifest_fields["index_terms"], index_terms_field)
+        self.assertEqual(manifest_fields["indexTerms"], index_terms_field)

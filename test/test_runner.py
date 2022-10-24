@@ -137,24 +137,29 @@ class TestInnoconvRunner(unittest.TestCase):
         _, makedirs, _, _, json_dump, *_ = args
         self.runner.run()
 
-        self.assertEqual(makedirs.call_count, 16)
-        self.assertEqual(json_dump.call_count, 16)
-
         paths = (
+            # sections
             "/out/de",
             "/out/de/section-1",
             "/out/de/section-1/section-1.1",
             "/out/de/section-1/section-1.2",
             "/out/de/section-2",
+            # pages
             "/out/de/_pages",
+            "/out/de/_pages",
+            # fragments
             "/out/de",
             "/out/de",
+            # sections
             "/out/en",
             "/out/en/section-1",
             "/out/en/section-1/section-1.1",
             "/out/en/section-1/section-1.2",
             "/out/en/section-2",
+            # pages
             "/out/en/_pages",
+            "/out/en/_pages",
+            # fragments
             "/out/en",
             "/out/en",
         )
@@ -163,6 +168,10 @@ class TestInnoconvRunner(unittest.TestCase):
             with self.subTest(path):
                 self.assertEqual(makedirs.call_args_list[i], call(path, exist_ok=True))
                 self.assertEqual(json_dump.call_args_list[i][0][0], ["content_ast"])
+
+        # assert no extra calls
+        self.assertEqual(makedirs.call_count, len(paths))
+        self.assertEqual(json_dump.call_count, len(paths))
 
     def test_run_no_folder(self, isdir, *_):
         """Ensure RuntimeError is raised on missing language folder."""
@@ -265,40 +274,58 @@ class TestInnoconvRunnerExtensions(unittest.TestCase):
         self.assertEqual(mocks["pre_conversion"].call_args_list[0], call("de"))
         self.assertEqual(mocks["pre_conversion"].call_args_list[1], call("en"))
 
-        self.assertEqual(mocks["pre_process_file"].call_count, 16)
         pre_process_file_args = [
+            # sections
             "de",
             "de/section-1",
             "de/section-1/section-1.1",
             "de/section-1/section-1.2",
             "de/section-2",
+            # 2x page
             "de/_pages",
+            "de/_pages",
+            # 2x footer
             "de",
             "de",
+            # sections
             "en",
             "en/section-1",
             "en/section-1/section-1.1",
             "en/section-1/section-1.2",
             "en/section-2",
+            # 2x page
             "en/_pages",
+            "en/_pages",
+            # 2x footer
             "en",
             "en",
         ]
+
+        # pre_process_file hooks
         for i, arg in enumerate(pre_process_file_args):
             self.assertEqual(mocks["pre_process_file"].call_args_list[i], call(arg))
 
-        self.assertEqual(mocks["post_process_file"].call_count, 16)
-        for i in list(range(0, 5)) + list(range(8, 13)):
+        # assert no extra calls
+        self.assertEqual(
+            mocks["post_process_file"].call_count, len(pre_process_file_args)
+        )
+
+        # post_process_file hooks: sections
+        for i in list(range(0, 5)) + list(range(9, 14)):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
                 call(["content_ast"], TITLE, "section", "test", "Short"),
             )
-        for i in (5, 13):
+
+        # post_process_file hooks: pages
+        for i in (5, 6, 14, 15):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
                 call(["content_ast"], TITLE, "page", None),
             )
-        for i in (6, 7, 14, 15):
+
+        # post_process_file hooks: fragments
+        for i in (7, 8, 16, 17):
             self.assertEqual(
                 mocks["post_process_file"].call_args_list[i],
                 call(["content_ast"], TITLE, "fragment", None),

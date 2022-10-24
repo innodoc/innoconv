@@ -3,7 +3,7 @@
 from copy import deepcopy
 from hashlib import md5
 from os.path import join
-from unittest.mock import call, MagicMock, patch
+from unittest.mock import call, MagicMock, Mock, patch
 
 from innoconv.ext.tikz2svg import (
     Tikz2Svg,
@@ -39,12 +39,15 @@ IMAGE_BLOCK = get_image_ast(
 
 @patch(
     "innoconv.ext.tikz2svg.TemporaryDirectory",
-    return_value=MagicMock(__enter__=MagicMock(return_value="")),
+    return_value=MagicMock(__enter__=Mock(return_value="")),
 )
 @patch("innoconv.ext.tikz2svg.mkdir")
 @patch("innoconv.ext.tikz2svg.rmtree")
 @patch("innoconv.ext.tikz2svg.copytree")
-@patch("innoconv.ext.tikz2svg.Popen", return_value=MagicMock(returncode=0))
+@patch(
+    "innoconv.ext.tikz2svg.Popen",
+    return_value=MagicMock(__enter__=Mock(return_value=Mock(returncode=0))),
+)
 class TestTikz2Svg(TestExtension):
     """Test the Tikz2Svg extension."""
 
@@ -93,8 +96,8 @@ class TestTikz2Svg(TestExtension):
         manifest = Manifest(manifest_data)
         input_ast = [deepcopy(TIKZ_BLOCK)]
         self._run(Tikz2Svg, input_ast, paths=PATHS, manifest=manifest)
-        written = mock_popen.return_value.stdin.write.call_args[0][0].decode()
-        self.assertIn(TIKZ_PREAMBLE, written)
+        pipe_mock = mock_popen.return_value.__enter__.return_value
+        self.assertIn(TIKZ_PREAMBLE, pipe_mock.stdin.write.call_args[0][0].decode())
 
     def test_directory_overwrite(self, _, mock_ct, mock_rmtree, *__):
         """Test overwriting of exisiting files."""
@@ -114,11 +117,11 @@ class TestTikz2Svg(TestExtension):
 
     def test_conversion_error(self, mock_popen, *_):
         """Test failed conversion."""
-        rv_orig = mock_popen.return_value.returncode
+        rc_orig = mock_popen.return_value.__enter__.return_value.returncode
         try:
-            mock_popen.return_value.returncode = 1
+            mock_popen.return_value.__enter__.return_value.returncode = 1
             input_ast = [deepcopy(TIKZ_BLOCK)]
             with self.assertRaises(RuntimeError):
                 self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
         finally:
-            mock_popen.return_value.returncode = rv_orig
+            mock_popen.return_value.__enter__.return_value.returncode = rc_orig
