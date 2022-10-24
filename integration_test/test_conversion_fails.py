@@ -72,7 +72,7 @@ class TestConversionFailDirectoryStructure(BaseConversionTest):
         """A conversion should fail on inconsistent content directories."""
 
         def _ignore(path, _):
-            if "en/02-elements/04-links/01-internal" in path:
+            if "en/02-elements/02-links/01-internal" in path:
                 return ["content.md"]
             return []
 

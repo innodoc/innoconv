@@ -68,7 +68,7 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertTrue(isdir(join(self.output_dir, lang)))
             self.assertTrue(isdir(join(self.output_dir, lang, "02-elements")))
             self.assertTrue(
-                isdir(join(self.output_dir, lang, "02-elements", "02-headings"))
+                isdir(join(self.output_dir, lang, "02-elements", "01-basics"))
             )
             self.assertTrue(isdir(join(self.output_dir, lang, "01-project")))
 
@@ -105,7 +105,7 @@ class TestConversionTubBase(BaseConversionTest):
         page_about, page_license = manifest["pages"]
 
         self.assertEqual("about", page_about["id"])
-        self.assertEqual("info-circle", page_about["icon"])
+        self.assertEqual("mdi:information-outline", page_about["icon"])
         self.assertIn("nav", page_about["linked"])
         self.assertIn("footer", page_about["linked"])
         self.assertEqual("Über diesen Kurs", page_about["title"]["de"])
@@ -114,9 +114,9 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual("About", page_about["short_title"]["en"])
 
         self.assertEqual("license", page_license["id"])
-        self.assertEqual("copyright", page_license["icon"])
-        self.assertNotIn("nav", page_about["linked"])
-        self.assertIn("footer", page_about["linked"])
+        self.assertEqual("mdi:copyright", page_license["icon"])
+        self.assertNotIn("nav", page_license["linked"])
+        self.assertIn("footer", page_license["linked"])
         self.assertEqual("Lizenz", page_license["title"]["de"])
         self.assertEqual("License", page_license["title"]["en"])
         self.assertEqual("Lizenz", page_license["short_title"]["de"])
@@ -137,13 +137,13 @@ class TestConversionTubBase(BaseConversionTest):
 
     def _test_copy_static(self):
         files = (
-            ("02-elements", "07-media", "adam.jpg"),
-            ("02-elements", "07-media", "star.png"),
-            ("02-elements", "07-media", "tu-logo.png"),
-            ("02-elements", "07-media", "video.mp4"),
+            ("02-elements", "04-media", "adam.jpg"),
+            ("02-elements", "04-media", "star.png"),
+            ("02-elements", "04-media", "tu-logo.png"),
+            ("02-elements", "04-media", "video.mp4"),
             ("subfolder", "math.jpg"),
-            ("_en", "02-elements", "07-media", "lines.png"),
-            ("_de", "02-elements", "07-media", "lines.png"),
+            ("_en", "02-elements", "04-media", "lines.png"),
+            ("_de", "02-elements", "04-media", "lines.png"),
         )
         for file in files:
             with self.subTest(file=file):
@@ -151,7 +151,7 @@ class TestConversionTubBase(BaseConversionTest):
                 self.assertTrue(isfile(full_filename))
 
     def _test_verbose_output(self, stderr):
-        for section in ("06-formulas", "10-interactive-exercises"):
+        for section in ("03-formulas", "07-interactive-exercises"):
             with self.subTest(section):
                 path = join("de", "02-elements", section, "content.json")
                 self.assertIn(path, stderr)
@@ -160,7 +160,7 @@ class TestConversionTubBase(BaseConversionTest):
     def _test_tikz2svg(self):
         folder = join(self.output_dir, STATIC_FOLDER, TIKZ_FOLDER)
         length = len([n for n in listdir(folder) if n.endswith(".svg")])
-        self.assertEqual(length, 5)
+        self.assertEqual(length, 6)
 
     def _test_write_manifest(self, stderr):
         filepath = join(self.output_dir, f"{MANIFEST_BASENAME}.json")
@@ -177,8 +177,8 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertEqual("innoDoc", data["title"]["de"])
             self.assertEqual("innoDoc", data["title"]["en"])
             self.assertEqual("_logo.svg", data["logo"])
-            self.assertEqual("/page/about", data["home_link"])
-            self.assertEqual(90, data["min_score"])
+            self.assertEqual("/page/about", data["homeLink"])
+            self.assertEqual(90, data["minScore"])
         self.assertIn("Wrote manifest", stderr)
         return data
 
@@ -190,31 +190,32 @@ class TestConversionTubBase(BaseConversionTest):
         self.assertEqual("01-project", sec_proj["id"])
         self.assertEqual(4, len(sec_proj["children"]))
         sec_folders = sec_proj["children"][0]
-        self.assertEqual("Ordnerstruktur", sec_folders["title"]["de"])
+        self.assertEqual("Verzeichnisse", sec_folders["title"]["de"])
         self.assertEqual("Folders", sec_folders["title"]["en"])
         self.assertEqual("01-folders", sec_folders["id"])
         self.assertNotIn("children", sec_folders)
 
     def _test_index_terms(self, manifest):
-        self.assertIn("index_terms", manifest)
-        index_terms = manifest["index_terms"]
+        self.assertIn("indexTerms", manifest)
+        index_terms = manifest["indexTerms"]
         self.assertEqual(len(index_terms["de"]), len(index_terms["en"]))
 
         term, occurrences = index_terms["en"]["latex-formula"]
         self.assertEqual(term, "$\\LaTeX$ formula")
         self.assertEqual(1, len(occurrences))
-        self.assertEqual("02-elements/11-index", occurrences[0][0])
+        self.assertEqual("02-elements/08-index", occurrences[0][0])
         self.assertEqual("latex-formula-0", occurrences[0][1])
 
         term, occurrences = index_terms["de"]["latex-formel"]
         self.assertEqual(term, "$\\LaTeX$-Formel")
         self.assertEqual(1, len(occurrences))
-        self.assertEqual("02-elements/11-index", occurrences[0][0])
+        self.assertEqual("02-elements/08-index", occurrences[0][0])
         self.assertEqual("latex-formel-0", occurrences[0][1])
 
     def _test_number_cards(self, manifest):
         self.assertIn("cards", manifest)
         cards = manifest["cards"]
+
         self.assertEqual(
             list(cards.keys()),
             [
@@ -223,14 +224,19 @@ class TestConversionTubBase(BaseConversionTest):
                 "01-project/02-files/02-content",
                 "01-project/03-languages",
                 "01-project/04-building",
-                "02-elements/04-links/01-internal",
-                "02-elements/04-links/02-external",
-                "02-elements/06-formulas",
-                "02-elements/07-media/01-pgf-tikz",
-                "02-elements/10-interactive-exercises",
-                "02-elements/10-interactive-exercises/01-text",
-                "02-elements/10-interactive-exercises/02-checkbox",
-                "02-elements/11-index",
+                "02-elements/01-basics",
+                "02-elements/02-links/01-internal",
+                "02-elements/02-links/02-external",
+                "02-elements/03-formulas",
+                "02-elements/04-media",
+                "02-elements/04-media/01-pgf-tikz",
+                "02-elements/05-tables",
+                "02-elements/06-grids",
+                "02-elements/07-interactive-exercises",
+                "02-elements/07-interactive-exercises/01-text",
+                "02-elements/07-interactive-exercises/02-checkbox",
+                "02-elements/08-index",
+                "03-test",
             ],
         )
 
@@ -243,17 +249,17 @@ class TestConversionTubBase(BaseConversionTest):
             ],
         )
         self.assertEqual(
-            cards["02-elements/10-interactive-exercises"],
+            cards["02-elements/07-interactive-exercises"],
             [
-                ["EX_DUMMY", "2.10.1", "exercise", 0, 0],
-                ["example-2.10.2", "2.10.2", "example"],
-                ["EX_FULL", "2.10.3", "exercise", 4, 1],
+                ["EX_DUMMY", "2.7.1", "exercise", 0, 0],
+                ["example-2.7.2", "2.7.2", "example"],
+                ["EX_FULL", "2.7.3", "exercise", 4, 1],
             ],
         )
         self.assertEqual(
-            cards["02-elements/11-index"],
+            cards["02-elements/08-index"],
             [
-                ["example-2.11.1", "2.11.1", "example"],
-                ["info-2.11.2", "2.11.2", "info"],
+                ["example-2.8.1", "2.8.1", "example"],
+                ["info-2.8.2", "2.8.2", "info"],
             ],
         )
