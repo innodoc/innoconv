@@ -10,10 +10,9 @@ cache: &cache
     - .pip-cache
     - .tox
 
-variables: &variables
+variables:
   GIT_SUBMODULE_STRATEGY: recursive
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
-  SEMVER_REGEXP: '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
   IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   IMAGE_CI_TAG: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG
   IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
@@ -22,9 +21,9 @@ before_script:
   - source /etc/profile
   - source $HOME/.bash_profile
 
-.docker-default-vars: &docker-default-vars
-  <<: *variables
-  GIT_SUBMODULE_STRATEGY: none
+.only_semver:
+  rules:
+    - if: $CI_COMMIT_TAG =~ "^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$"
 
 .docker-base: &docker-base
   image: docker
@@ -36,7 +35,7 @@ before_script:
     - docker logout "$CI_REGISTRY"
   cache: {}
   variables:
-    <<: *docker-default-vars
+    GIT_SUBMODULE_STRATEGY: none
 
 # Docker build
 
@@ -61,7 +60,7 @@ Build CI image:
     - docker build --pull --cache-from "$IMAGE_TAG" --cache-from "$IMAGE_RELEASE_TAG" --cache-from "$IMAGE_CI_TAG" --tag "$IMAGE_CI_TAG" --build-arg INNOCONV_IMAGE="$IMAGE_TAG" -f Dockerfile.ci .
     - docker push "$IMAGE_CI_TAG"
 
-# tox-based tests
+# tox jobs
 
 Python 3.10 unit tests:
   stage: test
@@ -133,8 +132,8 @@ Push main image:
     - docker tag "$IMAGE_TAG" "$IMAGE_RELEASE_TAG"
     - docker push "$IMAGE_RELEASE_TAG"
   variables:
-    <<: *docker-default-vars
     GIT_STRATEGY: none
+    GIT_SUBMODULE_STRATEGY: none
   only:
     - main
 
@@ -142,7 +141,6 @@ Push tag image:
   <<: *docker-base
   stage: release
   script:
-    - if echo "$CI_COMMIT_TAG" | grep -qvE "$SEMVER_REGEXP"; then echo "Not a semver tag. Happily skipping..."; exit 0; fi
     - docker pull "$IMAGE_TAG"
     - docker tag "$IMAGE_TAG" "$CI_REGISTRY_IMAGE":"${CI_COMMIT_TAG#v}"
     - docker push "$CI_REGISTRY_IMAGE":"${CI_COMMIT_TAG#v}"
@@ -153,10 +151,26 @@ Push tag image:
     - docker push "$DOCKER_HUB_REGISTRY_IMAGE"
     - docker logout "$DOCKER_HUB_REGISTRY"
   variables:
-    <<: *docker-default-vars
     GIT_STRATEGY: none
-  only:
-    - tags
+    GIT_SUBMODULE_STRATEGY: none
+  rules:
+    - !reference [.only_semver, rules]
+
+# GitLab release page
+
+GitLab release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo "release job"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    description: "Release $CI_COMMIT_TAG"
+  variables:
+    GIT_STRATEGY: none
+    GIT_SUBMODULE_STRATEGY: none
+  rules:
+    - !reference [.only_semver, rules]
 
 # PyPI version release
 
@@ -164,11 +178,10 @@ Upload to PyPI:
   stage: release
   image: $IMAGE_CI_TAG
   script:
-    - if echo "$CI_COMMIT_TAG" | grep -qvE "$SEMVER_REGEXP"; then echo "Not a semver tag. Happily skipping..."; exit 0; fi
     - tox -e release
   variables:
-    <<: *variables
     TWINE_USERNAME: $PYPI_USERNAME
     TWINE_PASSWORD: $PYPI_PASSWORD
-  only:
-    - tags
+    GIT_SUBMODULE_STRATEGY: none
+  rules:
+    - !reference [.only_semver, rules]
