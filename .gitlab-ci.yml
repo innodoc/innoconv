@@ -13,9 +13,10 @@ variables:
   IMAGE_CI_TAG: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG
   IMAGE_RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
 
-.cache-paths: $cache-paths
-  - .pip-cache
-  - .tox
+.cache-pip: &cache-pip
+  paths:
+    - .pip-cache
+    - .tox
 
 .only-semver-tag: &only-semver-tag
   variables:
@@ -67,18 +68,16 @@ Python 3.10 unit tests:
   script: tox -e py310-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py310"
-    paths:
-      <<: *cache-paths
 
 Python 3.10 integration tests:
   stage: test
   image: $IMAGE_CI_TAG
   script: tox -e py310-integration
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py310"
-    paths:
-      <<: *cache-paths
     policy: pull
 
 Python 3.9 unit tests:
@@ -87,18 +86,16 @@ Python 3.9 unit tests:
   script: tox -e py39-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py39"
-    paths:
-      <<: *cache-paths
 
 Python 3.9 integration tests:
   stage: test
   image: $IMAGE_CI_TAG
   script: tox -e py39-integration
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py39"
-    paths:
-      <<: *cache-paths
     policy: pull
 
 Python 3.8 unit tests:
@@ -107,18 +104,16 @@ Python 3.8 unit tests:
   script: tox -e py38-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py38"
-    paths:
-      <<: *cache-paths
 
 Python 3.8 integration tests:
   stage: test
   image: $IMAGE_CI_TAG
   script: tox -e py38-integration
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py38"
-    paths:
-      <<: *cache-paths
     policy: pull
 
 Python 3.7 unit tests:
@@ -127,18 +122,16 @@ Python 3.7 unit tests:
   script: tox -e py37-unit
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)/'
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py37"
-    paths:
-      <<: *cache-paths
 
 Python 3.7 integration tests:
   stage: test
   image: $IMAGE_CI_TAG
   script: tox -e py37-integration
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py37"
-    paths:
-      <<: *cache-paths
     policy: pull
 
 Linting:
@@ -146,9 +139,8 @@ Linting:
   image: $IMAGE_CI_TAG
   script: tox -e linters
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py310"
-    paths:
-      <<: *cache-paths
     policy: pull
 
 Documentation:
@@ -156,9 +148,8 @@ Documentation:
   image: $IMAGE_CI_TAG
   script: tox -e docs
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py310"
-    paths:
-      <<: *cache-paths
     policy: pull
 
 # Docker release
@@ -198,7 +189,6 @@ Push semver tag image:
 # GitLab release page
 
 GitLab release:
-  <<: *rules-semver-tag
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
@@ -216,7 +206,6 @@ GitLab release:
 # PyPI version release
 
 Upload to PyPI:
-  <<: *rules-semver-tag
   stage: release
   image: $IMAGE_CI_TAG
   script:
@@ -228,7 +217,6 @@ Upload to PyPI:
   only:
     <<: *only-semver-tag
   cache:
+    <<: *cache-pip
     key: "${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}-py310"
-    paths:
-      <<: *cache-paths
     policy: pull
