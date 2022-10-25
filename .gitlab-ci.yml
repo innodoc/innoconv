@@ -125,7 +125,7 @@ Documentation:
 
 # Docker release
 
-Push master image:
+Push main image:
   <<: *docker-base
   stage: release
   script:
@@ -136,7 +136,7 @@ Push master image:
     <<: *docker-default-vars
     GIT_STRATEGY: none
   only:
-    - master
+    - main
 
 Push tag image:
   <<: *docker-base
