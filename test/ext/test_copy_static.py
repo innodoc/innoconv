@@ -77,7 +77,7 @@ class TestCopyStatic(TestExtension):
             copyfile.call_args_list,
         )
         manifest_fields = copy_static.manifest_fields()
-        self.assertEqual(manifest_fields["logo"], "_logo.svg")
+        self.assertEqual(manifest_fields["logo"], "file:_logo.svg")
 
     def test_no_logo(self, copyfile, *_):
         """Test logo copy."""

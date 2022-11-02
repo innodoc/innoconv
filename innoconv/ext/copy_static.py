@@ -200,4 +200,4 @@ class CopyStatic(AbstractExtension):
 
     def manifest_fields(self):
         """Add `logo` field to manifest."""
-        return {"logo": self._logo_filename} if self._logo_filename else {}
+        return {"logo": f"file:{self._logo_filename}"} if self._logo_filename else {}

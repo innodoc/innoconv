@@ -176,7 +176,7 @@ class TestConversionTubBase(BaseConversionTest):
             self.assertIn("mathjax", data)
             self.assertEqual("innoDoc", data["title"]["de"])
             self.assertEqual("innoDoc", data["title"]["en"])
-            self.assertEqual("_logo.svg", data["logo"])
+            self.assertEqual("file:_logo.svg", data["logo"])
             self.assertEqual("/page/about", data["homeLink"])
             self.assertEqual(90, data["minScore"])
         self.assertIn("Wrote manifest", stderr)
