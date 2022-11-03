@@ -3,7 +3,7 @@
 from copy import deepcopy
 from hashlib import md5
 from os.path import join
-from unittest.mock import call, MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from innoconv.ext.tikz2svg import (
     Tikz2Svg,
@@ -37,13 +37,18 @@ IMAGE_BLOCK = get_image_ast(
 )
 
 
+@patch("innoconv.ext.tikz2svg.scour")
+@patch(
+    "innoconv.ext.tikz2svg.open",
+    return_value=MagicMock(
+        __enter__=Mock(return_value=Mock(read=Mock(return_value="<svg></svg>")))
+    ),
+)
 @patch(
     "innoconv.ext.tikz2svg.TemporaryDirectory",
     return_value=MagicMock(__enter__=Mock(return_value="")),
 )
-@patch("innoconv.ext.tikz2svg.mkdir")
-@patch("innoconv.ext.tikz2svg.rmtree")
-@patch("innoconv.ext.tikz2svg.copytree")
+@patch("innoconv.ext.tikz2svg.makedirs")
 @patch(
     "innoconv.ext.tikz2svg.Popen",
     return_value=MagicMock(__enter__=Mock(return_value=Mock(returncode=0))),
@@ -52,15 +57,15 @@ class TestTikz2Svg(TestExtension):
     """Test the Tikz2Svg extension."""
 
     def test_simple_life_cycle(
-        self, mock_popen, mock_ct, mock_rmtree, mock_mkdir, mock_td
+        self, mock_popen, mock_mkdir, mock_td, mock_open, mock_scour
     ):
         """Test successful lifecycle."""
         input_ast = [deepcopy(TIKZ_BLOCK)]
         _, asts = self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
+        self.assertTrue(mock_open.called)
+        self.assertTrue(mock_scour.scourString.called)
         self.assertTrue(mock_td.called)
-        self.assertTrue(mock_ct.called)
         self.assertTrue(mock_mkdir.called)
-        self.assertFalse(mock_rmtree.called)
         self.assertEqual(mock_popen.call_count, 2)
         image = asts[0][0]
         self.assertEqual(image["t"], "Image")
@@ -98,14 +103,6 @@ class TestTikz2Svg(TestExtension):
         self._run(Tikz2Svg, input_ast, paths=PATHS, manifest=manifest)
         pipe_mock = mock_popen.return_value.__enter__.return_value
         self.assertIn(TIKZ_PREAMBLE, pipe_mock.stdin.write.call_args[0][0].decode())
-
-    def test_directory_overwrite(self, _, mock_ct, mock_rmtree, *__):
-        """Test overwriting of exisiting files."""
-        mock_ct.side_effect = (FileExistsError, None)
-        input_ast = [deepcopy(TIKZ_BLOCK)]
-        self._run(Tikz2Svg, input_ast, languages=("en",), paths=PATHS)
-        self.assertEqual(mock_ct.call_count, 2)
-        self.assertEqual(mock_rmtree.call_args, call("/destination/_static/_tikz"))
 
     def test_no_tikz_images(self, *_):
         """Test without any TikZ images."""
