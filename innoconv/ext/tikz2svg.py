@@ -59,6 +59,8 @@ TEX_FILE_TEMPLATE = r"""
 \usepackage{{tikz}}
 {preamble}
 \begin{{document}}
+\definecolor{{currentcolor}}{{HTML}}{{FE00FE}}
+\color{{currentcolor}}
 \tikzset{{every picture/.style={{
   scale=2.0,every node/.style={{scale=2.0}}}}
 }}
@@ -191,6 +193,10 @@ class Tikz2Svg(AbstractExtension):
 
         # optimize SVG and scope IDs to prevent collisions
         svg_code = scour.scourString(svg_code, self._get_scour_options(tikz_hash[:5]))
+
+        # support styling color using CSS
+        svg_code = svg_code.replace('fill="#fe00fe"', 'fill="currentColor"')
+        svg_code = svg_code.replace('stroke="#fe00fe"', 'stroke="currentColor"')
 
         # save SVG file
         tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
