@@ -43,9 +43,8 @@ to the following.
 
 from hashlib import md5
 from logging import critical, info
-from os import mkdir
+from os import makedirs
 from os.path import join
-from shutil import copytree, rmtree
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
 
@@ -59,7 +58,7 @@ TEX_FILE_TEMPLATE = r"""
 {preamble}
 \begin{{document}}
 \tikzset{{every picture/.style={{
-  scale=1.4,every node/.style={{scale=1.4}}}}
+  scale=2.0,every node/.style={{scale=2.0}}}}
 }}
 {tikz_code}
 \end{{document}}
@@ -83,15 +82,15 @@ class Tikz2Svg(AbstractExtension):
         self._tikz_images = {}
 
     @staticmethod
-    def _run(cmd, cwd, stdin=None):
+    def _run(cmd, cwd, cmd_input=None):
         with Popen(
             cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=cwd
         ) as pipe:
             if pipe.stdin is None or pipe.stdout is None or pipe.stderr is None:
                 raise RuntimeError("Failed to open pipe!")
 
-            if stdin is not None:
-                pipe.stdin.write(stdin.encode(ENCODING))
+            if cmd_input is not None:
+                pipe.stdin.write(cmd_input)
                 pipe.stdin.close()
             pipe.wait()
             if pipe.returncode != 0:
@@ -130,54 +129,50 @@ class Tikz2Svg(AbstractExtension):
                 and parent["c"][1][0]["t"] == "Para"
             ):
                 caption = parent["c"][1].pop(0)["c"]
-                self._tikz_found(elem, caption)
+                self._tikz_found(elem, caption=caption)
                 return
         except KeyError:
             pass
         self._tikz_found(elem)
 
-    def _render_and_copy_tikz(self):
+    def _get_texdoc(self, tikz_code):
+        """Generate tex document from TikZ code."""
+        try:
+            preamble = self._manifest.tikz_preamble
+        except AttributeError:
+            preamble = ""
+        # as this template is used with .format() we need to escape
+        # curly brackets
+        preamble.replace("{", "{{")
+        preamble.replace("}", "}}")
+        return TEX_FILE_TEMPLATE.format(tikz_code=tikz_code, preamble=preamble)
+
+    def _render_svg(self, tikz_hash, tikz_code):
         if self._output_dir is None:
             raise RuntimeError("output dir is None!")
 
-        info("Compiling %d TikZ images.", len(self._tikz_images))
-        if not self._tikz_images:
-            return
-        with TemporaryDirectory(prefix="innoconv-tikz2pdf-") as tmp_dir:
-            pdf_path = join(tmp_dir, "pdf_out")
-            mkdir(pdf_path)
-            svg_path = join(tmp_dir, "svg_out")
-            mkdir(svg_path)
-            for tikz_hash, tikz_code in self._tikz_images.items():
-                file_base = Tikz2Svg._get_tikz_name(tikz_hash)
-                # generate tex document
-                try:
-                    preamble = self._manifest.tikz_preamble
-                except AttributeError:
-                    preamble = ""
-                # as this template is used with .format() we need to escape
-                # curly brackets
-                preamble.replace("{", "{{")
-                preamble.replace("}", "}}")
-                texdoc = TEX_FILE_TEMPLATE.format(
-                    tikz_code=tikz_code, preamble=preamble
-                )
-                info("Compiling %s", file_base)
-                # compile tex
-                cmd = CMD_PDFLATEX.format(join("pdf_out", file_base))
-                self._run(cmd, tmp_dir, stdin=texdoc)
-                # convert to SVG
-                pdf_filename = join(pdf_path, f"{file_base}.pdf")
-                svg_filename = join(svg_path, f"{file_base}.svg")
-                cmd = CMD_PDF2SVG.format(pdf_filename, svg_filename)
-                self._run(cmd, tmp_dir)
-            # copy SVG files
-            tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
-            try:
-                copytree(svg_path, tikz_path)
-            except FileExistsError:
-                rmtree(tikz_path)
-                copytree(svg_path, tikz_path)
+        texdoc = self._get_texdoc(tikz_code)
+        file_base = Tikz2Svg._get_tikz_name(tikz_hash)
+
+        with TemporaryDirectory(prefix=f"innoconv-tikz2pdf-{tikz_hash}-") as tmp_dir:
+            # Generate PDF from TikZ code
+            pdflatex_cmd = CMD_PDFLATEX.format(file_base)
+
+            # Convert PDF to SVG
+            pdf_filename = join(tmp_dir, f"{file_base}.pdf")
+            svg_filename = join(tmp_dir, f"{file_base}.svg")
+            self._run(pdflatex_cmd, tmp_dir, cmd_input=texdoc.encode(ENCODING))
+            pdf2svg_cmd = CMD_PDF2SVG.format(pdf_filename, svg_filename)
+            self._run(pdf2svg_cmd, tmp_dir)
+            with open(svg_filename, "r", encoding=ENCODING) as svg_file:
+                svg_code = svg_file.read()
+
+        # save SVG file
+        tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
+        svg_filename = join(tikz_path, f"{file_base}.svg")
+        makedirs(tikz_path, exist_ok=True)
+        with open(svg_filename, "w", encoding=ENCODING) as svg_file:
+            svg_file.write(svg_code)
 
     def process_element(self, elem, parent):
         """Respond to AST element."""
@@ -202,4 +197,9 @@ class Tikz2Svg(AbstractExtension):
 
     def finish(self):
         """Render images and copy SVG files to the static folder."""
-        self._render_and_copy_tikz()
+        info("Compiling %d TikZ images.", len(self._tikz_images))
+        if not self._tikz_images:
+            return
+
+        for tikz_hash, tikz_code in self._tikz_images.items():
+            self._render_svg(tikz_hash, tikz_code)
