@@ -37,6 +37,7 @@ def setup_package():
             "coloredlogs>=15,<16",
             "python-slugify>=6,<7",
             "PyYAML>=6,<7",
+            "scour>=0,<1",
         ],
         packages=["innoconv", "innoconv.ext"],
         python_requires=">=3.7.0",

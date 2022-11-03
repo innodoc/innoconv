@@ -48,6 +48,8 @@ from os.path import join
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
 
+from scour import scour
+
 from innoconv.constants import ENCODING, STATIC_FOLDER
 from innoconv.ext.abstract import AbstractExtension
 from innoconv.traverse_ast import TraverseAst
@@ -105,6 +107,26 @@ class Tikz2Svg(AbstractExtension):
     @staticmethod
     def _get_tikz_name(tikz_hash):
         return TIKZ_FILENAME.format(tikz_hash)
+
+    @staticmethod
+    def _get_scour_options(ids_prefix):
+        opts = scour.sanitizeOptions(options=None)
+        opts.create_groups = True
+        opts.remove_metadata = True
+        opts.strip_xml_prolog = True
+        opts.remove_titles = True
+        opts.remove_descriptions = True
+        opts.remove_metadata = True
+        opts.remove_descriptive_elements = True
+        opts.strip_comments = True
+        opts.indent_type = "none"
+        opts.indent_depth = 0
+        opts.newlines = False
+        opts.strip_xml_space_attribute = True
+        opts.strip_ids = True
+        opts.shorten_ids = True
+        opts.shorten_ids_prefix = ids_prefix
+        return opts
 
     def _tikz_found(self, element, caption=None):
         """Remember TikZ code and replace with image."""
@@ -166,6 +188,9 @@ class Tikz2Svg(AbstractExtension):
             self._run(pdf2svg_cmd, tmp_dir)
             with open(svg_filename, "r", encoding=ENCODING) as svg_file:
                 svg_code = svg_file.read()
+
+        # optimize SVG and scope IDs to prevent collisions
+        svg_code = scour.scourString(svg_code, self._get_scour_options(tikz_hash[:5]))
 
         # save SVG file
         tikz_path = join(self._output_dir, STATIC_FOLDER, TIKZ_FOLDER)
